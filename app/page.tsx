@@ -88,20 +88,21 @@ export default function Home() {
 
             return (
               <button
-                key={index}
-                onClick={() =>
-                  isAvailable &&
-                  router.push(`/country/ref?country=${encodeURIComponent(country.toLowerCase().replace(/\s+/g, "-"))}`)
-                }
-                disabled={!isAvailable}
-                className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
-                  ${isAvailable
-                    ? "bg-white opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110"
-                    : "bg-transparent text-gray-400 bg-white cursor-not-allowed shadow-none"
-                  }`}
-              >
-                {country}
-              </button>
+              key={index}
+              onClick={() =>
+                isAvailable &&
+                router.push(`/country/${encodeURIComponent(country.toLowerCase().replace(/\s+/g, "-"))}`)
+              }
+              disabled={!isAvailable}
+              className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
+                ${isAvailable
+                  ? "bg-white opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110"
+                  : " text-gray-400 bg-white cursor-not-allowed shadow-none"
+                }`}
+            >
+              {country}
+            </button>
+
             );
           })}
         </div>

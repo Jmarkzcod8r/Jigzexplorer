@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 import fs from "fs";
 import path from "path";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { country: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ country: string }> }
+
 ) {
   try {
-    const { country } = params;
+    const  country  = (await params).country;
 
     // Path to the specific country's folder
     const imagesDir = path.join(process.cwd(), "public", "Europe-Pics", country);
