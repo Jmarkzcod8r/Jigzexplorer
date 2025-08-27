@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
+import axios from "axios";
 
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
@@ -12,18 +13,15 @@ const JigsawPuzzle: React.FC = () => {
   // Fetch images for the given country
   useEffect(() => {
     const fetchImages = async () => {
-      try {
-        const res = await fetch(`/api/images/${country}`);
-        if (!res.ok) throw new Error("Failed to fetch images");
-
-        const data: string[] = await res.json();
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
-        setImageList(shuffled);
-      } catch (err) {
-        console.error("Error fetching images:", err);
-        alert("Error getting data");
-      }
-    };
+        try {
+          const res = await axios.get<string[]>(`/api/images/${country}`);
+          const shuffled = [...res.data].sort(() => Math.random() - 0.5);
+          setImageList(shuffled);
+        } catch (err) {
+          console.error("Error fetching images:", err);
+          alert("Error getting data");
+        }
+      };
 
     if (country) fetchImages();
   }, [country]);
