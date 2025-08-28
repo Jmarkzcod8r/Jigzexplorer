@@ -1,61 +1,55 @@
 import dbConnect from "../../mongodb/connection/dbConnection";
 import Profile from "../../mongodb/schemas/profile";
 
-export async function POST(req: Request) {
-  await dbConnect(); // ✅ ensure DB is connected
+// ✅ Get profile with caching logic
+export async function GET(req: Request) {
+  await dbConnect();
 
   try {
-    const {  name, email } = await req.json();
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email");
+    const lastUpdate = url.searchParams.get("last_update"); // from frontend localStorage
 
-    const profile = new Profile({
-    //   _id,
-      name,
-      email,
-      date: new Date().toISOString(), // ✅ auto-generate date
-    });
+    if (!email) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Email is required" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-    await profile.save();
+    // Always fetch updatedAt only for comparison
+    const profile = await Profile.findOne({ email }).select("updatedAt");
 
-    const statusMessage = email
-      ? "Your feedback has been accounted for. Thank you."
-      : "Uh-oh. Something seems to be wrong. Try again later.";
+    if (!profile) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Profile not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // If frontend has same updatedAt, tell it no need to refresh
+    if (lastUpdate && new Date(lastUpdate).getTime() === new Date(profile.updatedAt).getTime()) {
+      return new Response(
+        JSON.stringify({ success: true, upToDate: true }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Otherwise fetch full profile
+    const fullProfile = await Profile.findOne({ email });
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: statusMessage,
-        data: profile,
+        upToDate: false,
+        data: fullProfile,
       }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("❌ Error saving profile:", error);
+    console.error("❌ Error fetching profile:", error);
     return new Response(
-      JSON.stringify({ success: false, error: "Failed to save profile" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  }
-}
-
-export async function GET() {
-  await dbConnect();
-
-  try {
-    const profiles = await Profile.find({});
-    return new Response(JSON.stringify(profiles), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("❌ Error fetching profiles:", error);
-    return new Response(
-      JSON.stringify({ success: false, error: "Failed to fetch profiles" }),
+      JSON.stringify({ success: false, error: "Failed to fetch profile" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

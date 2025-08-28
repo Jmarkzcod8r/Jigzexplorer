@@ -22,21 +22,30 @@ export default function Home() {
   ];
 
   const handleClick = () => {
-    Swal.fire({
-      title: "Sign In Required",
-      text: "Proceed to Login page?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Proceed",
-      cancelButtonText: "Stay",
-      confirmButtonColor: "#2563eb", // Tailwind blue-600
-      cancelButtonColor: "#6b7280",  // Tailwind gray-500
-    }).then((result) => {
-      if (result.isConfirmed) {
-        router.push("/login"); // 👈 redirect if proceed
-      }
-    });
+    const email = localStorage.getItem("email");
+
+    if (email) {
+      // 👈 if email exists in localStorage, go to profile
+      router.push("/profile");
+    } else {
+      // 👈 if no email, show SweetAlert
+      Swal.fire({
+        title: "Sign In Required",
+        text: "Proceed to Login page?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Proceed",
+        cancelButtonText: "Stay",
+        confirmButtonColor: "#2563eb", // Tailwind blue-600
+        cancelButtonColor: "#6b7280",  // Tailwind gray-500
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login"); // 👈 redirect if proceed
+        }
+      });
+    }
   };
+
 
   return (
     <div

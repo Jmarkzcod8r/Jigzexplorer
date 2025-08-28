@@ -9,7 +9,7 @@ export default function ScoresPage() {
   const [scores, setScores] = useState<any[]>([]);
   const [countries, setCountries] = useState<
     { name: string; unlock: boolean; score: number; datePlayed: string }[]
-  >([]);
+  >([]); // This is a type list.
 
   // ✅ Fetch all scores on load
 //   useEffect(() => {
