@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Flag, User, Trophy, Settings as SettingsIcon, ArrowLeft, ShoppingCart } from "lucide-react";
 import Swal from "sweetalert2";
 
@@ -9,8 +9,10 @@ export default function Home() {
   const router = useRouter();
   const [menu, setMenu] = useState<"main" | "countries">("main");
 
-  const available_countries = ["Denmark", "Estonia", "Finland", "France", "Germany", "Switzerland"];
+  // 🔹 Default countries
+  const default_countries = ["Denmark", "Estonia", "Finland", "France", "Germany", "Switzerland"];
 
+  // 🔹 All available countries
   const countries = [
     "Denmark", "Estonia", "Finland", "Iceland", "Ireland", "Latvia", "Lithuania",
     "Norway", "Sweden", "United Kingdom", "Austria", "Belgium", "France", "Germany",
@@ -21,14 +23,30 @@ export default function Home() {
     "Poland", "Romania", "Slovakia", "Ukraine"
   ];
 
+  // 🔹 State for merged available countries
+  const [availableCountries, setAvailableCountries] = useState<string[]>(default_countries);
+
+  // 🔹 On mount, load localStorage countryList and merge
+  useEffect(() => {
+    const storedList = localStorage.getItem("countryList");
+    if (storedList) {
+      try {
+        const parsedList = JSON.parse(storedList); // must be an array
+        if (Array.isArray(parsedList)) {
+          setAvailableCountries([...new Set([...default_countries, ...parsedList])]);
+        }
+      } catch (e) {
+        console.error("Invalid countryList in localStorage:", e);
+      }
+    }
+  }, []);
+
   const handleClick = () => {
     const email = localStorage.getItem("email");
 
     if (email) {
-      // 👈 if email exists in localStorage, go to profile
       router.push("/profile");
     } else {
-      // 👈 if no email, show SweetAlert
       Swal.fire({
         title: "Sign In Required",
         text: "Proceed to Login page?",
@@ -36,16 +54,15 @@ export default function Home() {
         showCancelButton: true,
         confirmButtonText: "Proceed",
         cancelButtonText: "Stay",
-        confirmButtonColor: "#2563eb", // Tailwind blue-600
-        cancelButtonColor: "#6b7280",  // Tailwind gray-500
+        confirmButtonColor: "#2563eb",
+        cancelButtonColor: "#6b7280",
       }).then((result) => {
         if (result.isConfirmed) {
-          router.push("/login"); // 👈 redirect if proceed
+          router.push("/login");
         }
       });
     }
   };
-
 
   return (
     <div
@@ -55,54 +72,52 @@ export default function Home() {
     >
       {/* MAIN MENU */}
       {menu === "main" && (
-       <div className="flex flex-col gap-4 items-center">
-       <button
-         onClick={() => setMenu("countries")}
-         className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
-                    shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-       >
-         <Flag className="w-5 h-5" />
-         Start
-       </button>
+        <div className="flex flex-col gap-4 items-center">
+          <button
+            onClick={() => setMenu("countries")}
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
+          >
+            <Flag className="w-5 h-5" />
+            Start
+          </button>
 
-       <button
-        //  onClick={() => router.push("/profile")}
-        onClick={handleClick}
-        className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
-                    shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-       >
-         <User className="w-5 h-5" />
-         Profile
-       </button>
+          <button
+            onClick={handleClick}
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
+          >
+            <User className="w-5 h-5" />
+            Profile
+          </button>
 
-       <button
-         onClick={() => router.push("/leaderboard")}
-         className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
-                    shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-       >
-         <Trophy className="w-5 h-5" />
-         Leaderboard
-       </button>
+          <button
+            onClick={() => router.push("/leaderboard")}
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
+          >
+            <Trophy className="w-5 h-5" />
+            Leaderboard
+          </button>
 
-       <button
-         onClick={() => router.push("/settings")}
-         className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
-                    shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-       >
-         <SettingsIcon className="w-5 h-5" />
-         Settings
-       </button>
+          <button
+            onClick={() => router.push("/settings")}
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
+          >
+            <SettingsIcon className="w-5 h-5" />
+            Settings
+          </button>
 
-       <button
-         onClick={() => router.push("/shop")}
-         className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
-                    shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-       >
-         <ShoppingCart className="w-5 h-5" />
-         Shop
-       </button>
-     </div>
-
+          <button
+            onClick={() => router.push("/shop")}
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Shop
+          </button>
+        </div>
       )}
 
       {/* COUNTRIES GRID */}
@@ -122,26 +137,24 @@ export default function Home() {
           </button>
 
           {countries.map((country, index) => {
-            const isAvailable = available_countries.includes(country);
+            const isAvailable = availableCountries.includes(country);
 
             return (
               <button
-              key={index}
-              onClick={() =>
-                isAvailable &&
-                router.push(`/country/${encodeURIComponent(country.toLowerCase().replace(/\s+/g, "-"))}`)
-              }
-              disabled={!isAvailable}
-              className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
-                ${isAvailable
-                  ? "bg-white opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110 cursor-pointer"
-                  : "text-gray-400 bg-white cursor-not-allowed shadow-none"
-                }`}
-            >
-              {country}
-            </button>
-
-
+                key={index}
+                onClick={() =>
+                  isAvailable &&
+                  router.push(`/country/${encodeURIComponent(country.toLowerCase().replace(/\s+/g, "-"))}`)
+                }
+                disabled={!isAvailable}
+                className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
+                  ${isAvailable
+                    ? "bg-white opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110 cursor-pointer"
+                    : "text-gray-400 bg-white cursor-not-allowed shadow-none"
+                  }`}
+              >
+                {country}
+              </button>
             );
           })}
         </div>

@@ -4,11 +4,13 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import axios from "axios";
+import Swal from 'sweetalert2'
 
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
+
 
   // Fetch images for the given country
   useEffect(() => {
@@ -24,6 +26,7 @@ const JigsawPuzzle: React.FC = () => {
       };
 
     if (country) fetchImages();
+
   }, [country]);
 
   // ---------------- existing game state ----------------
@@ -221,6 +224,73 @@ const JigsawPuzzle: React.FC = () => {
     const secs = seconds % 60;
     return `${mins}m ${secs}s`;
   };
+
+  const hasFiredRef = useRef(false);
+  useEffect(() => {
+    if (solvedPuzzlesCount === 10 && !hasFiredRef.current) {
+      hasFiredRef.current = true; // ✅ mark as fired
+
+      Swal.fire({
+        title: "🎉 Congratulations!",
+        html: `
+          You solved <b>10</b> puzzles!<br>
+          <b>Score:</b> ${score}<br>
+          <b>Streak:</b> ${streak}<br>
+          <b>Time Spent:</b> ${elapsedTime}s
+        `,
+        icon: "success",
+        confirmButtonText: "Nice!",
+        didOpen: () => {
+          const burst = () => {
+            const particleCount = 50;
+
+            confetti({
+              particleCount,
+              origin: { x: 0, y: Math.random() - 0.2 },
+              angle: 60,
+              spread: 55,
+            });
+
+            confetti({
+              particleCount,
+              origin: { x: 1, y: Math.random() - 0.2 },
+              angle: 120,
+              spread: 55,
+            });
+          };
+
+          burst();
+          const interval = setInterval(burst, 2000);
+
+          Swal.getPopup()?.addEventListener("mouseleave", () => {
+            clearInterval(interval);
+          });
+        },
+      });
+
+      // 📡 Send payload only once
+      const rawEmail = localStorage.getItem("email");
+      const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : "";
+
+      const payload = {
+        email: cleanEmail,
+        country,
+        score,
+        datePlayed: Date.now(),
+      };
+
+      fetch("/api/post/country", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json())
+        .then((data) => console.log("✅ Saved:", data))
+        .catch((err) => console.error("❌ Error saving data:", err));
+    }
+  }, [solvedPuzzlesCount]); // ✅ only watch this
 
   // ---------------- Render ----------------
   return (

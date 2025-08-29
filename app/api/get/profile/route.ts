@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: true, data: profile, score: score },
+      { success: true, profile: profile, score: score },
       {
         status: 200,
         headers: {
