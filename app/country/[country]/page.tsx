@@ -52,7 +52,62 @@ const JigsawPuzzle: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [breakpoint, setBreakpoint] = useState("base");
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
+
+// Select a piece by clicking
+const handlePieceClick = (piece: string) => {
+  if (framePieces.includes(piece)) return; // already placed
+  setSelectedPiece(piece);
+};
+
+// Place piece by clicking a frame
+const handleFrameClick = (frameIndex: number) => {
+  const currentPiece = framePieces[frameIndex];
+
+  // 🟢 If cell already has a piece → remove it
+  if (currentPiece) {
+    const newFramePieces = [...framePieces];
+    newFramePieces[frameIndex] = null;
+    setFramePieces(newFramePieces);
+
+    setSelectedPiece(null); // reset selected
+    return;
+  }
+
+  // 🟢 Otherwise, place the selected piece
+  if (!selectedPiece) return;
+
+  const piece = selectedPiece;
+
+  // ✅ scoring / streak logic
+  if (originalPieces[frameIndex] === piece) {
+    setStreak((prev) => prev + 1);
+  } else {
+    setStreak(0);
+  }
+
+  const newFramePieces = [...framePieces];
+  newFramePieces[frameIndex] = piece;
+  setFramePieces(newFramePieces);
+
+  setSelectedPiece(null); // reset
+
+  // ✅ check if puzzle complete
+  if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
+    const updatedStatus = [...completedStatus];
+    updatedStatus[currentIndex] = true;
+    setCompletedStatus(updatedStatus);
+    setScore((prevScore) => prevScore + (turbo ? 200 : 100));
+    fireConfetti();
+    goNext();
+  }
+};
+
 
   // Init completed status
   useEffect(() => {
@@ -107,6 +162,8 @@ const JigsawPuzzle: React.FC = () => {
     }
   }, [completedStatus, imageList.length]);
 
+  const [orientation, setOrientation] = useState('')
+
   const createPuzzlePieces = (img: HTMLImageElement) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -114,8 +171,11 @@ const JigsawPuzzle: React.FC = () => {
     if (!ctx) return;
 
     const scale = Math.min(puzzleSize / img.width, puzzleSize / img.height);
+    // const scale = .07;
     const displayWidth = img.width * scale;
     const displayHeight = img.height * scale;
+
+    setOrientation(displayWidth > displayHeight ? "landscape" : "portrait");
 
     const pieceWidth = displayWidth / 3;
     const pieceHeight = displayHeight / 3;
@@ -292,11 +352,57 @@ const JigsawPuzzle: React.FC = () => {
     }
   }, [solvedPuzzlesCount]); // ✅ only watch this
 
+
+
+  const getBreakpoint = (width: number) => {
+    if (width >= 1536) {
+
+      return "2xl";
+    }
+
+    if (width >= 1280) return "xl";
+    if (width >= 1024) {
+      setPuzzleSize(300);
+     return "md"; }
+    if (width >= 768){
+      setPuzzleSize(300);
+     return "md"; }
+    if (width >= 640) {
+      setPuzzleSize(250);
+     return "sm"; }
+    else {
+      setPuzzleSize(120);
+      return "base";
+    }
+     // below 640px (phones)
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      // setSize({ width: w, height: h });
+      setBreakpoint(getBreakpoint(w));
+
+    };
+
+    handleResize(); // set on mount
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
   // ---------------- Render ----------------
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          {/* <p className="text-sm font-semibold text-blue-600">
+        Orientation: {orientation}
+      </p>
+      <p> {size.width}px x {size.height}px</p>
+      <p>{breakpoint} </p> */}
+      {/* {orientation} */}
       {/* Top bar */}
-      <div className="flex justify-between items-center w-full px-5 py-2 gap-2">
+      {/* <div className="bg-blue-600 flex justify-between items-center w-full px-5 py-2 gap-2">
         <button
           onClick={() => router.push("/")}
           className="cursor-pointer px-4 py-2 rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
@@ -335,7 +441,7 @@ const JigsawPuzzle: React.FC = () => {
         >
           {turbo ? "Turbo ON ⚡" : "Turbo"}
         </button>
-      </div>
+      </div> */}
 
       {/* Settings Popup */}
       {settingsOpen && (
@@ -372,30 +478,69 @@ const JigsawPuzzle: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-black/60 text-white px-3 py-1 rounded-md font-bold">
-        Score: {score} pts | Streak: {streak}
+        {/* start */}
+
+        <main className="bg-gray-100" >
+        {/* score */}
+      <div className="bg-purple-200 text-white px-3 py-1 text-xs sm:text-lg flex justify-around rounded-md font-bold">
+        <button
+          onClick={() => router.push("/")}
+          className="cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
+          >
+          🏠 Home
+        </button>
+        <div className="px-2 py-1 sm:py-2 text-xs sm:text-lg rounded-lg bg-violet-800">Score: {score} pts | Streak: {streak}</div>
+
+
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="cursor-pointer px-2 py-2 rounded-lg text-white bg-gray-500 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
+        >
+          Settings
+        </button>
+
+        <button
+          onClick={() => setTurbo(prev => !prev)}
+          className={`cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white transition-all duration-300 transform hover:scale-105
+            ${turbo
+              ? "bg-blue-500 shadow-[0_0_20px_5px_rgba(59,130,246,0.7)]"
+              : "bg-blue-500 hover:bg-blue-600"}`}
+        >
+          {turbo ? "Turbo ON ⚡" : "Turbo"}
+        </button>
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-center gap-4 m-1">
+      <div className=" flex justify-around gap-2 m-1 bg-purple-200 ">
+      <div className="bg-black/60 text-white sm:px-3 px-1 py-1 text-xs sm:text-lg rounded-md font-bold ">
+          <div className="flex justify-center">📷 </div>
+          <p>{currentIndex + 1} / {imageList.length}</p>
+        </div>
         <button
           onClick={goPrev}
-          className="cursor-pointer px-5 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-600
+          className="cursor-pointer px-2 sm:px-4 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-600
                     transition-all duration-300 text-sm shadow-md hover:shadow-lg transform hover:scale-110"
         >
           ⬅ Prev
         </button>
         <button
           onClick={goNext}
-          className="cursor-pointer px-5 py-2 rounded-lg text-white bg-green-500 hover:bg-green-600
+          className="cursor-pointer px-2 sm:px-4 py-2 rounded-lg text-white bg-green-500 hover:bg-green-600
                     transition-all duration-300 text-sm shadow-md hover:shadow-lg transform hover:scale-110"
         >
           Next ➡
         </button>
+        <div className="bg-black/60 text-white sm:px-3 px-2 py-1 text-xs sm:text-lg rounded-md font-bold text-xs">
+        <div className="flex justify-center">🧩 {solvedPuzzlesCount}</div>
+          {imageList.length > 0 && (
+            <> ({Math.round((solvedPuzzlesCount / imageList.length) * 100)}%)</>
+          )}
+        </div>
+
       </div>
 
       {/* Puzzle Board + Original */}
-      <div className="flex justify-around">
+      <div className=" flex justify-center">
         {loading ? (
           <div style={{
             width: `${pieceSize.width * 3}px`,
@@ -415,6 +560,8 @@ const JigsawPuzzle: React.FC = () => {
                 alt="Original"
                 style={{
                   margin: "5px",
+                  // width: `${pieceSize.width * 3}px`,
+                  // height: `${pieceSize.height * 3}px`,
                   width: `${pieceSize.width * 3}px`,
                   height: `${pieceSize.height * 3}px`,
                   border: "2px solid #ccc",
@@ -433,20 +580,24 @@ const JigsawPuzzle: React.FC = () => {
             width: `${pieceSize.width * 3}px`,
             height: `${pieceSize.height * 3}px`
           }}>
-            {framePieces.map((piece, index) => (
-              <div
-                key={index}
-                onDrop={(event) => handleDrop(event, index)}
-                onDragOver={handleDragOver}
-                style={{
-                  width: `${pieceSize.width}px`,
-                  height: `${pieceSize.height}px`,
-                  border: "1px solid gray",
-                  backgroundImage: piece ? `url(${piece})` : "none",
-                  backgroundSize: "cover",
-                }}
-              />
-            ))}
+          {framePieces.map((piece, index) => (
+            <div
+              key={index}
+              onClick={() => handleFrameClick(index)}
+              onDrop={(event) => handleDrop(event, index)}
+              onDragOver={handleDragOver}
+              style={{
+                width: `${pieceSize.width}px`,
+                height: `${pieceSize.height}px`,
+                border: "1px solid gray",
+                backgroundImage: piece ? `url(${piece})` : "none",
+                backgroundSize: "cover",
+                cursor: "pointer", // always clickable
+              }}
+            />
+          ))}
+
+
           </div>
         )}
       </div>
@@ -457,21 +608,23 @@ const JigsawPuzzle: React.FC = () => {
           ✅ Already Solved
         </div>
       ) : (
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-          <div>
-            <h3>Puzzle Pieces</h3>
-            <div
+        <div className=""
+               style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
+          <div className="pb-7">
+            <h3 className="text-center">Puzzle Pieces</h3>
+            <div className=""
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                width: `${pieceSize.width * 7}px`,
+                gap: "10px",        // space between pieces
+                justifyContent: "flex-start", // align pieces nicely
               }}
             >
-              {puzzlePieces.map((piece, index) => {
-                const isPlaced = framePieces.includes(piece);
-                return (
+           {puzzlePieces.map((piece, index) => {
+              const isPlaced = framePieces.includes(piece);
+              return (
+                <button key={index} onClick={() => handlePieceClick(piece)}>
                   <img
-                    key={index}
                     src={piece}
                     alt={`Piece ${index}`}
                     draggable
@@ -479,18 +632,26 @@ const JigsawPuzzle: React.FC = () => {
                     style={{
                       width: `${pieceSize.width}px`,
                       height: `${pieceSize.height}px`,
-                      margin: "5px",
                       cursor: "grab",
                       borderRadius: "6px",
                       transition: "all 0.3s ease",
+                      opacity: isPlaced ? 0.4 : 1, // dim if already used
+                      border: selectedPiece === piece ? "3px solid yellow" : "none",
                     }}
                   />
-                );
-              })}
+                </button>
+              );
+            })}
+
+
             </div>
+
           </div>
         </div>
       )}
+        </main>
+
+      {/* // end */}
 
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
