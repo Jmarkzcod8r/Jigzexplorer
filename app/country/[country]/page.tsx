@@ -530,7 +530,7 @@ const handleFrameClick = (frameIndex: number) => {
         >
           Next ➡
         </button>
-        <div className="bg-black/60 text-white sm:px-3 px-2 py-1 text-xs sm:text-lg rounded-md font-bold text-xs">
+        <div className="bg-black/60 text-white sm:px-3 px-2 py-1 text-xs sm:text-lg rounded-md font-bold ">
         <div className="flex justify-center">🧩 {solvedPuzzlesCount}</div>
           {imageList.length > 0 && (
             <> ({Math.round((solvedPuzzlesCount / imageList.length) * 100)}%)</>
@@ -611,7 +611,7 @@ const handleFrameClick = (frameIndex: number) => {
         <div className=""
                style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
           <div className="pb-7">
-            <h3 className="text-center">Puzzle Pieces</h3>
+            {/* <h3 className="text-center">Puzzle Pieces</h3> */}
             <div className=""
               style={{
                 display: "flex",
