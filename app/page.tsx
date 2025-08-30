@@ -75,7 +75,7 @@ export default function Home() {
         <div className="flex flex-col gap-4 items-center">
           <button
             onClick={() => setMenu("countries")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <Flag className="w-5 h-5" />
@@ -84,7 +84,7 @@ export default function Home() {
 
           <button
             onClick={handleClick}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <User className="w-5 h-5" />
@@ -93,7 +93,7 @@ export default function Home() {
 
           <button
             onClick={() => router.push("/leaderboard")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <Trophy className="w-5 h-5" />
@@ -102,7 +102,7 @@ export default function Home() {
 
           <button
             onClick={() => router.push("/settings")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <SettingsIcon className="w-5 h-5" />
@@ -111,7 +111,7 @@ export default function Home() {
 
           <button
             onClick={() => router.push("/shop")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg
+            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <ShoppingCart className="w-5 h-5" />
