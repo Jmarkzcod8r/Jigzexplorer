@@ -492,12 +492,15 @@ const handleFrameClick = (frameIndex: number) => {
         <div className="px-2 py-1 sm:py-2 text-xs sm:text-lg rounded-lg bg-violet-800">Score: {score} pts | Streak: {streak}</div>
 
 
-        <button
+        {/* <button
           onClick={() => setSettingsOpen(true)}
           className="cursor-pointer px-2 py-2 rounded-lg text-white bg-gray-500 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
         >
           Settings
-        </button>
+        </button> */}
+         <div className="bg-black/60 text-white px-2 py-1 sm:py-2 text-xs sm:text-lg rounded-md font-bold">
+          ⏱ {formatTime(elapsedTime)}
+        </div>
 
         <button
           onClick={() => setTurbo(prev => !prev)}
