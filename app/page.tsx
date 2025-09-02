@@ -1,8 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Flag, User, Trophy, Settings as SettingsIcon, ArrowLeft, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";import {
+  Flag,
+  User,
+  Trophy,
+  Settings as SettingsIcon,
+  ArrowLeft,
+  ShoppingCart,
+  Plug // ✅ added connect icon
+} from "lucide-react";
 import Swal from "sweetalert2";
 
 export default function Home() {
@@ -144,6 +151,14 @@ export default function Home() {
             <ShoppingCart className="w-5 h-5" />
             Shop
           </button>
+          <button
+              onClick={()=> {router.push('/connect')}} // ✅ use a separate redirect function for connect
+              className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
+                        shadow hover:bg-green-600 hover:text-white transition duration-300 cursor-pointer"
+            >
+              <Plug className="w-5 h-5" />  {/* ✅ changed icon */}
+              Connect
+            </button>
         </div>
       )}
 
@@ -177,7 +192,7 @@ export default function Home() {
                 className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
                   ${isAvailable
                     ? "bg-white opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110 cursor-pointer"
-                    : "text-gray-400 bg-white cursor-not-allowed shadow-none"
+                    : "text-gray-400 bg-white cursor-not-allowed  shadow-none"
                   }`}
               >
                 {country}
