@@ -185,15 +185,19 @@ export default function Shop() {
             ➕ Add Country
           </button>
         </div>
-       <section className='flex justify-around'>
+       <section className='flex flex-col'>
        {/* <button className={buttonDesc}></button> */}
+       <section className="flex justify-around">
        <button className={buttonDesc}>undo</button>
-       <button className={buttonDesc}>Auto-Solve Whole</button>
+       <button className={buttonDesc}>Multi-Select</button>
         <button className={buttonDesc}>Auto-Solve Whole</button>
         <button className={buttonDesc}>Auto-Place (piece)</button>
+        </section>
+        <section className="flex justify-around">
         <button className={buttonDesc}>Upgrade Turbo Duration</button>
         <button className={buttonDesc}>Upgrade Turbo Multiplier</button>
         <button className={buttonDesc}>Upgrade Streak Multiplier</button>
+        </section>
        </section>
         <button
           type="submit"

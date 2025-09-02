@@ -60,15 +60,22 @@ const JigsawPuzzle: React.FC = () => {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
+  const [selectedPieces, setSelectedPieces] = useState<string[]>([]);
 
-// Select a piece by clicking
+// ✅ Select/Deselect multiple pieces
 const handlePieceClick = (piece: string) => {
   if (framePieces.includes(piece)) return; // already placed
-  setSelectedPiece(piece);
+
+  setSelectedPieces(prev => {
+    if (prev.includes(piece)) {
+      // deselect if already selected
+      return prev.filter(p => p !== piece);
+    }
+    return [...prev, piece]; // add new selection
+  });
 };
 
-// Place piece by clicking a frame
+// ✅ Place pieces on frame in order
 const handleFrameClick = (frameIndex: number) => {
   const currentPiece = framePieces[frameIndex];
 
@@ -77,15 +84,13 @@ const handleFrameClick = (frameIndex: number) => {
     const newFramePieces = [...framePieces];
     newFramePieces[frameIndex] = null;
     setFramePieces(newFramePieces);
-
-    setSelectedPiece(null); // reset selected
     return;
   }
 
-  // 🟢 Otherwise, place the selected piece
-  if (!selectedPiece) return;
+  // 🟢 Place the *first* selected piece
+  if (selectedPieces.length === 0) return;
 
-  const piece = selectedPiece;
+  const [piece, ...rest] = selectedPieces;
 
   // ✅ scoring / streak logic
   if (originalPieces[frameIndex] === piece) {
@@ -98,7 +103,7 @@ const handleFrameClick = (frameIndex: number) => {
   newFramePieces[frameIndex] = piece;
   setFramePieces(newFramePieces);
 
-  setSelectedPiece(null); // reset
+  setSelectedPieces(rest); // keep remaining selected
 
   // ✅ check if puzzle complete
   if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
@@ -138,7 +143,15 @@ const handleFrameClick = (frameIndex: number) => {
     } else {
       setFramePieces([...originalPieces]);
     }
-  }, [currentIndex, imageList, puzzleSize]);
+  }, [currentIndex, imageList]);
+
+  // Recalculate piece size when puzzleSize changes
+useEffect(() => {
+  if (image) {
+    createPuzzlePieces(image); // just updates pieceSize + pieces
+  }
+}, [puzzleSize]);
+
 
   // Timer
   useEffect(() => {
@@ -663,6 +676,8 @@ const handleFrameClick = (frameIndex: number) => {
             >
            {puzzlePieces.map((piece, index) => {
               const isPlaced = framePieces.includes(piece);
+              const isSelected = selectedPieces.includes(piece);
+
               return (
                 <button key={index} onClick={() => handlePieceClick(piece)}>
                   <img
@@ -676,13 +691,14 @@ const handleFrameClick = (frameIndex: number) => {
                       cursor: "grab",
                       borderRadius: "6px",
                       transition: "all 0.3s ease",
-                      opacity: isPlaced ? 0.1 : 1, // dim if already used
-                      border: selectedPiece === piece ? "3px solid yellow" : "none",
+                      opacity: isPlaced ? 0.1 : 1,
+                      border: isSelected ? "3px solid yellow" : "none", // highlight multiple
                     }}
                   />
                 </button>
               );
             })}
+
 
 
             </div>
