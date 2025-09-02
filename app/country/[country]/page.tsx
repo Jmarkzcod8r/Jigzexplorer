@@ -42,6 +42,9 @@ const JigsawPuzzle: React.FC = () => {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [turbo, setTurbo] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [cooldown, setCooldown] = useState(false); // 🔒 stays disabled after Turbo ends
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
@@ -296,6 +299,7 @@ const handleFrameClick = (frameIndex: number) => {
           You solved <b>10</b> puzzles!<br>
           <b>Score:</b> ${score}<br>
           <b>Streak:</b> ${streak}<br>
+          <b>Over-All Score:</b> ${score + (streak * 10)}<br>
           <b>Time Spent:</b> ${elapsedTime}s
         `,
         icon: "success",
@@ -335,7 +339,7 @@ const handleFrameClick = (frameIndex: number) => {
       const payload = {
         email: cleanEmail,
         country,
-        score,
+        score: score + streak,
         datePlayed: Date.now(),
       };
 
@@ -391,6 +395,32 @@ const handleFrameClick = (frameIndex: number) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // useEffect for Turbo button
+  useEffect(() => {
+    if (turbo && countdown > 0) {
+      // ⏱ Countdown logic
+      timerRef.current = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0 && turbo) {
+      // 🔴 Time’s up, turn off Turbo but keep cooldown
+      setTurbo(false);
+      setCooldown(true);
+    }
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [turbo, countdown]);
+
+  const handleClick = () => {
+    if (!turbo && !cooldown) {
+      setTurbo(true);
+      setCountdown(30);
+    }
+  };
+
+
 
   // ---------------- Render ----------------
   return (
@@ -444,6 +474,7 @@ const handleFrameClick = (frameIndex: number) => {
       </div> */}
 
       {/* Settings Popup */}
+      {/* // Settings Popup - START */}
       {settingsOpen && (
         <div style={{
           position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
@@ -477,6 +508,7 @@ const handleFrameClick = (frameIndex: number) => {
           </div>
         </div>
       )}
+        {/* // Settings Popup - START */}
 
         {/* start */}
 
@@ -503,14 +535,17 @@ const handleFrameClick = (frameIndex: number) => {
         </div>
 
         <button
-          onClick={() => setTurbo(prev => !prev)}
-          className={`cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white transition-all duration-300 transform hover:scale-105
-            ${turbo
-              ? "bg-blue-500 shadow-[0_0_20px_5px_rgba(59,130,246,0.7)]"
-              : "bg-blue-500 hover:bg-blue-600"}`}
-        >
-          {turbo ? "Turbo ON ⚡" : "Turbo"}
-        </button>
+      onClick={handleClick}
+      disabled={turbo || cooldown} // 🚫 disables both while active + after finish
+      className={`cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white transition-all duration-300 transform hover:scale-105
+        ${turbo
+          ? "bg-blue-500 shadow-[0_0_20px_5px_rgba(59,130,246,0.7)]"
+          : cooldown
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-500 hover:bg-blue-600"}`}
+    >
+      {turbo ? `Turbo Mode (${countdown}s)` : cooldown ? "Turbo (Disabled)" : "Turbo"}
+    </button>
       </div>
 
       {/* Navigation */}
@@ -543,67 +578,70 @@ const handleFrameClick = (frameIndex: number) => {
       </div>
 
       {/* Puzzle Board + Original */}
-      <div className=" flex justify-center">
-        {loading ? (
-          <div style={{
-            width: `${pieceSize.width * 3}px`,
-            height: `${pieceSize.height * 3}px`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            border: "2px solid #ccc"
-          }}>
-            ⏳ Loading...
-          </div>
-        ) : (
-          image && (
-            <div className="flex justify-around">
-              <img
-                src={image.src}
-                alt="Original"
-                style={{
-                  margin: "5px",
-                  // width: `${pieceSize.width * 3}px`,
-                  // height: `${pieceSize.height * 3}px`,
-                  width: `${pieceSize.width * 3}px`,
-                  height: `${pieceSize.height * 3}px`,
-                  border: "2px solid #ccc",
-                  objectFit: "cover"
-                }}
-              />
-            </div>
-          )
-        )}
-
-        {completedStatus[currentIndex] ? null : (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "5px",
-            width: `${pieceSize.width * 3}px`,
-            height: `${pieceSize.height * 3}px`
-          }}>
-          {framePieces.map((piece, index) => (
+      <div className="flex justify-center bg-amber-600 flex-col [@media(min-width:300px)]:flex-row">
+          {loading ? (
             <div
-              key={index}
-              onClick={() => handleFrameClick(index)}
-              onDrop={(event) => handleDrop(event, index)}
-              onDragOver={handleDragOver}
               style={{
-                width: `${pieceSize.width}px`,
-                height: `${pieceSize.height}px`,
-                border: "1px solid gray",
-                backgroundImage: piece ? `url(${piece})` : "none",
-                backgroundSize: "cover",
-                cursor: "pointer", // always clickable
+                width: `${pieceSize.width * 3}px`,
+                height: `${pieceSize.height * 3}px`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "2px solid #ccc",
               }}
-            />
-          ))}
+            >
+              ⏳ Loading...
+            </div>
+          ) : (
+            image && (
+              <div className="flex justify-around">
+                <img
+                  src={image.src}
+                  alt="Original"
+                  style={{
+                    margin: "5px",
+                    width: `${pieceSize.width * 3}px`,
+                    height: `${pieceSize.height * 3}px`,
+                    border: "2px solid #ccc",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )
+          )}
 
+          {completedStatus[currentIndex] ? null : (
+         <div
+         className="mx-auto [@media(min-width:300px)]:mx-0"
+         style={{
+           display: "grid",
+           gridTemplateColumns: "repeat(3, 1fr)",
+           gap: "5px",
+           width: `${pieceSize.width * 3}px`,
+           height: `${pieceSize.height * 3}px`,
+         }}
+       >
+         {framePieces.map((piece, index) => (
+           <div
+             key={index}
+             onClick={() => handleFrameClick(index)}
+             onDrop={(event) => handleDrop(event, index)}
+             onDragOver={handleDragOver}
+             style={{
+               width: `${pieceSize.width}px`,
+               height: `${pieceSize.height}px`,
+               border: "1px solid gray",
+               backgroundImage: piece ? `url(${piece})` : "none",
+               backgroundSize: "cover",
+               cursor: "pointer",
+             }}
+           />
+         ))}
+       </div>
 
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+
 
       {/* Solved or Puzzle pieces */}
       {completedStatus[currentIndex] ? (
@@ -638,7 +676,7 @@ const handleFrameClick = (frameIndex: number) => {
                       cursor: "grab",
                       borderRadius: "6px",
                       transition: "all 0.3s ease",
-                      opacity: isPlaced ? 0.4 : 1, // dim if already used
+                      opacity: isPlaced ? 0.1 : 1, // dim if already used
                       border: selectedPiece === piece ? "3px solid yellow" : "none",
                     }}
                   />

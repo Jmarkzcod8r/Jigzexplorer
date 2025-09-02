@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
+import Swal from 'sweetalert2';
 
 export default function Shop() {
+  const router = useRouter();
   const defcountries = [
     "Iceland", "Ireland", "Latvia", "Lithuania",
     "Norway", "Sweden", "United Kingdom", "Austria", "Belgium",
@@ -11,7 +14,7 @@ export default function Shop() {
     "Montenegro", "North Macedonia", "Portugal", "San Marino", "Serbia", "Slovenia",
     "Spain", "Vatican City", "Belarus", "Bulgaria", "Czechia", "Hungary", "Moldova",
     "Poland", "Romania", "Slovakia", "Ukraine"
-  ];
+  ].map(c => c.toLowerCase());
 
   const [tickets, setTickets] = useState(0);
   const [overallScore, setOverallScore] = useState(0);
@@ -27,7 +30,8 @@ export default function Shop() {
 
   // 🔹 Load filtered list on mount
   useEffect(() => {
-    const savedList = JSON.parse(localStorage.getItem("countryList") || "[]");
+    const savedList = JSON.parse(localStorage.getItem("countryList") || "[]")
+  .map((c: string) => c.charAt(0).toUpperCase() + c.slice(1));
     if (savedList.length > 0) {
       const filtered = defcountries.filter((c) => !savedList.includes(c));
       setAvailableCountries(filtered);
@@ -107,9 +111,41 @@ export default function Shop() {
     }
   };
 
+  const buttonDesc = "cursor-pointer rounded-lg px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 text-sm transition m-1";
+
+  const handleUndoClick = () => {
+    Swal.fire({
+      title: "Purchase 'Undo'?",
+      html: `
+        Are you sure you want to buy the <b>Undo</b> feature?
+      `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Proceed",
+      cancelButtonText: "Cancel",
+      reverseButtons: true, // optional → puts "Cancel" on the left
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire("✅ Purchased!", "You bought the Undo feature.", "success");
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire("❌ Cancelled", "Purchase aborted.", "error");
+      }
+    });
+  };
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">SHOP</h1>
+      <div className='flex justify-baseline'>
+      <button
+          onClick={() => router.push("/")}
+          className="cursor-pointer px-2  text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
+          >
+          🏠 Home
+        </button>
+        <h1 className="text-2xl font-bold px-2 text-center items-center">SHOP</h1>
+      </div>
+
+
 
       {/* Score Form */}
       <form
@@ -129,12 +165,12 @@ export default function Shop() {
               <select
                 value={country.name}
                 onChange={(e) => updateCountry(index, "name", e.target.value)}
-                className="w-full border p-2 rounded"
+                className="cursor-pointer w-full border p-2 rounded"
               >
-                <option value="">-- Select Country --</option>
+               <option value="">-- Select Country --</option>
                 {availableCountries.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                  <option className='cursor-pointer' key={c} value={c}>
+                    {c.replace(/\b\w/g, (char) => char.toUpperCase())}
                   </option>
                 ))}
               </select>
@@ -144,17 +180,26 @@ export default function Shop() {
           <button
             type="button"
             onClick={addCountry}
-            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+            className="cursor-pointer bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
           >
             ➕ Add Country
           </button>
         </div>
-
+       <section className='flex justify-around'>
+       {/* <button className={buttonDesc}></button> */}
+       <button className={buttonDesc}>undo</button>
+       <button className={buttonDesc}>Auto-Solve Whole</button>
+        <button className={buttonDesc}>Auto-Solve Whole</button>
+        <button className={buttonDesc}>Auto-Place (piece)</button>
+        <button className={buttonDesc}>Upgrade Turbo Duration</button>
+        <button className={buttonDesc}>Upgrade Turbo Multiplier</button>
+        <button className={buttonDesc}>Upgrade Streak Multiplier</button>
+       </section>
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Save Score
+          Purchase
         </button>
       </form>
 

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react"; // icons
+import { useParams, useRouter } from "next/navigation";
+
 
 const Page = () => {
   const [profile, setProfile] = useState<any>(null);
@@ -9,6 +11,7 @@ const Page = () => {
   const [sortType, setSortType] = useState<"country" | "score" | "date">("country");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  const router = useRouter();
   useEffect(() => {
     const email = localStorage.getItem("email");
     if (!email) return;
@@ -29,6 +32,20 @@ const Page = () => {
         const data = await res.json();
 
         if (data.success) {
+          // Extract countries from response
+          const countryList = Object.keys(data.score.countries).map(
+            (c) => c.charAt(0) + c.slice(1) // Capitalize first letter
+          );
+
+          // Get existing list from localStorage (if any)
+          const savedList = JSON.parse(localStorage.getItem("countryList") || "[]");
+
+          // Merge and remove duplicates
+          const updatedList = Array.from(new Set([...savedList, ...countryList]));
+
+          // Save back to localStorage
+          localStorage.setItem("countryList", JSON.stringify(updatedList));
+
           setProfile(data.profile);
           if (data.score) {
             setScore(data.score);
@@ -71,8 +88,22 @@ const Page = () => {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
+
       {profile ? (
         <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md text-center">
+          <div className="flex justify-around">
+          <button
+          onClick={() => router.push("/")}
+          className="cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
+          >
+          🏠 Home
+        </button>
+        <button
+            onClick={()=>  {localStorage.clear();  router.push("/");}}
+            className="cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
+          >➡️ Logout</button>
+          </div>
+
           <h1 className="text-gray-700">Email: {profile.email}</h1>
           <p className="text-gray-700">Tickets: {score? score.tickets:''}</p>
           <p className="text-gray-700">Overall Score: {score? score.overallScore: ''}</p>
@@ -83,7 +114,7 @@ const Page = () => {
           <div className="flex gap-2 mt-3 mb-4 justify-center items-center">
             <button
               onClick={() => setSortType("country")}
-              className={`px-3 py-1 rounded-lg text-sm ${
+              className={`cursor-pointer px-3 py-1 rounded-lg text-sm ${
                 sortType === "country" ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
@@ -91,7 +122,7 @@ const Page = () => {
             </button>
             <button
               onClick={() => setSortType("score")}
-              className={`px-3 py-1 rounded-lg text-sm ${
+              className={`cursor-pointer px-3 py-1 rounded-lg text-sm ${
                 sortType === "score" ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
@@ -99,7 +130,7 @@ const Page = () => {
             </button>
             <button
               onClick={() => setSortType("date")}
-              className={`px-3 py-1 rounded-lg text-sm ${
+              className={`cursor-pointer px-3 py-1 rounded-lg text-sm ${
                 sortType === "date" ? "bg-blue-600 text-white" : "bg-gray-200"
               }`}
             >
@@ -109,7 +140,7 @@ const Page = () => {
             {/* Asc/Desc Toggle */}
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="ml-2 p-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+              className="cursor-pointer ml-2 p-2 rounded-lg bg-gray-200 hover:bg-gray-300"
               title="Toggle ascending/descending"
             >
               {sortOrder === "asc" ? <ChevronUp size={18} /> : <ChevronDown size={18} />}

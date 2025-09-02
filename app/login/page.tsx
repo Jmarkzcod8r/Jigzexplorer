@@ -79,7 +79,11 @@ export default function Login() {
   }
 
   return (
-    <div className="h-auto w-auto flex bg-blue-300">
+    <div
+      className="font-sans flex flex-col items-center justify-center
+                 min-h-screen p-8 pb-20 sm:p-20
+                 bg-[url('/Bg.png')] bg-cover bg-center"
+    >
       <div
         className="absolute z-10 flex justify-center items-center border border-gray-300 rounded-full
         w-60 m-2 p-2 bg-white bg-opacity-60 cursor-pointer hover:shadow-md hover:bg-opacity-100"

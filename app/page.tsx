@@ -31,7 +31,10 @@ export default function Home() {
     const storedList = localStorage.getItem("countryList");
     if (storedList) {
       try {
-        const parsedList = JSON.parse(storedList); // must be an array
+        const parsedList = JSON.parse(storedList).map(
+          (item: string) => item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()
+        );
+        ; // must be an array
         if (Array.isArray(parsedList)) {
           setAvailableCountries([...new Set([...default_countries, ...parsedList])]);
         }
@@ -41,11 +44,34 @@ export default function Home() {
     }
   }, []);
 
-  const handleClick = () => {
+  const redirect_login_profile = () => {
     const email = localStorage.getItem("email");
 
     if (email) {
       router.push("/profile");
+    } else {
+      Swal.fire({
+        title: "Sign In Required",
+        text: "Proceed to Login page?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Proceed",
+        cancelButtonText: "Stay",
+        confirmButtonColor: "#2563eb",
+        cancelButtonColor: "#6b7280",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
+      });
+    }
+  };
+
+  const redirect_login_shop = () => {
+    const email = localStorage.getItem("email");
+
+    if (email) {
+      router.push("/shop");
     } else {
       Swal.fire({
         title: "Sign In Required",
@@ -70,6 +96,7 @@ export default function Home() {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
+
       {/* MAIN MENU */}
       {menu === "main" && (
         <div className="flex flex-col gap-4 items-center">
@@ -83,7 +110,7 @@ export default function Home() {
           </button>
 
           <button
-            onClick={handleClick}
+            onClick={redirect_login_profile}
             className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
@@ -110,7 +137,7 @@ export default function Home() {
           </button>
 
           <button
-            onClick={() => router.push("/shop")}
+            onClick={redirect_login_shop}
             className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
