@@ -4,39 +4,39 @@ import React, { useEffect, useState } from "react";
 const Page = () => {
   const [leaderboard, setLeaderboard] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      let email = localStorage.getItem("email");
-      let accessToken = localStorage.getItem("accessToken");
+  // useEffect(() => {
+  //   const fetchLeaderboard = async () => {
+  //     let email = localStorage.getItem("email");
+  //     let accessToken = localStorage.getItem("accessToken");
 
-      if (!email || !accessToken) return;
+  //     if (!email || !accessToken) return;
 
-      try {
-        // Remove extra quotes if values were stringified
-        try {
-          email = JSON.parse(email);
-        } catch {}
-        try {
-          accessToken = JSON.parse(accessToken);
-        } catch {}
+  //     try {
+  //       // Remove extra quotes if values were stringified
+  //       try {
+  //         email = JSON.parse(email);
+  //       } catch {}
+  //       try {
+  //         accessToken = JSON.parse(accessToken);
+  //       } catch {}
 
-        const res = await fetch("/api/get/leaderboard", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, accessToken }),
-        });
+  //       const res = await fetch("/api/get/leaderboard", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ email, accessToken }),
+  //       });
 
-        const data = await res.json();
-        setLeaderboard(data);
-      } catch (err) {
-        alert("Error fetching leaderboard");
-      }
-    };
+  //       const data = await res.json();
+  //       setLeaderboard(data);
+  //     } catch (err) {
+  //       alert("Error fetching leaderboard");
+  //     }
+  //   };
 
-    fetchLeaderboard();
-  }, []);
+  //   fetchLeaderboard();
+  // }, []);
 
   return (
     <div
