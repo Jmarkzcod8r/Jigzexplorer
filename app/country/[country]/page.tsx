@@ -390,7 +390,7 @@ useEffect(() => {
       setPuzzleSize(250);
      return "sm"; }
     else {
-      setPuzzleSize(120);
+      setPuzzleSize(250);
       return "base";
     }
      // below 640px (phones)
