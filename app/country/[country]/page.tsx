@@ -50,7 +50,7 @@ const JigsawPuzzle: React.FC = () => {
   const [endTime, setEndTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  const [puzzleSize, setPuzzleSize] = useState(360);
+  const [puzzleSize, setPuzzleSize] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -440,7 +440,7 @@ useEffect(() => {
   // ---------------- Render ----------------
   return (
     <div className="flex flex-col items-center max-[400px]:justify-center max-[400px]:h-screen">
-       <p> {size.width}px x {size.height}px</p>
+       {/* <p> {size.width}px x {size.height}px</p> */}
           {/* <p className="text-sm font-semibold text-blue-600">
         Orientation: {orientation}
       </p>
@@ -596,16 +596,13 @@ useEffect(() => {
       {/* Puzzle Board + Original */}
       <div className="flex justify-center flex-col [@media(min-width:400px)]:flex-row">
           {loading ? (
-            <div
-              style={{
-                width: `${pieceSize.width * 3}px`,
-                height: `${pieceSize.height * 3}px`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px solid #ccc",
-              }}
-            >
+           <div
+           className="flex items-center justify-center border-2 border-gray-300 w-screen"
+           style={{
+             width: `${pieceSize.width * 3}px`,
+             height: `${pieceSize.height * 3}px`,
+           }}
+         >
               ⏳ Loading...
             </div>
           ) : (
