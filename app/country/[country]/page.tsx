@@ -591,7 +591,7 @@ useEffect(() => {
       </div>
 
       {/* Puzzle Board + Original */}
-      <div className="flex justify-center bg-amber-600 flex-col [@media(min-width:300px)]:flex-row">
+      <div className="flex justify-center flex-col [@media(min-width:350px)]:flex-row">
           {loading ? (
             <div
               style={{
@@ -625,7 +625,7 @@ useEffect(() => {
 
           {completedStatus[currentIndex] ? null : (
          <div
-         className="mx-auto [@media(min-width:300px)]:mx-0"
+         className="mx-auto [@media(min-width:350px)]:mx-0"
          style={{
            display: "grid",
            gridTemplateColumns: "repeat(3, 1fr)",
