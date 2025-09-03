@@ -55,7 +55,9 @@ const JigsawPuzzle: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  // 👇 initialize safely with 0
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
   const [breakpoint, setBreakpoint] = useState("base");
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -398,15 +400,15 @@ useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      // setSize({ width: w, height: h });
+      setSize({ width: w, height: h });
       setBreakpoint(getBreakpoint(w));
-
     };
 
-    handleResize(); // set on mount
+    handleResize(); // ✅ set on mount (runs only in client)
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
 
   // useEffect for Turbo button
   useEffect(() => {
@@ -438,6 +440,7 @@ useEffect(() => {
   // ---------------- Render ----------------
   return (
     <div className="flex flex-col items-center max-[350px]:justify-center max-[350px]:h-screen">
+       <p> {size.width}px x {size.height}px</p>
           {/* <p className="text-sm font-semibold text-blue-600">
         Orientation: {orientation}
       </p>
