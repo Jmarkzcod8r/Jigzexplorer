@@ -437,7 +437,7 @@ useEffect(() => {
 
   // ---------------- Render ----------------
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div className="flex flex-col items-center max-[350px]:justify-center max-[350px]:h-screen">
           {/* <p className="text-sm font-semibold text-blue-600">
         Orientation: {orientation}
       </p>
