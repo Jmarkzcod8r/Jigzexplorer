@@ -439,7 +439,7 @@ useEffect(() => {
 
   // ---------------- Render ----------------
   return (
-    <div className="flex flex-col items-center max-[350px]:justify-center max-[350px]:h-screen">
+    <div className="flex flex-col items-center max-[400px]:justify-center max-[400px]:h-screen">
        <p> {size.width}px x {size.height}px</p>
           {/* <p className="text-sm font-semibold text-blue-600">
         Orientation: {orientation}
@@ -594,7 +594,7 @@ useEffect(() => {
       </div>
 
       {/* Puzzle Board + Original */}
-      <div className="flex justify-center flex-col [@media(min-width:350px)]:flex-row">
+      <div className="flex justify-center flex-col [@media(min-width:400px)]:flex-row">
           {loading ? (
             <div
               style={{
@@ -628,7 +628,7 @@ useEffect(() => {
 
           {completedStatus[currentIndex] ? null : (
          <div
-         className="mx-auto [@media(min-width:350px)]:mx-0"
+         className="mx-auto [@media(min-width:400px)]:mx-0"
          style={{
            display: "grid",
            gridTemplateColumns: "repeat(3, 1fr)",
