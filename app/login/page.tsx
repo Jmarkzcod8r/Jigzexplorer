@@ -1,4 +1,5 @@
 "use client"
+// 'use cache' -> This produces an error
 
 import React from 'react'
 import { FcGoogle } from 'react-icons/fc'
@@ -7,6 +8,9 @@ import { useRouter } from 'next/navigation'
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth'
 import { apptry, db } from "../api/firebase/firebase-config"
 import { doc, setDoc } from "firebase/firestore"
+
+// import { getUser } from '../lib/getUser'
+
 import axios from "axios"
 
 export default function Login() {
@@ -16,8 +20,9 @@ export default function Login() {
 
   const signIn = async () => {
     try {
-      const { user } = await signInWithPopup(firebaseAuth, provider)
-      const { refreshToken, providerData, email } = user
+      const  {user}  = await signInWithPopup(firebaseAuth, provider)
+      console.log('user:', user)
+      // const { refreshToken, providerData, email } = user
 
       async function Go() {
         if (user) {
@@ -32,6 +37,10 @@ export default function Login() {
             emailVerified: user.emailVerified,
           })
 
+
+
+
+
           // ✅ Send to MongoDB via API
           try {
             await axios.post("/api/post/profile", {
@@ -39,8 +48,13 @@ export default function Login() {
               name: user.displayName,
               email: user.email,
               date: new Date().toISOString()
+
             })
-            console.log("User saved to MongoDB")
+            console.log("User saved to MongoDB");
+            localStorage.setItem("email", JSON.stringify(user.email))
+            // localStorage.setItem("user", JSON.stringify(providerData))
+            // localStorage.setItem("accessToken", JSON.stringify(refreshToken))
+
           } catch (err) {
             console.error("Error saving to MongoDB:", err)
           }
@@ -50,9 +64,7 @@ export default function Login() {
       }
       Go()
 
-      localStorage.setItem("email", JSON.stringify(email))
-      localStorage.setItem("user", JSON.stringify(providerData))
-      localStorage.setItem("accessToken", JSON.stringify(refreshToken))
+
 
       Dbadd()
     } catch (err) {

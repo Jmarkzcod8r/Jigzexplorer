@@ -4,6 +4,18 @@ import React, { useEffect, useState } from "react";
 const Page = () => {
   const [leaderboard, setLeaderboard] = useState<any>(null);
 
+  useEffect(() => {
+    const lead = async () => {
+      const res = await fetch("/api/get/leaderboard", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // body: JSON.stringify({ email, accessToken }),
+            }); }
+      lead()
+  })
+
   // useEffect(() => {
   //   const fetchLeaderboard = async () => {
   //     let email = localStorage.getItem("email");

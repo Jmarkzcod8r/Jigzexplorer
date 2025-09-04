@@ -134,6 +134,7 @@ export default function Home() {
             Leaderboard
           </button>
 
+            {/* Settings Button
           <button
             onClick={() => router.push("/settings")}
             className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
@@ -141,7 +142,7 @@ export default function Home() {
           >
             <SettingsIcon className="w-5 h-5" />
             Settings
-          </button>
+          </button> */}
 
           <button
             onClick={redirect_login_shop}

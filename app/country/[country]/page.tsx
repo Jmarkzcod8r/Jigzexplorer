@@ -68,6 +68,9 @@ const JigsawPuzzle: React.FC = () => {
 const handlePieceClick = (piece: string) => {
   if (framePieces.includes(piece)) return; // already placed
 
+  // ⏱️ start timer on first interaction
+  if (!startTime) setStartTime(Date.now());
+
   setSelectedPieces(prev => {
     if (prev.includes(piece)) {
       // deselect if already selected
@@ -76,6 +79,7 @@ const handlePieceClick = (piece: string) => {
     return [...prev, piece]; // add new selection
   });
 };
+;
 
 // ✅ Place pieces on frame in order
 const handleFrameClick = (frameIndex: number) => {
@@ -374,12 +378,14 @@ useEffect(() => {
 
 
   const getBreakpoint = (width: number) => {
-    if (width >= 1536) {
-
+    if (width >= 1536)  {
+      setPuzzleSize(300);
       return "2xl";
     }
-
-    if (width >= 1280) return "xl";
+    if (width >= 1280) {
+      setPuzzleSize(300);
+      return "xl";
+    }
     if (width >= 1024) {
       setPuzzleSize(300);
      return "md"; }
@@ -439,7 +445,7 @@ useEffect(() => {
 
   // ---------------- Render ----------------
   return (
-    <div className="flex flex-col items-center max-[400px]:justify-center max-[400px]:h-screen">
+    <div className="flex flex-col items-center  max-[400px]:h-screen">
        {/* <p> {size.width}px x {size.height}px</p> */}
           {/* <p className="text-sm font-semibold text-blue-600">
         Orientation: {orientation}
@@ -594,7 +600,7 @@ useEffect(() => {
       </div>
 
       {/* Puzzle Board + Original */}
-      <div className="flex justify-center flex-col [@media(min-width:400px)]:flex-row">
+      <div className="flex justify-around flex-col items-center  [@media(min-width:400px)]:flex-row">
           {loading ? (
            <div
            className="flex items-center justify-center border-2 border-gray-300 w-screen"
