@@ -11,10 +11,13 @@ import { useEffect, useState } from "react";import {
   Plug // ✅ added connect icon
 } from "lucide-react";
 import Swal from "sweetalert2";
+import Image from "next/image";
+
 
 export default function Home() {
   const router = useRouter();
   const [menu, setMenu] = useState<"main" | "countries">("main");
+  const [photoURL, setPhotoURL] = useState<string | null>(null);
 
   // 🔹 Default countries
   const default_countries = ["Denmark", "Estonia", "Finland", "France", "Germany", "Switzerland"];
@@ -35,6 +38,7 @@ export default function Home() {
 
   // 🔹 On mount, load localStorage countryList and merge
   useEffect(() => {
+    setPhotoURL(localStorage.getItem('photoURL'));
     const storedList = localStorage.getItem("countryList");
     if (storedList) {
       try {
@@ -103,7 +107,7 @@ export default function Home() {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
-
+      {/* {photoURL} */}
       {/* MAIN MENU */}
       {menu === "main" && (
         <div className="flex flex-col gap-4 items-center">
@@ -117,13 +121,23 @@ export default function Home() {
           </button>
 
           <button
-            onClick={redirect_login_profile}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-          >
-            <User className="w-5 h-5" />
-            Profile
-          </button>
+              onClick={redirect_login_profile}
+              className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
+                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
+            >
+              {photoURL ? (
+                 <img
+                 src={ photoURL.replace(/"/g, "")}
+                 alt="Profile"
+                 width={30}       // 👈 must define width & height
+                 height={30}
+                 className="rounded-full object-cover"
+               />
+             ) : (
+                <User className="w-5 h-5" />
+              )}
+              Profile
+            </button>
 
           <button
             onClick={() => router.push("/leaderboard")}

@@ -52,6 +52,8 @@ export default function Login() {
             })
             console.log("User saved to MongoDB");
             localStorage.setItem("email", JSON.stringify(user.email))
+            localStorage.setItem("photoURL", JSON.stringify(user.photoURL))
+
             // localStorage.setItem("user", JSON.stringify(providerData))
             // localStorage.setItem("accessToken", JSON.stringify(refreshToken))
 
