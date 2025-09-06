@@ -79,7 +79,7 @@ const Page = () => {
       }
     });
 
-    return sortOrder === "asc" ? sorted : sorted.reverse();
+    return sortOrder === "asc" ? sorted.reverse() : sorted;
   };
 
   return (
@@ -143,7 +143,7 @@ const Page = () => {
               className="cursor-pointer ml-2 p-2 rounded-lg bg-gray-200 hover:bg-gray-300"
               title="Toggle ascending/descending"
             >
-              {sortOrder === "asc" ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              {sortOrder === "asc" ? <ChevronUp size={18} /> : <ChevronDown size={18} /> }
             </button>
           </div>
 

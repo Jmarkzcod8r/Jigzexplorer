@@ -24,7 +24,7 @@ export default function Login() {
       console.log('user:', user)
       // const { refreshToken, providerData, email } = user
 
-      async function Go() {
+      async function SaveUser() {
         if (user) {
           const uid = user.uid
           console.log("user okay", uid)
@@ -35,6 +35,7 @@ export default function Login() {
             email: user.email,
             photoURL: user.photoURL,
             emailVerified: user.emailVerified,
+            tickets: 0
           })
 
 
@@ -54,8 +55,8 @@ export default function Login() {
             localStorage.setItem("email", JSON.stringify(user.email))
             localStorage.setItem("photoURL", JSON.stringify(user.photoURL))
 
-            // localStorage.setItem("user", JSON.stringify(providerData))
-            // localStorage.setItem("accessToken", JSON.stringify(refreshToken))
+            const res = await axios.get("/api/post/score")
+
 
           } catch (err) {
             console.error("Error saving to MongoDB:", err)
@@ -64,7 +65,7 @@ export default function Login() {
           router.push(`/`)
         }
       }
-      Go()
+      SaveUser()
 
 
 

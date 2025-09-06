@@ -309,7 +309,7 @@ useEffect(() => {
 
   const hasFiredRef = useRef(false);
   useEffect(() => {
-    if (solvedPuzzlesCount === 10 && !hasFiredRef.current) {
+    if (solvedPuzzlesCount === 1 && !hasFiredRef.current) {
       hasFiredRef.current = true; // ✅ mark as fired
 
       Swal.fire({
@@ -358,8 +358,9 @@ useEffect(() => {
       const payload = {
         email: cleanEmail,
         country,
-        score: score + streak,
+        score: score + (streak * 10),
         datePlayed: Date.now(),
+        tickets: 2
       };
 
       fetch("/api/post/country", {
