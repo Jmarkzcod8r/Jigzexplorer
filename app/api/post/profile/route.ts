@@ -161,7 +161,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("request body:", body);
-    const { name, email, date } = body;
+    const { name, email, date, tickets, overallscore } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, error: "Email is required" }, { status: 400 });
@@ -175,6 +175,8 @@ export async function POST(req: Request) {
           name,
           email,
           updatedAt: date || new Date(),
+          tickets,
+          overallscore
         },
       },
       { upsert: true, new: true }

@@ -74,7 +74,7 @@ export default function ConnectPage() {
       </form>
 
       {/* Reactions */}
-      <div className="flex gap-6 mt-8">
+      {/* <div className="flex gap-6 mt-8">
         <button
           onClick={() => handleReaction("👍")}
           className={`p-3 rounded-full shadow-md hover:scale-110 transition ${
@@ -107,10 +107,10 @@ export default function ConnectPage() {
         >
           <Frown className="w-6 h-6 text-red-600" />
         </button>
-      </div>
+      </div> */}
 
       {/* Comments Section */}
-      <div className="w-full max-w-lg mt-10">
+      {/* <div className="w-full max-w-lg mt-10">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">
           Recent Feedback
         </h2>
@@ -128,7 +128,7 @@ export default function ConnectPage() {
             ))
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -1,67 +1,85 @@
 "use client";
-import React, { useEffect, useState } from "react";
 
-const Page = () => {
-  const [leaderboard, setLeaderboard] = useState<any>(null);
+import React, { useEffect, useState } from "react";
+import { db } from "../api/firebase/firebase-config";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+
+interface Player {
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  overallscore: number;
+  tickets?: number;
+}
+
+const LeaderboardPage = () => {
+  const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
-    const lead = async () => {
-      const res = await fetch("/api/get/leaderboard", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              // body: JSON.stringify({ email, accessToken }),
-            }); }
-      lead()
-  })
+    const q = query(
+      collection(db, "Firebase-jigzexplorer-profiles"),
+      orderBy("overallscore", "desc"),
+      limit(20)
+    );
 
-  // useEffect(() => {
-  //   const fetchLeaderboard = async () => {
-  //     let email = localStorage.getItem("email");
-  //     let accessToken = localStorage.getItem("accessToken");
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let playerList: Player[] = snapshot.docs.map((doc) => ({
+        ...(doc.data() as Player),
+      }));
 
-  //     if (!email || !accessToken) return;
+      // 🔹 Force sort again (in case snapshot order lags)
+      playerList = playerList.sort((a, b) => b.overallscore - a.overallscore);
 
-  //     try {
-  //       // Remove extra quotes if values were stringified
-  //       try {
-  //         email = JSON.parse(email);
-  //       } catch {}
-  //       try {
-  //         accessToken = JSON.parse(accessToken);
-  //       } catch {}
+      setPlayers(playerList);
+    });
 
-  //       const res = await fetch("/api/get/leaderboard", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ email, accessToken }),
-  //       });
-
-  //       const data = await res.json();
-  //       setLeaderboard(data);
-  //     } catch (err) {
-  //       alert("Error fetching leaderboard");
-  //     }
-  //   };
-
-  //   fetchLeaderboard();
-  // }, []);
+    return () => unsubscribe();
+  }, []);
 
   return (
-    <div
-      className="font-sans flex flex-col items-center justify-center
-                 min-h-screen p-8 pb-20 sm:p-20
-                 bg-[url('/Bg.png')] bg-cover bg-center"
-    >
-      <h1 className="text-white text-2xl font-bold mb-4">Leaderboard</h1>
-      <pre className="text-white text-sm">
-        {leaderboard ? JSON.stringify(leaderboard, null, 2) : "Loading..."}
-      </pre>
+    <div className="font-sans flex flex-col items-center min-h-screen p-6 bg-[url('/Bg.png')] bg-cover bg-center">
+      <h1 className="text-3xl font-bold text-white mb-6">🏆 Leaderboard</h1>
+      <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-2xl">
+        <ul className="divide-y divide-gray-200">
+          {players.map((player, index) => (
+            <li
+              key={player.email}
+              className="flex items-center justify-between py-3"
+            >
+              <div className="flex items-center space-x-3">
+                <span className="font-bold text-lg w-6 text-gray-700">
+                  {index + 1}
+                </span>
+                {player.photoURL ? (
+                  <img
+                    src={player.photoURL}
+                    alt={player.displayName}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+                    {player.displayName.charAt(0)}
+                  </div>
+                )}
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    {player.displayName}
+                  </p>
+                  <p className="text-sm text-gray-500">{player.email}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-blue-600 text-lg">
+                  {player.overallscore ?? 0}
+                </p>
+                <p className="text-xs text-gray-500">Score</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
 
-export default Page;
+export default LeaderboardPage;

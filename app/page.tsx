@@ -158,14 +158,14 @@ export default function Home() {
             Settings
           </button> */}
 
-          <button
+          {/* <button
             onClick={redirect_login_shop}
             className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <ShoppingCart className="w-5 h-5" />
             Shop
-          </button>
+          </button> */}
           <button
               onClick={()=> {router.push('/connect')}} // ✅ use a separate redirect function for connect
               className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl

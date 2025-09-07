@@ -5,11 +5,16 @@ import { useParams, useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import Swal from 'sweetalert2'
+import { doc, getDoc, increment, setDoc, updateDoc } from "firebase/firestore"
+// import { apptry, db } from "../api/firebase/firebase-config"
+import { apptry, db } from "@/app/api/firebase/firebase-config";
 
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
+
+  const [quotaPics, setQuotaPics] = useState(10);
 
 
   // Fetch images for the given country
@@ -54,6 +59,8 @@ const JigsawPuzzle: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+
 
   // 👇 initialize safely with 0
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -309,7 +316,7 @@ useEffect(() => {
 
   const hasFiredRef = useRef(false);
   useEffect(() => {
-    if (solvedPuzzlesCount === 1 && !hasFiredRef.current) {
+    if (solvedPuzzlesCount === quotaPics && !hasFiredRef.current) {
       hasFiredRef.current = true; // ✅ mark as fired
 
       Swal.fire({
@@ -319,7 +326,8 @@ useEffect(() => {
           <b>Score:</b> ${score}<br>
           <b>Streak:</b> ${streak}<br>
           <b>Over-All Score:</b> ${score + (streak * 10)}<br>
-          <b>Time Spent:</b> ${elapsedTime}s
+          <b>Time Spent:</b> ${elapsedTime}s <br>
+          <b>Tickets Earned</b> "+2"<br>
         `,
         icon: "success",
         confirmButtonText: "Nice!",
@@ -355,6 +363,9 @@ useEffect(() => {
       const rawEmail = localStorage.getItem("email");
       const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : "";
 
+      const rawUID = localStorage.getItem("uid");
+      const cleanUID = rawUID ? rawUID.replace(/^"+|"+$/g, "") : "";
+
       const payload = {
         email: cleanEmail,
         country,
@@ -373,6 +384,15 @@ useEffect(() => {
         .then((res) => res.json())
         .then((data) => console.log("✅ Saved:", data))
         .catch((err) => console.error("❌ Error saving data:", err));
+
+        const userRef = doc(db, "Firebase-jigzexplorer-profiles", cleanUID);
+        updateDoc(userRef, {
+          tickets: increment(2),
+          overallscore: increment(score + (streak * 10)),
+        })
+        .then(() => console.log("✅ Firestore updated with score & tickets"))
+        .catch((err) => console.error("❌ Firestore update failed:", err));
+
     }
   }, [solvedPuzzlesCount]); // ✅ only watch this
 
@@ -416,7 +436,6 @@ useEffect(() => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
   // useEffect for Turbo button
   useEffect(() => {
     if (turbo && countdown > 0) {
@@ -441,8 +460,6 @@ useEffect(() => {
       setCountdown(30);
     }
   };
-
-
 
   // ---------------- Render ----------------
   return (

@@ -1,15 +1,16 @@
 "use client"
-// 'use cache' -> This produces an error
 
-import React from 'react'
-import { FcGoogle } from 'react-icons/fc'
-import { useRouter } from 'next/navigation'
+import React from "react"
+import { FcGoogle } from "react-icons/fc"
+import { useRouter } from "next/navigation"
 
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth'
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth"
 import { apptry, db } from "../api/firebase/firebase-config"
-import { doc, setDoc } from "firebase/firestore"
-
-// import { getUser } from '../lib/getUser'
+import { doc, getDoc, setDoc } from "firebase/firestore"
 
 import axios from "axios"
 
@@ -20,77 +21,61 @@ export default function Login() {
 
   const signIn = async () => {
     try {
-      const  {user}  = await signInWithPopup(firebaseAuth, provider)
-      console.log('user:', user)
-      // const { refreshToken, providerData, email } = user
+      const { user } = await signInWithPopup(firebaseAuth, provider)
+      console.log("user:", user)
 
-      async function SaveUser() {
-        if (user) {
-          const uid = user.uid
-          console.log("user okay", uid)
+      if (!user) return
 
-          // Save to Firestore
-          await setDoc(doc(db, "Firebase-test userz", uid), {
+      const uid = user.uid
+      localStorage.setItem('uid', uid)
+      console.log("user okay", uid)
+
+      try {
+        // ✅ Save to MongoDB (upsert behavior)
+        const mongores = await axios.post("/api/post/profile", {
+          name: user.displayName,
+          email: user.email, // unique key
+          date: new Date().toISOString(),
+          tickets: 0,
+          overallscore: 0,
+        })
+        if (mongores) {
+          console.log("User saved to MongoDB")
+        }
+
+        // ✅ Local cache
+        localStorage.setItem("email", JSON.stringify(user.email))
+        localStorage.setItem("photoURL", JSON.stringify(user.photoURL))
+
+        // ✅ Save to Firestore only if no existing doc
+        const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid)
+        const userSnap = await getDoc(userRef)
+
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
             displayName: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
             emailVerified: user.emailVerified,
-            tickets: 0
+            tickets: 0,
+            overallscore: 0,
           })
-
-
-
-
-
-          // ✅ Send to MongoDB via API
-          try {
-            await axios.post("/api/post/profile", {
-              // uid,
-              name: user.displayName,
-              email: user.email,
-              date: new Date().toISOString()
-
-            })
-            console.log("User saved to MongoDB");
-            localStorage.setItem("email", JSON.stringify(user.email))
-            localStorage.setItem("photoURL", JSON.stringify(user.photoURL))
-
-            const res = await axios.get("/api/post/score")
-
-
-          } catch (err) {
-            console.error("Error saving to MongoDB:", err)
-          }
-
-          router.push(`/`)
+          console.log("✅ Firestore profile created")
+        } else {
+          console.log("ℹ️ Firestore profile already exists, skipping write")
         }
+
+        await axios.get("/api/post/score")
+
+      } catch (err) {
+        console.error("Error saving to MongoDB/Firestore:", err)
       }
-      SaveUser()
 
-
-
-      Dbadd()
+      // ✅ Done — redirect
+      router.push(`/`)
     } catch (err) {
       console.log("Login error", err)
     }
-  }
-
-  async function Dbadd() {
-    const auth = getAuth()
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const uid = user.uid
-        await setDoc(doc(db, "Firebase-test users", uid), {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          emailVerified: user.emailVerified,
-        })
-      } else {
-        console.log("error")
-      }
-    })
-    console.log("sendingss")
   }
 
   return (
