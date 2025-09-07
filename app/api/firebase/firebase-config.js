@@ -1,8 +1,8 @@
 // import React from "react";
 
-import * as firebase from "firebase/app";
+// import * as firebase from "firebase/app";
 // import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs} from "firebase/firestore"
+import { getFirestore} from "firebase/firestore"
 // import firebase from "firebase";
 // import * as firebase from "firebase";
 
