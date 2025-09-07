@@ -96,10 +96,8 @@
 //   )
 // }
 
-import React from 'react'
+"use client";
 
-export const page = () => {
-  return (
-    <div>Login page</div>
-  )
+export default function Login() {
+  return <>Login</>;
 }
