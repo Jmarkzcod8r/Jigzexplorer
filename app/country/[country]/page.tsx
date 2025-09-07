@@ -5,9 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import Swal from 'sweetalert2'
-import { doc, getDoc, increment, setDoc, updateDoc } from "firebase/firestore"
+import { doc, increment, updateDoc } from "firebase/firestore"
 // import { apptry, db } from "../api/firebase/firebase-config"
-import { apptry, db } from "@/app/api/firebase/firebase-config";
+import {  db } from "@/app/api/firebase/firebase-config";
 
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
