@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ThumbsUp, Heart, Laugh, Frown } from "lucide-react";
+
 import Swal from "sweetalert2";
 
 export default function ConnectPage() {
