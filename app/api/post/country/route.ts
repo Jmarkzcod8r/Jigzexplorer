@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       { email },
       {
         $set: updateField,
-        $inc: { tickets: 2, overallScore: score  },
+        $inc: { tickets: 5, overallScore: score  },
         $setOnInsert: { email }, // ⚡ no tickets here to avoid conflict
       },
       { upsert: true, new: true }
