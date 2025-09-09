@@ -8,12 +8,13 @@ import { doc, onSnapshot } from "firebase/firestore";
 
 interface PlayerScore {
   tickets?: number;
-  countries?: Record<string, { score: number; datePlayed?: string }>;
+  overallscore?: number;
 }
 
 const Page = () => {
   const [profile, setProfile] = useState<any>(null);
-  const [score, setScore] = useState<PlayerScore | null>(null); // tickets + countries
+  const [score, setScore] = useState<PlayerScore | null>(null); // Firestore values
+  const [countries, setCountries] = useState<Record<string, { score: number; datePlayed?: string }> | null>(null); // MongoDB
   const [sortType, setSortType] = useState<"country" | "score" | "date">("country");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [photoURL, setPhotoURL] = useState<string | null>(null);
@@ -22,31 +23,39 @@ const Page = () => {
 
   useEffect(() => {
     const uid = localStorage.getItem("uid");
-    const email = localStorage.getItem("email"); // MongoDB still uses email
+    const email = localStorage.getItem("email");
     if (!uid || !email) return;
 
     const cleanUid = uid.replace(/^"+|"+$/g, "");
     const cleanEmail = email.replace(/^"+|"+$/g, "");
+
     if (!cleanUid || !cleanEmail) return;
 
-    // ✅ Listen to Firestore tickets (real-time)
-    const unsubscribe = onSnapshot(doc(db, "Firebase-jigzexplorer-profiles", cleanUid), (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        setScore((prev) => ({
-          tickets: data?.tickets ?? 0,
-          countries: prev?.countries ?? {}, // keep countries untouched
-        }));
+    // ✅ Firestore listener (tickets + overallscore)
+    const unsubscribe = onSnapshot(
+      doc(db, "Firebase-jigzexplorer-profiles", cleanUid),
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          console.log("📥 Firestore data:", data);
 
-        setProfile({
-          displayName: data.displayName,
-          email: data.email,
-          photoURL: data.photoURL,
-        });
+          setScore({
+            tickets: data?.tickets ?? 0,
+            overallscore: data?.overallscore ?? 0,
+          });
+
+          setProfile({
+            displayName: data.displayName,
+            email: data.email,
+            photoURL: data.photoURL,
+          });
+        } else {
+          console.log("❌ No Firestore document found for UID:", cleanUid);
+        }
       }
-    });
+    );
 
-    // ✅ Fetch countries from MongoDB
+    // ✅ Fetch MongoDB countries
     const fetchCountries = async () => {
       try {
         const res = await fetch("/api/get/profile", {
@@ -57,10 +66,7 @@ const Page = () => {
 
         const data = await res.json();
         if (data.success && data.score?.countries) {
-          setScore((prev) => ({
-            tickets: prev?.tickets ?? 0,
-            countries: data.score.countries,
-          }));
+          setCountries(data.score.countries);
 
           // Save discovered countries to localStorage
           const countryList = Object.keys(data.score.countries).map(
@@ -76,7 +82,6 @@ const Page = () => {
     };
 
     fetchCountries();
-
     return () => unsubscribe();
   }, []);
 
@@ -84,7 +89,7 @@ const Page = () => {
     setPhotoURL(localStorage.getItem("photoURL"));
   }, []);
 
-  // Sorting function for countries
+  // Sorting logic
   const sortEntries = (entries: [string, any][]) => {
     const sorted = [...entries].sort((a, b) => {
       switch (sortType) {
@@ -101,17 +106,13 @@ const Page = () => {
       }
     });
 
-    return sortOrder === "asc" ? sorted.reverse() : sorted;
+    return sortOrder === "asc" ? sorted : sorted.reverse();
   };
 
-  // Total score from MongoDB countries
-  const totalScore =
-    score?.countries
-      ? Object.values(score.countries).reduce(
-          (sum: number, country: any) => sum + (country.score || 0),
-          0
-        )
-      : 0;
+  // Total score from MongoDB
+  const totalScore = countries
+    ? Object.values(countries).reduce((sum, c) => sum + (c.score || 0), 0)
+    : 0;
 
   return (
     <div
@@ -122,7 +123,7 @@ const Page = () => {
       {profile ? (
         <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md text-center">
           {/* Header */}
-          <div className="flex justify-around">
+          <div className="flex justify-around items-center">
             <button
               onClick={() => router.push("/")}
               className="cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
@@ -156,12 +157,13 @@ const Page = () => {
           {/* Info */}
           <h1 className="text-gray-700 mt-2">Email: {profile.email}</h1>
           <p className="text-gray-700 font-medium">🎟️ Tickets: {score?.tickets ?? 0}</p>
-          <p className="text-gray-700 font-medium">🏆 Overall Score: {totalScore}</p>
+          <p className="text-gray-700 font-medium">⭐ Overall Score: {score?.overallscore ?? 0}</p>
+          <p className="text-gray-700 font-medium">🏆 Total Country Score: {totalScore}</p>
 
           {/* Countries */}
           <h2 className="text-lg font-semibold mt-4">Countries:</h2>
 
-          {score?.countries && Object.keys(score.countries).length > 0 ? (
+          {countries && Object.keys(countries).length > 0 ? (
             <>
               {/* Sorting Controls */}
               <div className="flex gap-2 mt-3 mb-4 justify-center items-center">
@@ -201,31 +203,29 @@ const Page = () => {
 
               {/* List */}
               <ul className="mt-2 text-left">
-                {sortEntries(Object.entries(score.countries)).map(
-                  ([country, details]: any) => (
-                    <li
-                      key={country}
-                      className="mb-2 p-3 bg-white shadow rounded-lg flex justify-between items-center"
-                    >
-                      <div>
-                        <span className="font-semibold text-lg text-gray-800">
-                          {country.charAt(0).toUpperCase() + country.slice(1)}
+                {sortEntries(Object.entries(countries)).map(([country, details]: any) => (
+                  <li
+                    key={country}
+                    className="mb-2 p-3 bg-white shadow rounded-lg flex justify-between items-center"
+                  >
+                    <div>
+                      <span className="font-semibold text-lg text-gray-800">
+                        {country.charAt(0).toUpperCase() + country.slice(1)}
+                      </span>
+                      <div className="text-sm text-gray-600">
+                        Score:{" "}
+                        <span className="font-medium text-blue-600">{details.score}</span> | Last Played:{" "}
+                        <span className="font-medium text-green-600">
+                          {details.datePlayed ? new Date(details.datePlayed).toLocaleDateString() : "N/A"}
                         </span>
-                        <div className="text-sm text-gray-600">
-                          Score:{" "}
-                          <span className="font-medium text-blue-600">{details.score}</span> | Last Played:{" "}
-                          <span className="font-medium text-green-600">
-                            {details.datePlayed ? new Date(details.datePlayed).toLocaleDateString() : "N/A"}
-                          </span>
-                        </div>
                       </div>
-                    </li>
-                  )
-                )}
+                    </div>
+                  </li>
+                ))}
               </ul>
             </>
           ) : (
-            <p className="text-gray-500 mt-3">No scores yet. Play to unlock countries 🎮</p>
+            <p className="text-gray-500 mt-3">Loading...</p>
           )}
         </div>
       ) : (
@@ -236,7 +236,6 @@ const Page = () => {
 };
 
 export default Page;
-
 
 
 // "use client";

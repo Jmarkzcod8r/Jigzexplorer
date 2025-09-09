@@ -463,6 +463,55 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        event.preventDefault(); // prevent page scroll
+        placeRandomCorrectPiece();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [framePieces, originalPieces, puzzlePieces]);
+
+  // 👉 Function to auto-place one random correct piece
+  const placeRandomCorrectPiece = () => {
+    if (!originalPieces.length) return;
+
+    // find unsolved slots
+    const unsolvedIndexes = originalPieces
+      .map((piece, idx) => (framePieces[idx] !== piece ? idx : null))
+      .filter((idx): idx is number => idx !== null);
+
+    if (unsolvedIndexes.length === 0) return;
+
+    // pick random unsolved slot
+    const randomIndex =
+      unsolvedIndexes[Math.floor(Math.random() * unsolvedIndexes.length)];
+
+    const correctPiece = originalPieces[randomIndex];
+
+    // update frame
+    const newFramePieces = [...framePieces];
+    newFramePieces[randomIndex] = correctPiece;
+    setFramePieces(newFramePieces);
+
+    // also remove from puzzlePieces so it doesn’t duplicate
+    setPuzzlePieces((prev) => prev.filter((p) => p !== correctPiece));
+
+    // check completion
+    if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
+      const updatedStatus = [...completedStatus];
+      updatedStatus[currentIndex] = true;
+      setCompletedStatus(updatedStatus);
+      setScore((prev) => prev + (turbo ? 200 : 100));
+      fireConfetti();
+      goNext();
+    }
+  };
+
+
   // ---------------- Render ----------------
   return (
     <div className="flex flex-col items-center  max-[400px]:h-screen">

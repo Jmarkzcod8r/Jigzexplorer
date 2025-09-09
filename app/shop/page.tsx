@@ -140,7 +140,10 @@ const calculatedCost = useMemo(() => {
         const countryList = Object.keys(data.data.countries);
         const existing = JSON.parse(localStorage.getItem("countryList") || "[]");
         const updatedList = Array.from(new Set([...existing, ...countryList]));
+
+        // ✅ Update localStorage + ownedCountries state
         localStorage.setItem("countryList", JSON.stringify(updatedList));
+        setOwnedCountries(updatedList);
 
         const filtered = defcountries.filter((c) => !updatedList.includes(c));
         setAvailableCountries(filtered);
@@ -148,7 +151,8 @@ const calculatedCost = useMemo(() => {
         setScores((prev) => [...prev, data.data]);
         setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }]);
       }
-    } else {
+    }
+     else {
       alert("❌ Failed to save score.");
     }
   };
