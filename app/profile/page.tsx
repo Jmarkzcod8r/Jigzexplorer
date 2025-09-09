@@ -3,10 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { ChevronUp, ChevronDown, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { db } from "../api/firebase/firebase-config";
+import { doc, onSnapshot } from "firebase/firestore";
+
+interface PlayerScore {
+  tickets?: number;
+  countries?: Record<string, { score: number; datePlayed?: string }>;
+}
 
 const Page = () => {
   const [profile, setProfile] = useState<any>(null);
-  const [score, setScore] = useState<any>(null);
+  const [score, setScore] = useState<PlayerScore | null>(null); // tickets + countries
   const [sortType, setSortType] = useState<"country" | "score" | "date">("country");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [photoURL, setPhotoURL] = useState<string | null>(null);
@@ -14,13 +21,33 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const email = localStorage.getItem("email");
-    if (!email) return;
+    const uid = localStorage.getItem("uid");
+    const email = localStorage.getItem("email"); // MongoDB still uses email
+    if (!uid || !email) return;
 
+    const cleanUid = uid.replace(/^"+|"+$/g, "");
     const cleanEmail = email.replace(/^"+|"+$/g, "");
-    if (!cleanEmail) return;
+    if (!cleanUid || !cleanEmail) return;
 
-    const fetchProfile = async () => {
+    // ✅ Listen to Firestore tickets (real-time)
+    const unsubscribe = onSnapshot(doc(db, "Firebase-jigzexplorer-profiles", cleanUid), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setScore((prev) => ({
+          tickets: data?.tickets ?? 0,
+          countries: prev?.countries ?? {}, // keep countries untouched
+        }));
+
+        setProfile({
+          displayName: data.displayName,
+          email: data.email,
+          photoURL: data.photoURL,
+        });
+      }
+    });
+
+    // ✅ Fetch countries from MongoDB
+    const fetchCountries = async () => {
       try {
         const res = await fetch("/api/get/profile", {
           method: "POST",
@@ -29,33 +56,35 @@ const Page = () => {
         });
 
         const data = await res.json();
+        if (data.success && data.score?.countries) {
+          setScore((prev) => ({
+            tickets: prev?.tickets ?? 0,
+            countries: data.score.countries,
+          }));
 
-        if (data.success) {
-          // If score exists, extract countries
-          if (data.score && data.score.countries) {
-            const countryList = Object.keys(data.score.countries).map(
-              (c) => c.charAt(0).toUpperCase() + c.slice(1)
-            );
-
-            const savedList = JSON.parse(localStorage.getItem("countryList") || "[]");
-            const updatedList = Array.from(new Set([...savedList, ...countryList]));
-            localStorage.setItem("countryList", JSON.stringify(updatedList));
-          }
-
-          setProfile(data.profile);
-          setScore(data.score); // may be null
-        } else {
-          console.error("Profile fetch failed:", data.error);
+          // Save discovered countries to localStorage
+          const countryList = Object.keys(data.score.countries).map(
+            (c) => c.charAt(0).toUpperCase() + c.slice(1)
+          );
+          const savedList = JSON.parse(localStorage.getItem("countryList") || "[]");
+          const updatedList = Array.from(new Set([...savedList, ...countryList]));
+          localStorage.setItem("countryList", JSON.stringify(updatedList));
         }
       } catch (err) {
-        console.error("❌ Error fetching profile:", err);
+        console.error("❌ Error fetching MongoDB countries:", err);
       }
     };
 
-    fetchProfile();
+    fetchCountries();
+
+    return () => unsubscribe();
   }, []);
 
-  // Sorting function
+  useEffect(() => {
+    setPhotoURL(localStorage.getItem("photoURL"));
+  }, []);
+
+  // Sorting function for countries
   const sortEntries = (entries: [string, any][]) => {
     const sorted = [...entries].sort((a, b) => {
       switch (sortType) {
@@ -75,11 +104,7 @@ const Page = () => {
     return sortOrder === "asc" ? sorted.reverse() : sorted;
   };
 
-  useEffect(() => {
-    setPhotoURL(localStorage.getItem("photoURL"));
-  }, []);
-
-  // Safely calculate total score
+  // Total score from MongoDB countries
   const totalScore =
     score?.countries
       ? Object.values(score.countries).reduce(
@@ -96,6 +121,7 @@ const Page = () => {
     >
       {profile ? (
         <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md text-center">
+          {/* Header */}
           <div className="flex justify-around">
             <button
               onClick={() => router.push("/")}
@@ -127,13 +153,15 @@ const Page = () => {
             </button>
           </div>
 
-          <h1 className="text-gray-700">Email: {profile.email}</h1>
-          <p className="text-gray-700">Tickets: {score ? score.tickets : 0}</p>
-          <p className="text-gray-700">Overall Score: {totalScore}</p>
+          {/* Info */}
+          <h1 className="text-gray-700 mt-2">Email: {profile.email}</h1>
+          <p className="text-gray-700 font-medium">🎟️ Tickets: {score?.tickets ?? 0}</p>
+          <p className="text-gray-700 font-medium">🏆 Overall Score: {totalScore}</p>
 
+          {/* Countries */}
           <h2 className="text-lg font-semibold mt-4">Countries:</h2>
 
-          {score && score.countries ? (
+          {score?.countries && Object.keys(score.countries).length > 0 ? (
             <>
               {/* Sorting Controls */}
               <div className="flex gap-2 mt-3 mb-4 justify-center items-center">
@@ -185,14 +213,9 @@ const Page = () => {
                         </span>
                         <div className="text-sm text-gray-600">
                           Score:{" "}
-                          <span className="font-medium text-blue-600">
-                            {details.score}
-                          </span>{" "}
-                          | Last Played:{" "}
+                          <span className="font-medium text-blue-600">{details.score}</span> | Last Played:{" "}
                           <span className="font-medium text-green-600">
-                            {details.datePlayed
-                              ? new Date(details.datePlayed).toLocaleDateString()
-                              : "N/A"}
+                            {details.datePlayed ? new Date(details.datePlayed).toLocaleDateString() : "N/A"}
                           </span>
                         </div>
                       </div>
@@ -213,6 +236,8 @@ const Page = () => {
 };
 
 export default Page;
+
+
 
 // "use client";
 

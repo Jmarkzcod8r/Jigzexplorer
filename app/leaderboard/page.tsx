@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../api/firebase/firebase-config";
 import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 interface Player {
   displayName: string;
@@ -13,6 +15,7 @@ interface Player {
 }
 
 const LeaderboardPage = () => {
+  const router = useRouter()
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -27,7 +30,10 @@ const LeaderboardPage = () => {
         ...(doc.data() as Player),
       }));
 
-      // 🔹 Force sort again (in case snapshot order lags)
+      // 🔹 Exclude players with 0 score
+      playerList = playerList.filter((p) => (p.overallscore ?? 0) > 0);
+
+      // 🔹 Ensure sorting stays correct
       playerList = playerList.sort((a, b) => b.overallscore - a.overallscore);
 
       setPlayers(playerList);
@@ -36,8 +42,17 @@ const LeaderboardPage = () => {
     return () => unsubscribe();
   }, []);
 
+
   return (
     <div className="font-sans flex flex-col items-center min-h-screen p-6 bg-[url('/Bg.png')] bg-cover bg-center">
+       <button
+            onClick={() => router.push("/")}
+            className="cursor-pointer col-span-4 mb-4 flex items-center gap-2 px-4 py-2 bg-gray-200
+                       text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
       <h1 className="text-3xl font-bold text-white mb-6">🏆 Leaderboard</h1>
       <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-2xl">
         <ul className="divide-y divide-gray-200">

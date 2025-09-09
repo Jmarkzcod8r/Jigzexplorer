@@ -14,7 +14,7 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(10);
+  const [quotaPics, setQuotaPics] = useState(1);
 
 
   // Fetch images for the given country
@@ -25,7 +25,7 @@ const JigsawPuzzle: React.FC = () => {
           const shuffled = [...res.data].sort(() => Math.random() - 0.5);
           setImageList(shuffled);
         } catch (err) {
-          console.error("Error fetching images:", err);
+          // console.error("Error fetching images:", err);
           alert("Error getting data");
         }
       };
@@ -315,9 +315,11 @@ useEffect(() => {
   };
 
   const hasFiredRef = useRef(false);
+  const confettiIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (solvedPuzzlesCount === quotaPics && !hasFiredRef.current) {
-      hasFiredRef.current = true; // ✅ mark as fired
+      hasFiredRef.current = true;
 
       Swal.fire({
         title: "🎉 Congratulations!",
@@ -325,23 +327,21 @@ useEffect(() => {
           You solved <b>10</b> puzzles!<br>
           <b>Score:</b> ${score}<br>
           <b>Streak:</b> ${streak}<br>
-          <b>Over-All Score:</b> ${score + (streak * 10)}<br>
+          <b>Over-All Score:</b> ${score + streak * 10}<br>
           <b>Time Spent:</b> ${elapsedTime}s <br>
-          <b>Tickets Earned</b> "+2"<br>
+          <b>Tickets Earned:</b> +5 🎟
         `,
         icon: "success",
         confirmButtonText: "Nice!",
         didOpen: () => {
           const burst = () => {
             const particleCount = 50;
-
             confetti({
               particleCount,
               origin: { x: 0, y: Math.random() - 0.2 },
               angle: 60,
               spread: 55,
             });
-
             confetti({
               particleCount,
               origin: { x: 1, y: Math.random() - 0.2 },
@@ -351,50 +351,52 @@ useEffect(() => {
           };
 
           burst();
-          const interval = setInterval(burst, 2000);
-
-          Swal.getPopup()?.addEventListener("mouseleave", () => {
-            clearInterval(interval);
-          });
+          confettiIntervalRef.current = setInterval(burst, 2000);
+        },
+        willClose: () => {
+          if (confettiIntervalRef.current) {
+            clearInterval(confettiIntervalRef.current);
+            confettiIntervalRef.current = null;
+          }
         },
       });
 
-      // 📡 Send payload only once
+      // 📡 Save to backend + Firestore
       const rawEmail = localStorage.getItem("email");
       const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : "";
-
       const rawUID = localStorage.getItem("uid");
       const cleanUID = rawUID ? rawUID.replace(/^"+|"+$/g, "") : "";
 
       const payload = {
         email: cleanEmail,
         country,
-        score: score + (streak * 10),
+        score: score + streak * 10,
         datePlayed: Date.now(),
-        tickets: 2
+        tickets: 0,
       };
 
       fetch("/api/post/country", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
-        .then((res) => res.json())
-        .then((data) => console.log("✅ Saved:", data))
-        .catch((err) => console.error("❌ Error saving data:", err));
+      }).catch(console.error);
 
-        const userRef = doc(db, "Firebase-jigzexplorer-profiles", cleanUID);
-        updateDoc(userRef, {
-          tickets: increment(2),
-          overallscore: increment(score + (streak * 10)),
-        })
-        .then(() => console.log("✅ Firestore updated with score & tickets"))
-        .catch((err) => console.error("❌ Firestore update failed:", err));
-
+      const userRef = doc(db, "Firebase-jigzexplorer-profiles", cleanUID);
+      updateDoc(userRef, {
+        tickets: increment(5),
+        overallscore: increment(score + streak * 10),
+      }).catch(console.error);
     }
-  }, [solvedPuzzlesCount]); // ✅ only watch this
+
+    // ✅ Cleanup on unmount / route leave
+    return () => {
+      if (confettiIntervalRef.current) {
+        clearInterval(confettiIntervalRef.current);
+        confettiIntervalRef.current = null;
+      }
+      Swal.close(); // close any active Swal when leaving
+    };
+  }, [solvedPuzzlesCount]);
 
 
 

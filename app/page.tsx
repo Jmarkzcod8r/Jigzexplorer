@@ -20,7 +20,7 @@ export default function Home() {
   const [photoURL, setPhotoURL] = useState<string | null>(null);
 
   // 🔹 Default countries
-  const default_countries = ["Denmark", "Estonia", "Finland", "France", "Germany", "Switzerland"];
+  const default_countries = [ "Estonia", "Finland", "France", "Germany", "Switzerland"];
 
   // 🔹 All available countries
   const countries = [
@@ -158,14 +158,14 @@ export default function Home() {
             Settings
           </button> */}
 
-          {/* <button
+          <button
             onClick={redirect_login_shop}
             className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
           >
             <ShoppingCart className="w-5 h-5" />
             Shop
-          </button> */}
+          </button>
           <button
               onClick={()=> {router.push('/connect')}} // ✅ use a separate redirect function for connect
               className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
@@ -206,7 +206,7 @@ export default function Home() {
                 disabled={!isAvailable}
                 className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
                   ${isAvailable
-                    ? "bg-white opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110 cursor-pointer"
+                    ? "bg-blue-200 opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110 cursor-pointer"
                     : "text-gray-400 bg-white cursor-not-allowed  shadow-none"
                   }`}
               >
