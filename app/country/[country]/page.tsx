@@ -476,40 +476,40 @@ useEffect(() => {
   }, [framePieces, originalPieces, puzzlePieces]);
 
   // 👉 Function to auto-place one random correct piece
-  const placeRandomCorrectPiece = () => {
-    if (!originalPieces.length) return;
+  // const placeRandomCorrectPiece = () => {
+  //   if (!originalPieces.length) return;
 
-    // find unsolved slots
-    const unsolvedIndexes = originalPieces
-      .map((piece, idx) => (framePieces[idx] !== piece ? idx : null))
-      .filter((idx): idx is number => idx !== null);
+  //   // find unsolved slots
+  //   const unsolvedIndexes = originalPieces
+  //     .map((piece, idx) => (framePieces[idx] !== piece ? idx : null))
+  //     .filter((idx): idx is number => idx !== null);
 
-    if (unsolvedIndexes.length === 0) return;
+  //   if (unsolvedIndexes.length === 0) return;
 
-    // pick random unsolved slot
-    const randomIndex =
-      unsolvedIndexes[Math.floor(Math.random() * unsolvedIndexes.length)];
+  //   // pick random unsolved slot
+  //   const randomIndex =
+  //     unsolvedIndexes[Math.floor(Math.random() * unsolvedIndexes.length)];
 
-    const correctPiece = originalPieces[randomIndex];
+  //   const correctPiece = originalPieces[randomIndex];
 
-    // update frame
-    const newFramePieces = [...framePieces];
-    newFramePieces[randomIndex] = correctPiece;
-    setFramePieces(newFramePieces);
+  //   // update frame
+  //   const newFramePieces = [...framePieces];
+  //   newFramePieces[randomIndex] = correctPiece;
+  //   setFramePieces(newFramePieces);
 
-    // also remove from puzzlePieces so it doesn’t duplicate
-    setPuzzlePieces((prev) => prev.filter((p) => p !== correctPiece));
+  //   // also remove from puzzlePieces so it doesn’t duplicate
+  //   setPuzzlePieces((prev) => prev.filter((p) => p !== correctPiece));
 
-    // check completion
-    if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
-      const updatedStatus = [...completedStatus];
-      updatedStatus[currentIndex] = true;
-      setCompletedStatus(updatedStatus);
-      setScore((prev) => prev + (turbo ? 200 : 100));
-      fireConfetti();
-      goNext();
-    }
-  };
+  //   // check completion
+  //   if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
+  //     const updatedStatus = [...completedStatus];
+  //     updatedStatus[currentIndex] = true;
+  //     setCompletedStatus(updatedStatus);
+  //     setScore((prev) => prev + (turbo ? 200 : 100));
+  //     fireConfetti();
+  //     goNext();
+  //   }
+  // };
 
 
   // ---------------- Render ----------------
