@@ -389,13 +389,13 @@ useEffect(() => {
     }
 
     // ✅ Cleanup on unmount / route leave
-    return () => {
-      if (confettiIntervalRef.current) {
-        clearInterval(confettiIntervalRef.current);
-        confettiIntervalRef.current = null;
-      }
-      Swal.close(); // close any active Swal when leaving
-    };
+    // return () => {
+    //   if (confettiIntervalRef.current) {
+    //     clearInterval(confettiIntervalRef.current);
+    //     confettiIntervalRef.current = null;
+    //   }
+    //   Swal.close(); // close any active Swal when leaving
+    // };
   }, [solvedPuzzlesCount]);
 
 
