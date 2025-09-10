@@ -467,7 +467,7 @@ useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Space") {
         event.preventDefault(); // prevent page scroll
-        placeRandomCorrectPiece();
+        // placeRandomCorrectPiece();
       }
     };
 
