@@ -24,12 +24,24 @@ const Page = () => {
   useEffect(() => {
     const uid = localStorage.getItem("uid");
     const email = localStorage.getItem("email");
-    if (!uid || !email) return;
+
+    // ✅ If no email, auto logout
+    if (!email) {
+      localStorage.clear();
+      router.push("/");
+      return;
+    }
+
+    if (!uid) return;
 
     const cleanUid = uid.replace(/^"+|"+$/g, "");
     const cleanEmail = email.replace(/^"+|"+$/g, "");
 
-    if (!cleanUid || !cleanEmail) return;
+    if (!cleanUid || !cleanEmail) {
+      localStorage.clear();
+      router.push("/");
+      return;
+    }
 
     // ✅ Firestore listener (tickets + overallscore)
     const unsubscribe = onSnapshot(
@@ -83,7 +95,7 @@ const Page = () => {
 
     fetchCountries();
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     setPhotoURL(localStorage.getItem("photoURL"));
@@ -120,7 +132,7 @@ const Page = () => {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
-      {profile ? (
+      {/* {profile ? ( */}
         <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md text-center">
           {/* Header */}
           <div className="flex justify-around items-center">
@@ -155,7 +167,7 @@ const Page = () => {
           </div>
 
           {/* Info */}
-          <h1 className="text-gray-700 mt-2">Email: {profile.email}</h1>
+          <h1 className="text-gray-700 mt-2">Email: {profile?.email}</h1>
           <p className="text-gray-700 font-medium">🎟️ Tickets: {score?.tickets ?? 0}</p>
           <p className="text-gray-700 font-medium">⭐ Overall Score: {score?.overallscore ?? 0}</p>
           <p className="text-gray-700 font-medium">🏆 Total Country Score: {totalScore}</p>
@@ -228,9 +240,9 @@ const Page = () => {
             <p className="text-gray-500 mt-3">Loading...</p>
           )}
         </div>
-      ) : (
-        <p className="text-white">Loading profile...</p>
-      )}
+      {/* // ) : (
+      //   <p className="text-white">Loading profile...</p>
+      // )} */}
     </div>
   );
 };
