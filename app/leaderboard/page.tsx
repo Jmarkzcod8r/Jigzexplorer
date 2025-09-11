@@ -80,7 +80,7 @@ const LeaderboardPage = () => {
                   <p className="font-semibold text-gray-800">
                     {player.displayName}
                   </p>
-                  <p className="text-sm text-gray-500">{player.email}</p>
+                  {/* <p className="text-sm text-gray-500">{player.email}</p> */}
                 </div>
               </div>
               <div className="text-right">

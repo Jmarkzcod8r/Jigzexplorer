@@ -101,121 +101,201 @@ export default function Home() {
     }
   };
 
+
+  // ✅ Map of country → emoji flag
+const countryFlags: Record<string, string> = {
+  "Denmark": "🇩🇰",
+  "Estonia": "🇪🇪",
+  "Finland": "🇫🇮",
+  "Iceland": "🇮🇸",
+  "Ireland": "🇮🇪",
+  "Latvia": "🇱🇻",
+  "Lithuania": "🇱🇹",
+  "Norway": "🇳🇴",
+  "Sweden": "🇸🇪",
+  "United Kingdom": "🇬🇧",
+  "Austria": "🇦🇹",
+  "Belgium": "🇧🇪",
+  "France": "🇫🇷",
+  "Germany": "🇩🇪",
+  "Liechtenstein": "🇱🇮",
+  "Luxembourg": "🇱🇺",
+  "Monaco": "🇲🇨",
+  "Netherlands": "🇳🇱",
+  "Switzerland": "🇨🇭",
+  "Albania": "🇦🇱",
+  "Andorra": "🇦🇩",
+  "Bosnia and Herzegovina": "🇧🇦",
+  "Croatia": "🇭🇷",
+  "Greece": "🇬🇷",
+  "Italy": "🇮🇹",
+  "Malta": "🇲🇹",
+  "Montenegro": "🇲🇪",
+  "North Macedonia": "🇲🇰",
+  "Portugal": "🇵🇹",
+  "San Marino": "🇸🇲",
+  "Serbia": "🇷🇸",
+  "Slovenia": "🇸🇮",
+  "Spain": "🇪🇸",
+  "Vatican City": "🇻🇦",
+  "Belarus": "🇧🇾",
+  "Bulgaria": "🇧🇬",
+  "Czechia": "🇨🇿",
+  "Hungary": "🇭🇺",
+  "Moldova": "🇲🇩",
+  "Poland": "🇵🇱",
+  "Romania": "🇷🇴",
+  "Slovakia": "🇸🇰",
+  "Ukraine": "🇺🇦",
+};
+
+
   return (
     <div
       className="font-sans flex flex-col items-center justify-center
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
-      {/* {photoURL} */}
       {/* MAIN MENU */}
-      {menu === "main" && (
-        <div className="flex flex-col gap-4 items-center">
-          <button
-            onClick={() => setMenu("countries")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-          >
-            <Flag className="w-5 h-5" />
-            Start
-          </button>
+{menu === "main" && (
+  <div className="flex flex-col gap-4 items-center  max-w-xs sm:max-w-md">
+    <button
+      onClick={() => setMenu("countries")}
+      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+                 text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+                 hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center"
+    >
+      <Flag className="w-4 h-4 sm:w-5 sm:h-5" />
+      Start
+    </button>
 
-          <button
-              onClick={redirect_login_profile}
-              className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                        shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-            >
-              {photoURL ? (
-                 <img
-                 src={ photoURL.replace(/"/g, "")}
-                 alt="Profile"
-                 width={30}       // 👈 must define width & height
-                 height={30}
-                 className="rounded-full object-cover"
-               />
-             ) : (
-                <User className="w-5 h-5" />
-              )}
-              Profile
-            </button>
-
-          <button
-            onClick={() => router.push("/leaderboard")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-          >
-            <Trophy className="w-5 h-5" />
-            Leaderboard
-          </button>
-
-            {/* Settings Button
-          <button
-            onClick={() => router.push("/settings")}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-          >
-            <SettingsIcon className="w-5 h-5" />
-            Settings
-          </button> */}
-
-          <button
-            onClick={redirect_login_shop}
-            className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                       shadow hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            Shop
-          </button>
-          <button
-              onClick={()=> {router.push('/connect')}} // ✅ use a separate redirect function for connect
-              className="flex items-center gap-2 px-6 py-3 bg-white opacity-80 text-gray-800 rounded-lg text-2xl
-                        shadow hover:bg-green-600 hover:text-white transition duration-300 cursor-pointer"
-            >
-              <Plug className="w-5 h-5" />  {/* ✅ changed icon */}
-              Connect
-            </button>
-        </div>
+    <button
+      onClick={redirect_login_profile}
+      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+                 text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+                 hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center"
+    >
+      {photoURL ? (
+        <img
+          src={photoURL.replace(/"/g, "")}
+          alt="Profile"
+          width={24}
+          height={24}
+          className="sm:w-[30px] sm:h-[30px] rounded-full object-cover"
+        />
+      ) : (
+        <User className="w-4 h-4 sm:w-5 sm:h-5" />
       )}
+      Profile
+    </button>
 
-      {/* COUNTRIES GRID */}
-      {menu === "countries" && (
-        <div
-          className="grid grid-rows-12 grid-cols-4 items-center justify-items-center
-                     gap-1 w-full"
+    <button
+      onClick={() => router.push("/leaderboard")}
+      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+                 text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+                 hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center"
+    >
+      <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
+      Leaderboard
+    </button>
+
+    <button
+      onClick={redirect_login_shop}
+      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+                 text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+                 hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center"
+    >
+      <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+      Shop
+    </button>
+
+    <button
+      onClick={() => router.push("/connect")}
+      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+                 text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+                 hover:bg-green-600 hover:text-white transition duration-300 cursor-pointer  justify-center"
+    >
+      <Plug className="w-4 h-4 sm:w-5 sm:h-5" />
+      Connect
+    </button>
+  </div>
+)}
+
+
+
+
+
+
+
+
+
+
+{/* COUNTRIES GRID */}
+{menu === "countries" && (
+  <div
+    className="grid grid-cols-3 sm:grid-cols-4 items-center justify-items-center
+               gap-1 "
+  >
+    {/* Top controls: Back + Marathon + Progress */}
+    <div className="col-span-3 sm:col-span-4 flex justify-center gap-4 sm:gap-10 items-center  mb-4 px-2">
+      {/* Back button */}
+      <button
+        onClick={() => setMenu("main")}
+        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-200
+                   text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300 text-sm sm:text-base"
+      >
+        <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+        Back
+      </button>
+
+      {/* Marathon button */}
+      {/* <button
+        onClick={() => router.push("/marathon")}
+        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-yellow-400
+                   text-gray-800 rounded-lg shadow hover:bg-yellow-500 transition duration-300 text-sm sm:text-base"
+      >
+        🏃 Marathon
+      </button> */}
+
+      {/* Progress label */}
+      <span className="text-xs sm:text-sm  text-gray-800 bg-gray-300 p-3 rounded-md">
+        {availableCountries.length}/{countries.length} (
+        {((availableCountries.length / countries.length) * 100).toFixed(1)}%)
+      </span>
+    </div>
+
+    {/* Country buttons */}
+    {countries.map((country, index) => {
+      const isAvailable = availableCountries.includes(country);
+      const flagEmoji = countryFlags[country] || "🏳️"; // fallback flag
+
+      return (
+        <button
+          key={index}
+          onClick={() =>
+            isAvailable &&
+            router.push(
+              `/country/${encodeURIComponent(
+                country.toLowerCase().replace(/\s+/g, "-")
+              )}`
+            )
+          }
+          disabled={!isAvailable}
+          className={`flex items-center gap-2 px-2 sm:px-4 py-2 rounded-lg shadow transition duration-300 transform text-xs sm:text-base
+            ${
+              isAvailable
+                ? "bg-blue-200 opacity-95 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-105 cursor-pointer"
+                : "text-gray-400 bg-white cursor-not-allowed shadow-none opacity-70"
+            }`}
         >
-          {/* Back button */}
-          <button
-            onClick={() => setMenu("main")}
-            className="col-span-4 mb-4 flex items-center gap-2 px-4 py-2 bg-gray-200
-                       text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back
-          </button>
+          <span className="text-base sm:text-lg">{flagEmoji}</span>
+          {country}
+        </button>
+      );
+    })}
+  </div>
+)}
 
-          {countries.map((country, index) => {
-            const isAvailable = availableCountries.includes(country);
-
-            return (
-              <button
-                key={index}
-                onClick={() =>
-                  isAvailable &&
-                  router.push(`/country/${encodeURIComponent(country.toLowerCase().replace(/\s+/g, "-"))}`)
-                }
-                disabled={!isAvailable}
-                className={`px-4 py-2 rounded-lg shadow transition duration-300 transform
-                  ${isAvailable
-                    ? "bg-blue-200 opacity-80 text-gray-800 hover:bg-blue-600 hover:text-white hover:scale-110 cursor-pointer"
-                    : "text-gray-400 bg-white cursor-not-allowed  shadow-none"
-                  }`}
-              >
-                {country}
-              </button>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }

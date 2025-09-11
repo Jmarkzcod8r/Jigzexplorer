@@ -59,7 +59,54 @@ export default function Login() {
             emailVerified: user.emailVerified,
             tickets: 0,
             overallscore: 0,
-          })
+            countryscore: {
+              denmark: 0,
+              estonia: 0,
+              finland: 0,
+              iceland: 0,
+              ireland: 0,
+              latvia: 0,
+              lithuania: 0,
+              norway: 0,
+              sweden: 0,
+              "united kingdom": 0,
+              austria: 0,
+              belgium: 0,
+              france: 0,
+              germany: 0,
+              liechtenstein: 0,
+              luxembourg: 0,
+              monaco: 0,
+              netherlands: 0,
+              switzerland: 0,
+              albania: 0,
+              andorra: 0,
+              "bosnia and herzegovina": 0,
+              croatia: 0,
+              greece: 0,
+              italy: 0,
+              malta: 0,
+              montenegro: 0,
+              "north macedonia": 0,
+              portugal: 0,
+              "san marino": 0,
+              serbia: 0,
+              slovenia: 0,
+              spain: 0,
+              "vatican city": 0,
+              belarus: 0,
+              bulgaria: 0,
+              czechia: 0,
+              hungary: 0,
+              moldova: 0,
+              poland: 0,
+              romania: 0,
+              slovakia: 0,
+              ukraine: 0
+            }
+          });
+
+
           console.log("✅ Firestore profile created")
         } else {
           console.log("ℹ️ Firestore profile already exists, skipping write")

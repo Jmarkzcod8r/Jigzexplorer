@@ -9,13 +9,16 @@ import { doc, increment, updateDoc } from "firebase/firestore"
 // import { apptry, db } from "../api/firebase/firebase-config"
 import {  db } from "@/app/api/firebase/firebase-config";
 
+import { updateOverallScore } from "@/app/lib/updateOverallScore";
+
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(2);
-
+  const [quotaPics, setQuotaPics] = useState(10);
+  const [coins, setCoins] = useState(0);
+  const [enableCoins, setEnableCoins] = useState(true);
 
   // Fetch images for the given country
   useEffect(() => {
@@ -89,45 +92,57 @@ const handlePieceClick = (piece: string) => {
 ;
 
 // ✅ Place pieces on frame in order
+
 const handleFrameClick = (frameIndex: number) => {
   const currentPiece = framePieces[frameIndex];
 
-  // 🟢 If cell already has a piece → remove it
+  if (currentPiece && currentPiece === originalPieces[frameIndex]) return;
+
   if (currentPiece) {
     const newFramePieces = [...framePieces];
     newFramePieces[frameIndex] = null;
     setFramePieces(newFramePieces);
+
+    setPuzzlePieces((prev) =>
+      prev.includes(currentPiece) ? prev : [...prev, currentPiece]
+    );
+
     return;
   }
 
-  // 🟢 Place the *first* selected piece
   if (selectedPieces.length === 0) return;
 
   const [piece, ...rest] = selectedPieces;
 
-  // ✅ scoring / streak logic
-  if (originalPieces[frameIndex] === piece) {
-    setStreak((prev) => prev + 1);
-  } else {
-    setStreak(0);
-  }
+  // ✅ check correctness
+  // inside handleFrameClick
+if (originalPieces[frameIndex] === piece) {
+  setStreak((prev) => prev + 1);
+
+  // if (enableCoins) {
+    const baseCoins = 10;
+    const bonusCoins = streak > 0 ? 5 : 0;
+    setCoins((prev) => prev + baseCoins + bonusCoins);
+  // }
+} else {
+  setStreak(0);
+}
 
   const newFramePieces = [...framePieces];
   newFramePieces[frameIndex] = piece;
   setFramePieces(newFramePieces);
+  setSelectedPieces(rest);
 
-  setSelectedPieces(rest); // keep remaining selected
-
-  // ✅ check if puzzle complete
   if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
     const updatedStatus = [...completedStatus];
     updatedStatus[currentIndex] = true;
     setCompletedStatus(updatedStatus);
-    setScore((prevScore) => prevScore + (turbo ? 200 : 100));
+    setScore((prev) => prev + (turbo ? 200 : 100));
     fireConfetti();
     goNext();
   }
 };
+
 
 
   // Init completed status
@@ -284,6 +299,12 @@ useEffect(() => {
 
     if (originalPieces[frameIndex] === piece) {
       setStreak(prev => prev + 1);
+      const baseCoins = 10;
+      // const bonusCoins = streak > 0 ? 5 : 0;
+      const bonusCoins = 0;
+      setCoins((prev) => prev + baseCoins + bonusCoins);
+
+
     } else {
       setStreak(0);
     }
@@ -333,70 +354,42 @@ useEffect(() => {
         `,
         icon: "success",
         confirmButtonText: "Nice!",
-        didOpen: () => {
-          const burst = () => {
-            const particleCount = 50;
-            confetti({
-              particleCount,
-              origin: { x: 0, y: Math.random() - 0.2 },
-              angle: 60,
-              spread: 55,
-            });
-            confetti({
-              particleCount,
-              origin: { x: 1, y: Math.random() - 0.2 },
-              angle: 120,
-              spread: 55,
-            });
-          };
-
-          burst();
-          confettiIntervalRef.current = setInterval(burst, 2000);
-        },
-        willClose: () => {
-          if (confettiIntervalRef.current) {
-            clearInterval(confettiIntervalRef.current);
-            confettiIntervalRef.current = null;
-          }
-        },
       });
 
-      // 📡 Save to backend + Firestore
-      const rawEmail = localStorage.getItem("email");
-      const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : "";
-      const rawUID = localStorage.getItem("uid");
-      const cleanUID = rawUID ? rawUID.replace(/^"+|"+$/g, "") : "";
+      // run async tasks safely
+      const saveToFirestore = async () => {
+        const rawEmail = localStorage.getItem("email");
+        const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : "";
+        const rawUID = localStorage.getItem("uid");
+        const cleanUID = rawUID ? rawUID.replace(/^"+|"+$/g, "") : "";
 
-      const payload = {
-        email: cleanEmail,
-        country,
-        score: score + streak * 10,
-        datePlayed: Date.now(),
-        tickets: 0,
+        const payload = {
+          email: cleanEmail,
+          country,
+          score: score + streak * 10,
+          datePlayed: Date.now(),
+          tickets: 0,
+        };
+
+        // send to backend
+        await fetch("/api/post/country", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).catch(console.error);
+
+        // update Firestore
+        await updateOverallScore(
+          cleanUID,
+          country.toLowerCase(),
+          score + streak * 10
+        );
       };
 
-      fetch("/api/post/country", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }).catch(console.error);
-
-      const userRef = doc(db, "Firebase-jigzexplorer-profiles", cleanUID);
-      updateDoc(userRef, {
-        tickets: increment(5),
-        overallscore: increment(score + streak * 10),
-      }).catch(console.error);
+      saveToFirestore();
     }
-
-    // ✅ Cleanup on unmount / route leave
-    // return () => {
-    //   if (confettiIntervalRef.current) {
-    //     clearInterval(confettiIntervalRef.current);
-    //     confettiIntervalRef.current = null;
-    //   }
-    //   Swal.close(); // close any active Swal when leaving
-    // };
   }, [solvedPuzzlesCount]);
+
 
 
 
@@ -467,7 +460,7 @@ useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Space") {
         event.preventDefault(); // prevent page scroll
-        // placeRandomCorrectPiece();
+        placeRandomCorrectPiece();
       }
     };
 
@@ -476,40 +469,116 @@ useEffect(() => {
   }, [framePieces, originalPieces, puzzlePieces]);
 
   // 👉 Function to auto-place one random correct piece
-  // const placeRandomCorrectPiece = () => {
-  //   if (!originalPieces.length) return;
+// 👉 Function to auto-place one random correct piece (cost: 50 coins)
+const placeRandomCorrectPiece = () => {
+  const cost = 50;
+  if (coins < cost) {
+    alert("Not enough coins!");
+    return;
+  }
+  setCoins(prev => prev - cost);
 
-  //   // find unsolved slots
-  //   const unsolvedIndexes = originalPieces
-  //     .map((piece, idx) => (framePieces[idx] !== piece ? idx : null))
-  //     .filter((idx): idx is number => idx !== null);
+  if (!originalPieces.length) return;
 
-  //   if (unsolvedIndexes.length === 0) return;
+  // find unsolved slots
+  const unsolvedIndexes = originalPieces
+    .map((piece, idx) => (framePieces[idx] !== piece ? idx : null))
+    .filter((idx): idx is number => idx !== null);
 
-  //   // pick random unsolved slot
-  //   const randomIndex =
-  //     unsolvedIndexes[Math.floor(Math.random() * unsolvedIndexes.length)];
+  if (unsolvedIndexes.length === 0) return;
 
-  //   const correctPiece = originalPieces[randomIndex];
+  // pick random unsolved slot
+  const randomIndex =
+    unsolvedIndexes[Math.floor(Math.random() * unsolvedIndexes.length)];
 
-  //   // update frame
-  //   const newFramePieces = [...framePieces];
-  //   newFramePieces[randomIndex] = correctPiece;
-  //   setFramePieces(newFramePieces);
+  const correctPiece = originalPieces[randomIndex];
 
-  //   // also remove from puzzlePieces so it doesn’t duplicate
-  //   setPuzzlePieces((prev) => prev.filter((p) => p !== correctPiece));
+  const newFramePieces = [...framePieces];
+  newFramePieces[randomIndex] = correctPiece;
+  setFramePieces(newFramePieces);
 
-  //   // check completion
-  //   if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
-  //     const updatedStatus = [...completedStatus];
-  //     updatedStatus[currentIndex] = true;
-  //     setCompletedStatus(updatedStatus);
-  //     setScore((prev) => prev + (turbo ? 200 : 100));
-  //     fireConfetti();
-  //     goNext();
-  //   }
-  // };
+  setPuzzlePieces(prev => prev.filter((p) => p !== correctPiece));
+
+  if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
+    const updatedStatus = [...completedStatus];
+    updatedStatus[currentIndex] = true;
+    setCompletedStatus(updatedStatus);
+    setScore(prev => prev + (turbo ? 200 : 100));
+    fireConfetti();
+    goNext();
+  }
+};
+
+// 👉 Function to auto-place 3 random correct pieces (cost: 150 coins)
+const place3RandomCorrectPieces = () => {
+  const cost = 150;
+  if (coins < cost) {
+    alert("Not enough coins!");
+    return;
+  }
+  setCoins(prev => prev - cost);
+
+  if (!originalPieces.length) return;
+
+  const unsolvedIndexes = originalPieces
+    .map((piece, idx) => (framePieces[idx] !== piece ? idx : null))
+    .filter((idx): idx is number => idx !== null);
+
+  if (unsolvedIndexes.length === 0) return;
+
+  const piecesToPlace = Math.min(3, unsolvedIndexes.length);
+  const randomIndexes = unsolvedIndexes
+    .sort(() => 0.5 - Math.random())
+    .slice(0, piecesToPlace);
+
+  const newFramePieces = [...framePieces];
+  let updatedPuzzlePieces = [...puzzlePieces];
+
+  randomIndexes.forEach((randomIndex) => {
+    const correctPiece = originalPieces[randomIndex];
+    newFramePieces[randomIndex] = correctPiece;
+    updatedPuzzlePieces = updatedPuzzlePieces.filter((p) => p !== correctPiece);
+  });
+
+  setFramePieces(newFramePieces);
+  setPuzzlePieces(updatedPuzzlePieces);
+
+  if (newFramePieces.every((p, idx) => p === originalPieces[idx])) {
+    const updatedStatus = [...completedStatus];
+    updatedStatus[currentIndex] = true;
+    setCompletedStatus(updatedStatus);
+    setScore(prev => prev + (turbo ? 200 : 100));
+    fireConfetti();
+    goNext();
+  }
+};
+
+// 👉 Solve All (cost: 300 coins)
+const solveAll = () => {
+  const cost = 300;
+  if (coins < cost) {
+    alert("Not enough coins!");
+    return;
+  }
+  setCoins(prev => prev - cost);
+
+  const newFramePieces = [...originalPieces];
+  setFramePieces(newFramePieces);
+  setPuzzlePieces([]);
+  setSelectedPieces([]);
+  setScore(prev => prev + (turbo ? 200 : 100));
+  setStreak(0);
+
+  const updatedStatus = [...completedStatus];
+  updatedStatus[currentIndex] = true;
+  setCompletedStatus(updatedStatus);
+
+  fireConfetti();
+  goNext();
+};
+
+
+
 
 
   // ---------------- Render ----------------
@@ -652,6 +721,9 @@ useEffect(() => {
         >
           ⬅ Prev
         </button>
+          <div className="flex items-center justify-center px-2 py-1 sm:py-2 text-xs text-white sm:text-lg rounded-lg font-bold">
+            💰 {coins}
+          </div>
         <button
           onClick={goNext}
           className="cursor-pointer px-2 sm:px-4 py-2 rounded-lg text-white bg-green-500 hover:bg-green-600
@@ -668,7 +740,7 @@ useEffect(() => {
 
       </div>
 
-      {/* Puzzle Board + Original */}
+      {/*  Original Image + Puzzle Board */}
       <div className="flex justify-around flex-col items-center  [@media(min-width:400px)]:flex-row">
           {loading ? (
            <div
@@ -728,6 +800,7 @@ useEffect(() => {
        </div>
 
           )}
+
         </div>
 
 
@@ -780,7 +853,34 @@ useEffect(() => {
 
           </div>
         </div>
+
+
       )}
+        <div className="flex flex-row justify-center gap-3 mt-3">
+            <button
+              onClick={placeRandomCorrectPiece}
+              className="cursor-pointer px-4 py-2 bg-blue-500 text-white font-semibold rounded-xl shadow-md
+                        hover:bg-blue-600 active:scale-95 transition transform"
+            >
+              💡 Hint
+            </button>
+
+            <button
+              onClick={place3RandomCorrectPieces}
+              className="cursor-pointer px-4 py-2 bg-green-500 text-white font-semibold rounded-xl shadow-md
+                        hover:bg-green-600 active:scale-95 transition transform"
+            >
+              🎲 (x3)
+            </button>
+
+            <button
+              onClick={solveAll}
+              className="cursor-pointer px-4 py-2 bg-purple-500 text-white font-semibold rounded-xl shadow-md
+                        hover:bg-purple-600 active:scale-95 transition transform"
+            >
+              🧩 Whole
+            </button>
+          </div>
         </main>
 
       {/* // end */}

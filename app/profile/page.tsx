@@ -170,7 +170,7 @@ const Page = () => {
           <h1 className="text-gray-700 mt-2">Email: {profile?.email}</h1>
           <p className="text-gray-700 font-medium">🎟️ Tickets: {score?.tickets ?? 0}</p>
           <p className="text-gray-700 font-medium">⭐ Overall Score: {score?.overallscore ?? 0}</p>
-          <p className="text-gray-700 font-medium">🏆 Total Country Score: {totalScore}</p>
+          {/* <p className="text-gray-700 font-medium">🏆 Total Country Score: {totalScore}</p> */}
 
           {/* Countries */}
           <h2 className="text-lg font-semibold mt-4">Countries:</h2>
@@ -237,7 +237,7 @@ const Page = () => {
               </ul>
             </>
           ) : (
-            <p className="text-gray-500 mt-3">Loading...</p>
+            <p className="text-gray-500 mt-3">🇬🇧 🇫🇷 🇩🇪</p>
           )}
         </div>
       {/* // ) : (
