@@ -15,7 +15,7 @@ export default function Shop() {
   const [profile, setProfile] = useState<any>(null);
   const [score, setScore] = useState<PlayerScore | null>(null); // tickets + countries
   const router = useRouter();
-  const defcountries = [
+  const defcountries = ["Denmark",
     "Iceland", "Ireland", "Latvia", "Lithuania",
     "Norway", "Sweden", "United Kingdom", "Austria", "Belgium",
     "Liechtenstein", "Luxembourg", "Monaco", "Netherlands", "Albania",
@@ -188,78 +188,92 @@ const calculatedCost = useMemo(() => {
   }, []);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <div className="flex justify-baseline">
-        <button
-          onClick={() => router.push("/")}
-          className="cursor-pointer px-2 text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
-        >
-          🏠 Home
-        </button>
-        <h1 className="text-2xl font-bold px-2 text-center items-center">SHOP</h1>
-        <h2 className="text-2xl font-bold px-2 text-center items-center">
-          🎟️ Tickets: {score?.tickets ?? 0}
+    <div
+    className="font-sans flex flex-col items-center justify-center
+      min-h-screen p-6 sm:p-10 bg-[url('/Bg.png')] bg-cover bg-center"
+  >
+    {/* Top Bar */}
+    <div className="flex items-center justify-between w-full max-w-3xl bg-white/80 backdrop-blur-sm rounded-lg shadow-md px-4 py-2 mb-6">
+      <button
+        onClick={() => router.push("/")}
+        className="cursor-pointer flex items-center gap-1 px-3 py-1.5 text-sm sm:text-base rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105 shadow-sm"
+      >
+        🏠 Home
+      </button>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-800">🛍️ Shop</h1>
+      <h2 className="text-base sm:text-lg font-semibold text-gray-700">
+        🎟️ Tickets: <span className="text-blue-600">{score?.tickets ?? 0}</span>
+      </h2>
+    </div>
+
+    {/* Score Form */}
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-3xl bg-white shadow-lg rounded-2xl p-6 space-y-6"
+    >
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+          🌍 Countries
+          <span className="text-sm font-normal text-gray-500">
+            (Cost: {calculatedCost} 🎟️)
+          </span>
         </h2>
+
+        {countries.map((country, index) => (
+          <div
+            key={index}
+            className="p-4 border rounded-xl bg-gray-50 flex flex-col sm:flex-row gap-3 items-center shadow-sm"
+          >
+            <select
+              value={country.name}
+              onChange={(e) => updateCountry(index, "name", e.target.value)}
+              className="cursor-pointer w-full sm:w-1/2 border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            >
+              <option value="">-- Select Country --</option>
+              {availableCountries
+                .filter(
+                  (c) =>
+                    !ownedCountries.includes(c) &&
+                    !countries.some(
+                      (selected, idx) => selected.name === c && idx !== index
+                    )
+                )
+                .sort((a, b) => a.localeCompare(b)) // ✅ Alphabetical order
+                .map((c) => (
+                  <option key={c} value={c}>
+                    {c.replace(/\b\w/g, (char) => char.toUpperCase())}
+                  </option>
+                ))}
+            </select>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={addCountry}
+          className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-md transition-transform transform hover:scale-105"
+        >
+          ➕ Add Country
+        </button>
+        <button
+    type="button"
+    onClick={() =>
+      setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }])
+    }
+    className="cursor-pointer bg-orange-500 text-white mx-2 px-4 py-2 rounded-lg hover:bg-red-700 shadow-md transition-transform transform hover:scale-105"
+  >
+    🔄 Reset
+  </button>
       </div>
 
-      {/* Score Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="mb-6 bg-white shadow rounded-lg p-4 space-y-3"
+      <button
+        type="submit"
+        className="w-full sm:w-auto cursor-pointer bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow-lg transition-transform transform hover:scale-105"
       >
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            🌍 Countries
-            <span className="text-sm font-normal text-gray-600">
-              (Cost: {calculatedCost} 🎟️)
-            </span>
-          </h2>
+         Purchase
+      </button>
+    </form>
+  </div>
 
-          {countries.map((country, index) => (
-            <div key={index} className="p-3 border rounded bg-gray-50 space-y-2">
-             <select
-  value={country.name}
-  onChange={(e) => updateCountry(index, "name", e.target.value)}
-  className="cursor-pointer w-full border p-2 rounded"
->
-  <option value="">-- Select Country --</option>
-  {availableCountries
-    .filter(
-      (c) =>
-        // 🔹 Hide countries already purchased
-        !ownedCountries.includes(c) &&
-        // 🔹 Hide countries already selected in this form
-        !countries.some(
-          (selected, idx) => selected.name === c && idx !== index
-        )
-    )
-    .map((c) => (
-      <option key={c} value={c}>
-        {c.replace(/\b\w/g, (char) => char.toUpperCase())}
-      </option>
-    ))}
-</select>
-
-
-            </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={addCountry}
-            className="cursor-pointer bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-          >
-            ➕ Add Country
-          </button>
-        </div>
-
-        <button
-          type="submit"
-          className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Purchase
-        </button>
-      </form>
-    </div>
   );
 }

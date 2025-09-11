@@ -16,8 +16,8 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(10);
-  const [coins, setCoins] = useState(0);
+  const [quotaPics, setQuotaPics] = useState(1);
+  const [coins, setCoins] = useState(1000);
   const [enableCoins, setEnableCoins] = useState(true);
 
   // Fetch images for the given country
@@ -350,7 +350,7 @@ useEffect(() => {
           <b>Streak:</b> ${streak}<br>
           <b>Over-All Score:</b> ${score + streak * 10}<br>
           <b>Time Spent:</b> ${elapsedTime}s <br>
-          <b>Tickets Earned:</b> +5 🎟
+          <b>Tickets Earned:</b> +2 🎟
         `,
         icon: "success",
         confirmButtonText: "Nice!",

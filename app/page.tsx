@@ -209,7 +209,7 @@ const countryFlags: Record<string, string> = {
       Shop
     </button>
 
-    <button
+    {/* <button
       onClick={() => router.push("/connect")}
       className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
                  text-gray-800 rounded-lg text-lg sm:text-2xl shadow
@@ -217,7 +217,7 @@ const countryFlags: Record<string, string> = {
     >
       <Plug className="w-4 h-4 sm:w-5 sm:h-5" />
       Connect
-    </button>
+    </button> */}
   </div>
 )}
 
