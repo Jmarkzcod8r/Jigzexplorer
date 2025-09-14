@@ -120,7 +120,7 @@ if (originalPieces[frameIndex] === piece) {
   setStreak((prev) => prev + 1);
 
   // if (enableCoins) {
-    const baseCoins = 10;
+    const baseCoins = turbo? 22: 10;
     const bonusCoins = streak > 0 ? 5 : 0;
     setCoins((prev) => prev + baseCoins + bonusCoins);
   // }
@@ -567,7 +567,6 @@ const solveAll = () => {
   setPuzzlePieces([]);
   setSelectedPieces([]);
   setScore(prev => prev + (turbo ? 200 : 100));
-  setStreak(0);
 
   const updatedStatus = [...completedStatus];
   updatedStatus[currentIndex] = true;

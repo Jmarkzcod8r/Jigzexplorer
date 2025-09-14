@@ -241,7 +241,7 @@ const countryFlags: Record<string, string> = {
       {/* Back button */}
       <button
         onClick={() => setMenu("main")}
-        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-200
+        className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-200
                    text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300 text-sm sm:text-base"
       >
         <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
