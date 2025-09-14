@@ -74,6 +74,9 @@ const JigsawPuzzle: React.FC = () => {
 
   const [selectedPieces, setSelectedPieces] = useState<string[]>([]);
 
+  const [puzzleFrames, setPuzzleFrames] = useState<{ [index: number]: (string | null)[] }>({});
+
+
 // ✅ Select/Deselect multiple pieces
 const handlePieceClick = (piece: string) => {
   if (framePieces.includes(piece)) return; // already placed
@@ -113,6 +116,17 @@ const handleFrameClick = (frameIndex: number) => {
   if (selectedPieces.length === 0) return;
 
   const [piece, ...rest] = selectedPieces;
+  // const newFrame = [...framePieces];
+  // newFrame[frameIndex] = piece;
+
+  // setFramePieces(newFrame);
+  // setSelectedPieces(rest);
+
+  // // 🔹 Save this puzzle’s progress
+  // setPuzzleFrames(prev => ({
+  //   ...prev,
+  //   [currentIndex]: newFrame,
+  // }));
 
   // ✅ check correctness
   // inside handleFrameClick
@@ -576,6 +590,11 @@ const solveAll = () => {
   goNext();
 };
 
+useEffect(() => {
+  setFramePieces(
+    puzzleFrames[currentIndex] || Array(originalPieces.length).fill(null)
+  );
+}, [currentIndex, puzzleFrames, originalPieces.length]);
 
 
 
@@ -694,17 +713,22 @@ const solveAll = () => {
         </div>
 
         <button
-      onClick={handleClick}
-      disabled={turbo || cooldown} // 🚫 disables both while active + after finish
-      className={`cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white transition-all duration-300 transform hover:scale-105
-        ${turbo
-          ? "bg-blue-500 shadow-[0_0_20px_5px_rgba(59,130,246,0.7)]"
-          : cooldown
-          ? "bg-gray-400 cursor-not-allowed"
-          : "bg-blue-500 hover:bg-blue-600"}`}
-    >
-      {turbo ? `Turbo Mode (${countdown}s)` : cooldown ? "Turbo (Disabled)" : "Turbo"}
-    </button>
+            onClick={handleClick}
+            disabled={turbo || cooldown} // 🚫 disables both while active + after finish
+            className={`cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white transition-all duration-300 transform hover:scale-105
+              ${turbo
+                ? "bg-blue-500 shadow-[0_0_20px_5px_rgba(59,130,246,0.7)]"
+                : cooldown
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"}`}
+          >
+            {turbo
+              ? `⚡ Turbo Mode (${countdown}s)`
+              : cooldown
+              ? "⚡ Turbo (Disabled)"
+              : "⚡ Turbo"}
+          </button>
+
       </div>
 
       {/* Navigation */}

@@ -222,14 +222,6 @@ const countryFlags: Record<string, string> = {
 )}
 
 
-
-
-
-
-
-
-
-
 {/* COUNTRIES GRID */}
 {menu === "countries" && (
   <div

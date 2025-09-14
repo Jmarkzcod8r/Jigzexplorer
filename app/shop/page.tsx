@@ -272,7 +272,20 @@ const calculatedCost = useMemo(() => {
       >
          Purchase
       </button>
+      <div className="flex items-center justify-center flex-col">
+
+</div>
     </form>
+    <div className="flex items-center flex-col justify-between w-full max-w-3xl bg-gray-100 backdrop-blur-sm rounded-2xl shadow-md px-4 py-2 mt-6"  >
+    <h1>Accelerate Your Account with these premium offers:</h1>
+  <button onClick={() => {router.push('/shop/premium')}}
+    className="cursor-pointer px-6 py-3 mt-2 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300">
+  🚀 All Access
+  </button>
+
+    </div>
+
+
   </div>
 
   );
