@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Swal from "sweetalert2";
 import { db } from "../api/firebase/firebase-config";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import Logo from "../component/logo";
 
 interface PlayerScore {
   tickets?: number;
@@ -192,6 +193,7 @@ const calculatedCost = useMemo(() => {
     className="font-sans flex flex-col items-center justify-center
       min-h-screen p-6 sm:p-10 bg-[url('/Bg.png')] bg-cover bg-center"
   >
+    <Logo/>
     {/* Top Bar */}
     <div className="flex items-center justify-between w-full max-w-3xl bg-white/80 backdrop-blur-sm rounded-lg shadow-md px-4 py-2 mb-6">
       <button

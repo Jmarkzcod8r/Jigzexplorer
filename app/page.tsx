@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";import {
   Flag,
@@ -12,6 +13,7 @@ import { useEffect, useState } from "react";import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import Image from "next/image";
+import Logo from "./component/logo";
 
 
 export default function Home() {
@@ -38,22 +40,37 @@ export default function Home() {
 
   // 🔹 On mount, load localStorage countryList and merge
   useEffect(() => {
-    setPhotoURL(localStorage.getItem('photoURL'));
+    setPhotoURL(localStorage.getItem("photoURL"));
     const storedList = localStorage.getItem("countryList");
+
     if (storedList) {
       try {
-        const parsedList = JSON.parse(storedList).map(
-          (item: string) => item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()
-        );
-        ; // must be an array
-        if (Array.isArray(parsedList)) {
-          setAvailableCountries([...new Set([...default_countries, ...parsedList])]);
-        }
+        const parsedList: string[] = JSON.parse(storedList);
+
+            if (Array.isArray(parsedList)) {
+              // Title Case: every word's first letter capitalized
+              const normalizedList = parsedList.map((item: string) =>
+                item
+                  .trim()
+                  .toLowerCase()
+                  .split(" ")
+                  .map(
+                    (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                  )
+                  .join(" ")
+              );
+
+              setAvailableCountries([
+                ...new Set([...default_countries, ...normalizedList]),
+              ]);
+            }
+
       } catch (e) {
         console.error("Invalid countryList in localStorage:", e);
       }
     }
   }, []);
+
 
   const redirect_login_profile = () => {
     const email = localStorage.getItem("email");
@@ -152,13 +169,16 @@ const countryFlags: Record<string, string> = {
 
   return (
     <div
-      className="font-sans flex flex-col items-center justify-center
+      className="font-sans flex flex-col items-center
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
+      <Logo/>
+
+
       {/* MAIN MENU */}
 {menu === "main" && (
-  <div className="flex flex-col gap-4 items-center  max-w-xs sm:max-w-md">
+  <div className="flex flex-col gap-4 justify-center mt-40 max-w-xs sm:max-w-md">
     <button
       onClick={() => setMenu("countries")}
       className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80

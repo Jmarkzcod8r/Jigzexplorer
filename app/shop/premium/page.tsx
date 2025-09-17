@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import React from "react";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Logo from "@/app/component/logo";
 
 const PremiumWelcome = () => {
   const router = useRouter();
@@ -68,6 +69,7 @@ const handleCheckout = async () => {
       className="font-sans flex flex-col items-center justify-center
         min-h-screen p-6 sm:p-10 bg-[url('/Bg.png')] bg-cover bg-center"
     >
+        <Logo/>
       <div className="bg-white shadow-xl rounded-2xl max-w-lg w-full p-8 text-center">
         <h1 className="text-3xl font-bold text-blue-600 mb-2">
           🎉 We’re glad to have you on board!

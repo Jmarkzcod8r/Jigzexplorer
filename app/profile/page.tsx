@@ -5,6 +5,7 @@ import { ChevronUp, ChevronDown, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { db } from "../api/firebase/firebase-config";
 import { doc, onSnapshot } from "firebase/firestore";
+import Logo from "../component/logo";
 
 interface PlayerScore {
   tickets?: number;
@@ -132,6 +133,9 @@ const Page = () => {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
+        {/* // This is for logo */}
+        {profile && countries &&  <Logo/>}
+
       {/* {profile ? ( */}
         <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md text-center">
           {/* Header */}

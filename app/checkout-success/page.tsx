@@ -22,10 +22,10 @@ const SuccessPage = () => {
         </p>
 
         <button
-          onClick={() => router.push("/premium")}
+          onClick={() => router.push("/")}
           className="w-full bg-green-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-green-700 transition-transform transform hover:scale-105"
         >
-          Go to Premium Features
+          Go to Main Page
         </button>
       </div>
     </div>
