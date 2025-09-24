@@ -9,11 +9,13 @@ import { useEffect, useState } from "react";import {
   Settings as SettingsIcon,
   ArrowLeft,
   ShoppingCart,
-  Plug // ✅ added connect icon
+  Plug, // ✅ added connect icon
+  Globe
 } from "lucide-react";
 import Swal from "sweetalert2";
 import Image from "next/image";
 import Logo from "./component/logo";
+import GlobeButton from "./component/globe";
 
 
 export default function Home() {
@@ -173,8 +175,8 @@ const countryFlags: Record<string, string> = {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
-      <button onClick={()=> {if(menu=='countries') {setMenu('main')}}}
-      > <Logo/></button>
+      <div onClick={()=> {if(menu=='countries') {setMenu('main')}}}
+      > <Logo/></div>
 
       {/* MAIN MENU */}
 {menu === "main" && (
@@ -251,14 +253,16 @@ const countryFlags: Record<string, string> = {
     {/* Top controls: Back + Marathon + Progress */}
     <div className="col-span-3 sm:col-span-4 flex justify-center gap-4 sm:gap-10 items-center  mb-4 px-2">
       {/* Back button */}
-      <button
-        onClick={() => setMenu("main")}
-        className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-200
-                   text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300 text-sm sm:text-base"
-      >
-        <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-        Back
-      </button>
+      <div
+          // onClick={() => setMenu("main")}
+          // className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-200
+          //           text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300 text-sm sm:text-base"
+        >
+          {/* <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> */}
+          <GlobeButton setMenu={function (menu: string): void {
+                throw new Error("Function not implemented.");
+              } }/>
+        </div>
 
       {/* Marathon button */}
       {/* <button
