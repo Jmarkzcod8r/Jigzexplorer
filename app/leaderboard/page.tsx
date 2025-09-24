@@ -43,7 +43,6 @@ const LeaderboardPage = () => {
     return () => unsubscribe();
   }, []);
 
-
   return (
     <div className="font-sans flex flex-col items-center min-h-screen p-6 bg-[url('/Bg.png')] bg-cover bg-center">
         <Logo/>

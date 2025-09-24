@@ -12,7 +12,7 @@ export async function GET(
 
     // Path to the specific country's folder
     const imagesDir = path.join(process.cwd(), "public", "Europe-Pics", country);
-
+    console.log('getting pics for:',country);
     // Check if the folder exists
     if (!fs.existsSync(imagesDir)) {
       return NextResponse.json(

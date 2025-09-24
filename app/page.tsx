@@ -173,8 +173,8 @@ const countryFlags: Record<string, string> = {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
-      <Logo/>
-
+      <button onClick={()=> {if(menu=='countries') {setMenu('main')}}}
+      > <Logo/></button>
 
       {/* MAIN MENU */}
 {menu === "main" && (
