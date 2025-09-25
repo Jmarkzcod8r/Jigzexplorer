@@ -600,6 +600,17 @@ useEffect(() => {
   );
 }, [currentIndex, puzzleFrames, originalPieces.length]);
 
+useEffect(() => {
+  let interval: NodeJS.Timeout;
+
+  if (!isPaused && startTime > 0) {
+    interval = setInterval(() => {
+      setElapsedTime((prev) => prev + 1);
+    }, 1000);
+  }
+
+  return () => clearInterval(interval);
+}, [isPaused]);
 
 
 
