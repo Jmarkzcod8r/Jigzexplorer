@@ -56,9 +56,11 @@ const JigsawPuzzle: React.FC = () => {
   const [cooldown, setCooldown] = useState(false); // 🔒 stays disabled after Turbo ends
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [startTime, setStartTime] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<number | 0>(0);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
 
   const [puzzleSize, setPuzzleSize] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -790,6 +792,16 @@ useEffect(() => {
                     border: "2px solid #ccc",
                     objectFit: "cover",
                   }}
+                  onLoadStart={() => {
+                      if (elapsedTime !== null && elapsedTime !== 0 && startTime > 0) {
+                        setIsPaused(true);
+                      }
+                    }}
+                    onLoad={() => {
+                      if (elapsedTime !== null && elapsedTime !== 0 && startTime > 0) {
+                        setIsPaused(false);
+                      }
+                    }}
                 />
 
               </div>
