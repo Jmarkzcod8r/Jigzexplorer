@@ -11,6 +11,8 @@ import {  db } from "@/app/api/firebase/firebase-config";
 
 import { updateOverallScore } from "@/app/lib/updateOverallScore";
 
+import Image from "next/image";
+
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
@@ -171,7 +173,7 @@ if (originalPieces[frameIndex] === piece) {
     setLoading(true);
     setImage(null);
 
-    const img = new Image();
+    const img = new window.Image();
     img.src = imageList[currentIndex];
 
     img.onload = () => {
@@ -778,17 +780,18 @@ useEffect(() => {
           ) : (
             image && (
               <div className="flex justify-around">
-                <img
+               <Image
                   src={image.src}
                   alt="Original"
+                  width={pieceSize.width * 3}
+                  height={pieceSize.height * 3}
                   style={{
                     margin: "5px",
-                    width: `${pieceSize.width * 3}px`,
-                    height: `${pieceSize.height * 3}px`,
                     border: "2px solid #ccc",
                     objectFit: "cover",
                   }}
                 />
+
               </div>
             )
           )}
