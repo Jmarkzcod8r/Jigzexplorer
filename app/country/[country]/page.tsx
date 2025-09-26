@@ -86,7 +86,7 @@ const handlePieceClick = (piece: string) => {
   if (framePieces.includes(piece)) return; // already placed
 
   // ⏱️ start timer on first interaction
-  if (!startTime) setStartTime(Date.now());
+  // if (!startTime) setStartTime(Date.now());
 
   setSelectedPieces(prev => {
     if (prev.includes(piece)) {
@@ -136,6 +136,7 @@ const handleFrameClick = (frameIndex: number) => {
   // inside handleFrameClick
 if (originalPieces[frameIndex] === piece) {
   setStreak((prev) => prev + 1);
+  if (!startTime) setStartTime(Date.now());
 
   // if (enableCoins) {
     const baseCoins = turbo? 22: 10;
@@ -203,14 +204,14 @@ useEffect(() => {
   useEffect(() => {
     let timerInterval: NodeJS.Timeout | null = null;
 
-    if (startTime && !endTime) {
+    if (startTime && !endTime ) {
       timerInterval = setInterval(() => {
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
     }
 
     return () => {
-      if (timerInterval) clearInterval(timerInterval);
+      if (timerInterval ) clearInterval(timerInterval);
     };
   }, [startTime, endTime]);
 
@@ -600,17 +601,17 @@ useEffect(() => {
   );
 }, [currentIndex, puzzleFrames, originalPieces.length]);
 
-useEffect(() => {
-  let interval: NodeJS.Timeout;
+// useEffect(() => {
+//   let interval: NodeJS.Timeout;
 
-  if (!isPaused && startTime > 0) {
-    interval = setInterval(() => {
-      setElapsedTime((prev) => prev + 1);
-    }, 1000);
-  }
+//   if (!isPaused && startTime > 0) {
+//     interval = setInterval(() => {
+//       setElapsedTime((prev) => prev + 1);
+//     }, 1000);
+//   }
 
-  return () => clearInterval(interval);
-}, [isPaused]);
+//   return () => clearInterval(interval);
+// }, [isPaused]);
 
 
 
@@ -759,6 +760,12 @@ useEffect(() => {
         >
           ⬅ Prev
         </button>
+        {/* <button
+  onClick={() => setIsPaused((prev) => !prev)}
+>
+  {isPaused ? "Resume" : "Pause"}
+</button> */}
+
           <div className="flex items-center justify-center px-2 py-1 sm:py-2 text-xs text-white sm:text-lg rounded-lg font-bold">
             💰 {coins}
           </div>
