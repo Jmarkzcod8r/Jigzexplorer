@@ -36,7 +36,7 @@ export default function Home() {
     "Spain", "Vatican City", "Belarus", "Bulgaria", "Czechia", "Hungary", "Moldova",
     "Poland", "Romania", "Slovakia", "Ukraine"
   ];
-
+  const [storedList, setStoredList] = useState<string[]>([]);
   // 🔹 State for merged available countries
   const [availableCountries, setAvailableCountries] = useState<string[]>(default_countries);
 

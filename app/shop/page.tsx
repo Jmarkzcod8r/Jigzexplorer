@@ -151,11 +151,13 @@ const calculatedCost = useMemo(() => {
 
         setScores((prev) => [...prev, data.data]);
         setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }]);
+        window.location.reload()
       }
     }
      else {
       alert("❌ Failed to save score.");
     }
+
   };
 
   useEffect(() => {
@@ -269,11 +271,13 @@ const calculatedCost = useMemo(() => {
       </div>
 
       <button
-        type="submit"
-        className="w-full sm:w-auto cursor-pointer bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow-lg transition-transform transform hover:scale-105"
-      >
-         Purchase
-      </button>
+  // onClick={() => window.location.reload()}
+  type="submit"
+  className="w-full sm:w-auto cursor-pointer bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow-lg transition-transform transform hover:scale-105"
+>
+  Purchase
+</button>
+
       <div className="flex items-center justify-center flex-col">
 
 </div>
