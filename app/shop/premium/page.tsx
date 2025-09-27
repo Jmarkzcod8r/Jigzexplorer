@@ -17,7 +17,7 @@ const PremiumWelcome = () => {
   const features = [
     "All access to countries",
     "All access to reusable pictures",
-    "Early access to new features and updates",
+    "Early access to future new features and updates",
     "An opportunity to share your pictures as puzzles for the world to see",
     // "Be the first to access future places, culture and wonderfu sites.",
 
