@@ -14,11 +14,9 @@ export default function GlobeButton({ setMenu }: { setMenu: (menu: string) => vo
 
           <!-- Disabled with tooltip -->
           <button disabled title="Coming soon" class="swal2-confirm swal2-styled" style="opacity: 0.5; cursor: not-allowed;">Asia</button>
-          <button disabled title="Coming soon" class="swal2-confirm swal2-styled" style="opacity: 0.5; cursor: not-allowed;">Africa</button>
-          <button disabled title="Coming soon" class="swal2-confirm swal2-styled" style="opacity: 0.5; cursor: not-allowed;">North America</button>
-          <button disabled title="Coming soon" class="swal2-confirm swal2-styled" style="opacity: 0.5; cursor: not-allowed;">South America</button>
+
           <button disabled title="Coming soon" class="swal2-confirm swal2-styled" style="opacity: 0.5; cursor: not-allowed;">Australia</button>
-          <button disabled title="Coming soon" class="swal2-confirm swal2-styled" style="opacity: 0.5; cursor: not-allowed;">Antarctica</button>
+
         </div>
       `,
       showConfirmButton: false,
