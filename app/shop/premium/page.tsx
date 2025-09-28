@@ -42,7 +42,7 @@ const handleCheckout = async () => {
       settings: {
           // displayMode: 'overlay' ,
           theme: 'dark' ,
-          successUrl: 'http://localhost:3000/checkout-success' ,
+          successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
       },
       customData: {
         userId: 'aksdiq8w 89i21kqwdqwidj', // 🔑 your logged-in user's id
