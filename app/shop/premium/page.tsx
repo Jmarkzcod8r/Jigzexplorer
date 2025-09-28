@@ -35,6 +35,9 @@ const handleCheckout = async () => {
     if (!paddle) return alert (`paddle not initialized`) ;
 
     const response = await fetch ("/api/payment");
+    if (response) {
+
+    }
     const data = await response.json();
     if (data) {console.log("data retreieved!");
     paddle.Checkout.open ({
@@ -42,7 +45,8 @@ const handleCheckout = async () => {
       settings: {
           // displayMode: 'overlay' ,
           theme: 'dark' ,
-          successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
+          // successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
+          successUrl: 'http://localhost:3000/checkout-success' ,
       },
       customData: {
         userId: 'aksdiq8w 89i21kqwdqwidj', // 🔑 your logged-in user's id
