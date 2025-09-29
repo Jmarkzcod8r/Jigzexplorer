@@ -34,39 +34,34 @@ const PremiumWelcome = () => {
 const handleCheckout = async () => {
     if (!paddle) return alert (`paddle not initialized`) ;
 
-    const response = await fetch ("/api/payment");
-    if (response) {
+//     const response = await fetch ("/api/payment");
+//     const data = await response.json();
+//     if (data) {console.log("data retreieved!");
+//     paddle.Checkout.open ({
+//       transactionId: data.txn,
+//       settings: {
+//           // displayMode: 'overlay' ,
+//           theme: 'dark' ,
+//           successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
+//           // successUrl: 'http://localhost:3000/checkout-success' ,
+//       },
+//       // customData: {
+//       //   userId: 'aksdiq8w 89i21kqwdqwidj', // 🔑 your logged-in user's id
+//       // },
+//   })
 
-    }
-    const data = await response.json();
-    if (data) {console.log("data retreieved!");
-    paddle.Checkout.open ({
-      transactionId: data.txn,
-      settings: {
-          // displayMode: 'overlay' ,
-          theme: 'dark' ,
-          // successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
-          successUrl: 'http://localhost:3000/checkout-success' ,
-      },
-      customData: {
-        userId: 'aksdiq8w 89i21kqwdqwidj', // 🔑 your logged-in user's id
-      },
-  })
+//     }\
 
-    }
-
-
-
-
-
-    // paddle.Checkout.open ( {
-    //     items: [{priceId: 'pri_01k56yns22wkpzrztxpc0ztr64' , quantity: 1}],
-    //     settings: {
-    //         displayMode: 'overlay' ,
-    //         theme: 'dark' ,
-    //         successUrl: 'http://localhost:3000/checkout-success' ,
-    //     },
-    // });
+   //-------- Client-Side Paddle Checkout ----------------
+    paddle.Checkout.open ( {
+        items: [{priceId: 'pri_01k56yns22wkpzrztxpc0ztr64' , quantity: 1}],
+        settings: {
+            displayMode: 'overlay' ,
+            theme: 'dark' ,
+            successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
+            // successUrl: 'http://localhost:3000/checkout-success' ,
+        },
+    });
 }
 
   return (
