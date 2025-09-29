@@ -58,7 +58,7 @@ const handleCheckout = async () => {
         settings: {
             displayMode: 'overlay' ,
             theme: 'dark' ,
-            successUrl: 'https://jigzexplorer.netlify.app/checkout-success' ,
+            successUrl: 'https://jigzexplorer.quest/checkout-success' ,
             // successUrl: 'http://localhost:3000/checkout-success' ,
         },
     });
