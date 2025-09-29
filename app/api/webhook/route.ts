@@ -55,7 +55,7 @@ import dbConnect from "../mongodb/connection/dbConnection";
 import WebhookLog from "../mongodb/schemas/webhooklog";
 
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.sandbox
+  environment: Environment.production
 });
 
 async function logWebhookEvent(

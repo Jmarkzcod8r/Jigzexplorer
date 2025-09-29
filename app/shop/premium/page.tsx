@@ -25,7 +25,7 @@ const PremiumWelcome = () => {
 
   useEffect (() => {
     initializePaddle({
-        environment: 'sandbox', //either sandbox or production
+        environment: 'production', //either sandbox or production
         token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!,
     }).then((paddle) => setPaddle(paddle))
 }, [])

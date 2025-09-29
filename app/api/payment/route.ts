@@ -2,7 +2,7 @@ import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { NextResponse } from "next/server";
 
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.sandbox,
+  environment: Environment.production,
 
 });
 
@@ -12,7 +12,8 @@ export async function GET(req: Request) {
     items: [
       {
         quantity: 1, // ✅ just a number when using priceId
-        priceId: "pri_01k56yns22wkpzrztxpc0ztr64" // -> this is like a paddle key
+        // priceId: "pri_01k56yns22wkpzrztxpc0ztr64" // -> this is for sandbox environment
+        priceId: "pri_01k69w2t6vc6zg9tyd99hzp80v"
       }
     ]
   });

@@ -102,22 +102,23 @@ export default function Home() {
 
     if (email) {
       router.push("/shop");
-    } else {
-      Swal.fire({
-        title: "Sign In Required",
-        text: "Proceed to Login page?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Proceed",
-        cancelButtonText: "Stay",
-        confirmButtonColor: "#2563eb",
-        cancelButtonColor: "#6b7280",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push("/login");
-        }
-      });
     }
+    // else {
+    //   Swal.fire({
+    //     title: "Sign In Required",
+    //     text: "Proceed to Login page?",
+    //     icon: "warning",
+    //     showCancelButton: true,
+    //     confirmButtonText: "Proceed",
+    //     cancelButtonText: "Stay",
+    //     confirmButtonColor: "#2563eb",
+    //     cancelButtonColor: "#6b7280",
+    //   }).then((result) => {
+    //     if (result.isConfirmed) {
+    //       router.push("/login");
+    //     }
+    //   });
+    // }
   };
 
 
