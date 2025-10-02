@@ -1,8 +1,16 @@
 "use client";
 
+import Logo from "../component/logo";
+
 export default function TermsAndConditions() {
   return (
-    <div className="max-w-3xl mx-auto p-6 text-gray-800">
+    <div
+      className="font-sans flex flex-col items-center justify-center
+        min-h-screen p-6 sm:p-10 bg-[url('/Bg.png')] bg-cover bg-center"
+    >
+
+         <div className="max-w-3xl mx-auto p-6 text-gray-800 bg-white opacity-95">
+         <Logo/>
       <h1 className="text-3xl font-bold mb-4 text-center">Terms & Conditions</h1>
       <p className="text-sm text-gray-500 text-center mb-8">
         Effective Date: October 1, 2025
@@ -87,6 +95,7 @@ export default function TermsAndConditions() {
           Continued use of the app after changes means you accept the updated Terms.
         </li>
       </ul>
+    </div>
     </div>
   );
 }
