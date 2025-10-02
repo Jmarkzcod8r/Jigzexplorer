@@ -19,6 +19,7 @@ const PremiumWelcome = () => {
     "All access to reusable pictures",
     "Early access to future new features and updates",
     "An opportunity to share your pictures as puzzles for the world to see",
+
     // "Be the first to access future places, culture and wonderfu sites.",
 
   ];
@@ -87,13 +88,25 @@ const handleCheckout = async () => {
 
         {/* Features */}
         <ul className="text-left space-y-3 mb-6">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-center gap-2 text-gray-800">
-              <CheckCircle className="text-green-500 w-5 h-5" />
-              {feature}
-            </li>
-          ))}
-        </ul>
+      {features.map((feature, index) => (
+        <li key={index} className="flex items-center gap-2 text-gray-800">
+          <CheckCircle className="text-green-500 w-5 h-5" />
+          {feature}
+        </li>
+      ))}
+      <div className="text-center">
+       <span>
+          See our{" "}
+          <span
+            className="cursor-pointer text-blue-600 hover:underline"
+            onClick={() => router.push("/terms-and-condition")}
+          >
+            Terms and Conditions
+          </span>{" "}
+          for more.
+        </span>
+        </div>
+    </ul>
 
         {/* Action Button */}
         <button
