@@ -99,7 +99,7 @@ const handleCheckout = async () => {
           See our{" "}
           <span
             className="cursor-pointer text-blue-600 hover:underline"
-            onClick={() => router.push("/terms-and-condition")}
+            onClick={() => router.push("/terms-and-conditions")}
           >
             Terms and Conditions
           </span>{" "}
