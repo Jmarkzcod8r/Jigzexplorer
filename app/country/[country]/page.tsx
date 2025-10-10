@@ -141,7 +141,7 @@ if (originalPieces[frameIndex] === piece) {
   // if (enableCoins) {
     const baseCoins = turbo? 22: 10;
     const bonusCoins = streak > 0 ? 5 : 0;
-    setCoins((prev) => prev + baseCoins + bonusCoins);
+    setCoins((prev) => prev + baseCoins + bonusCoins );
   // }
 } else {
   setStreak(0);
