@@ -200,15 +200,21 @@ useEffect(() => {
 }, [puzzleSize]);
 
 
+
+
   // Timer
   useEffect(() => {
     let timerInterval: NodeJS.Timeout | null = null;
 
-    if (startTime && !endTime ) {
+    if (startTime && !endTime) {
+      const countdownStart = 180; // 3 minutes = 300 seconds
+      setElapsedTime(countdownStart);
+
       timerInterval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+        setElapsedTime((prevTime) => prevTime - 1);
       }, 1000);
     }
+
 
     return () => {
       if (timerInterval ) clearInterval(timerInterval);
@@ -349,10 +355,13 @@ useEffect(() => {
   const goPrev = () => setCurrentIndex(prev => (prev - 1 + imageList.length) % imageList.length);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
+    const sign = seconds < 0 ? "-" : "";
+    const absSeconds = Math.abs(seconds);
+    const mins = Math.floor(absSeconds / 60);
+    const secs = absSeconds % 60;
+    return `${sign}${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
 
   const hasFiredRef = useRef(false);
   const confettiIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -364,11 +373,14 @@ useEffect(() => {
       Swal.fire({
         title: "🎉 Congratulations!",
         html: `
-          You solved <b>10</b> puzzles!<br>
-          <b>Score:</b> ${score}<br>
-          <b>Streak:</b> ${streak}<br>
-          <b>Over-All Score:</b> ${score + streak * 10}<br>
+          You solved <b>${quotaPics}</b> puzzles!<br>
+          <b>Raw Score:</b> ${score}<br>
+          <b>Streak:</b> ${streak} * 5<br>
           <b>Time Spent:</b> ${elapsedTime}s <br>
+          <b>Over-All Score:</br>
+          <b> Raw Score + Streak + Time Spent</br>
+          <b>Over-All Score:</b> ${score + (streak * 5) + elapsedTime}<br>
+
           <b>Tickets Earned:</b> +2 🎟
         `,
         icon: "success",
@@ -385,7 +397,7 @@ useEffect(() => {
         const payload = {
           email: cleanEmail,
           country,
-          score: score + streak * 10,
+          score: score + (streak * 10) + elapsedTime,
           datePlayed: Date.now(),
           tickets: 0,
         };
@@ -617,7 +629,7 @@ useEffect(() => {
 
   // ---------------- Render ----------------
   return (
-    <div className="flex flex-col items-center  max-[400px]:h-screen">
+    <div className="flex flex-col items-center  bg-white">
        {/* <p> {size.width}px x {size.height}px</p> */}
           {/* <p className="text-sm font-semibold text-blue-600">
         Orientation: {orientation}
@@ -724,9 +736,14 @@ useEffect(() => {
         >
           Settings
         </button> */}
-         <div className="bg-black/60 text-white px-2 py-1 sm:py-2 text-xs sm:text-lg rounded-md font-bold">
+                <div
+          className={`px-2 py-1 sm:py-2 text-xs sm:text-lg rounded-md font-bold ${
+            elapsedTime < 0 ? "bg-red-700" : "bg-black/60 text-white"
+          }`}
+        >
           ⏱ {formatTime(elapsedTime)}
         </div>
+
 
         <button
             onClick={handleClick}
