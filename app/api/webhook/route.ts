@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       // Handle different event types
       switch (eventData.eventType) {
         case EventName.SubscriptionActivated:
-          console.log(`Product ${eventData.data.id} was activated`);
+          console.log(`Subscription ${eventData.data.id} was activated`);
           await logWebhookEvent(eventData, 'success', null, signature, req);
           // Add your subscription activation logic here
           break;

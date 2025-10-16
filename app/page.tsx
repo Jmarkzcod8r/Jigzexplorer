@@ -2,7 +2,8 @@
 
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";import {
+import { useEffect, useState } from "react";
+import { Image,
   Flag,
   User,
   Trophy,
@@ -13,9 +14,11 @@ import { useEffect, useState } from "react";import {
   Globe
 } from "lucide-react";
 import Swal from "sweetalert2";
-import Image from "next/image";
+// import Image from "next/image";
 import Logo from "./component/logo";
 import GlobeButton from "./component/globe";
+import { detectDevTools } from "./component/checkdevtools";
+import { checkPremiumStatus } from "./lib/checkPremiumStatus";
 
 
 export default function Home() {
@@ -42,6 +45,8 @@ export default function Home() {
 
   // 🔹 On mount, load localStorage countryList and merge
   useEffect(() => {
+    // detectDevTools();
+
     setPhotoURL(localStorage.getItem("photoURL"));
     const storedList = localStorage.getItem("countryList");
 
@@ -99,26 +104,14 @@ export default function Home() {
 
   const redirect_login_shop = () => {
     const email = localStorage.getItem("email");
-
     if (email) {
       router.push("/shop");
     }
-    // else {
-    //   Swal.fire({
-    //     title: "Sign In Required",
-    //     text: "Proceed to Login page?",
-    //     icon: "warning",
-    //     showCancelButton: true,
-    //     confirmButtonText: "Proceed",
-    //     cancelButtonText: "Stay",
-    //     confirmButtonColor: "#2563eb",
-    //     cancelButtonColor: "#6b7280",
-    //   }).then((result) => {
-    //     if (result.isConfirmed) {
-    //       router.push("/login");
-    //     }
-    //   });
-    // }
+  };
+
+
+  const redirect_webp_page = () => {
+    router.push("/convert-webp");
   };
 
 
@@ -230,6 +223,15 @@ const countryFlags: Record<string, string> = {
     >
       <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
       Shop
+    </button>
+    <button
+      onClick={redirect_webp_page}
+      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+                 text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+                 hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center"
+    >
+      <Image className="w-4 h-4 sm:w-5 sm:h-5" />
+      Webp Converter
     </button>
 
     {/* <button

@@ -5,6 +5,7 @@ export interface IProfile extends Document {
   name: string;
   email: string;
   date: Date;
+  premium: boolean;
   // tickets: number;
   // overallscore: number;
   createdAt: Date;
@@ -17,6 +18,7 @@ const ProfileSchema = new Schema<IProfile>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },  // This serves as a key
     date: { type: Date, default: Date.now },
+    premium: { type: Boolean, default: false, required: true },
     // tickets: {type: Number, default:0},
     // overallscore: {type: Number, default:0}
   },

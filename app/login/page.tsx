@@ -1,63 +1,57 @@
-"use client"
+"use client";
 
-import React from "react"
-import { FcGoogle } from "react-icons/fc"
-import { useRouter } from "next/navigation"
-
+import React from "react";
+import { FcGoogle } from "react-icons/fc";
+import { useRouter } from "next/navigation";
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-} from "firebase/auth"
-import { apptry, db } from "../api/firebase/firebase-config"
-import { doc, getDoc, setDoc } from "firebase/firestore"
-
-import axios from "axios"
+} from "firebase/auth";
+import { apptry, db } from "../api/firebase/firebase-config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import axios from "axios";
 
 export default function Login() {
-  const firebaseAuth = getAuth(apptry)
-  const provider = new GoogleAuthProvider()
-  const router = useRouter()
+  const firebaseAuth = getAuth(apptry);
+  const provider = new GoogleAuthProvider();
+  const router = useRouter();
 
   const signIn = async () => {
     try {
-      const { user } = await signInWithPopup(firebaseAuth, provider)
-      console.log("user:", user)
+      const { user } = await signInWithPopup(firebaseAuth, provider);
+      if (!user) return;
 
-      if (!user) return
-
-      const uid = user.uid
-      localStorage.setItem('uid', uid)
-      console.log("user okay", uid)
+      const uid = user.uid;
+      localStorage.setItem("uid", uid);
 
       try {
-        // ✅ Save to MongoDB (upsert behavior)
-        const mongores = await axios.post("/api/post/profile", {
+        // ✅ Save to MongoDB (upsert)
+        await axios.post("/api/post/profile", {
           name: user.displayName,
-          email: user.email, // unique key
+          email: user.email,
           date: new Date().toISOString(),
           tickets: 0,
           overallscore: 0,
-        })
-        if (mongores) {
-          console.log("User saved to MongoDB")
-        }
+        });
 
         // ✅ Local cache
-        localStorage.setItem("email", JSON.stringify(user.email))
-        localStorage.setItem("photoURL", JSON.stringify(user.photoURL))
+        localStorage.setItem("email", JSON.stringify(user.email));
+        localStorage.setItem("photoURL", JSON.stringify(user.photoURL));
 
-        // ✅ Save to Firestore only if no existing doc
-        const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid)
-        const userSnap = await getDoc(userRef)
+        // ✅ Check Firestore
+        const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+        const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
+          // 🔹 If new user, create profile
           await setDoc(userRef, {
             displayName: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
             emailVerified: user.emailVerified,
             tickets: 0,
+            premium: false,
             overallscore: 0,
             countryscore: {
               denmark: 0,
@@ -102,28 +96,31 @@ export default function Login() {
               poland: 0,
               romania: 0,
               slovakia: 0,
-              ukraine: 0
-            }
+              ukraine: 0,
+            },
           });
 
-
-          console.log("✅ Firestore profile created")
+          console.log("✅ Firestore profile created");
+          localStorage.setItem("premium", "false");
         } else {
-          console.log("ℹ️ Firestore profile already exists, skipping write")
+          // 🔹 If user already exists, read data
+          const data = userSnap.data();
+          const isPremium = data?.premium === true;
+
+          console.log("ℹ️ Existing Firestore profile found:", data);
+          localStorage.setItem("premium", isPremium ? "true" : "false");
         }
 
-        await axios.get("/api/post/score")
-
+        await axios.get("/api/post/score");
       } catch (err) {
-        console.error("Error saving to MongoDB/Firestore:", err)
+        console.error("Error saving to MongoDB/Firestore:", err);
       }
 
-      // ✅ Done — redirect
-      router.push(`/`)
+      router.push(`/`);
     } catch (err) {
-      console.log("Login error", err)
+      console.log("Login error", err);
     }
-  }
+  };
 
   return (
     <div
@@ -140,11 +137,5 @@ export default function Login() {
         <p className="text-lg font-semibold ml-4">Sign in with Google</p>
       </div>
     </div>
-  )
+  );
 }
-
-// "use client";
-
-// export default function Login() {
-//   return <>Login</>;
-// }
