@@ -159,34 +159,34 @@ export async function POST(req: Request) {
     const eventData = await paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
     console.log("📦 Paddle Webhook Received:", JSON.stringify(eventData, null, 2));
 
-    const email =
-      'jmgutierrez122091@gmail.com' ||
-      null;
+    // const email =
+    //   'jmgutierrez122091@gmail.com' ||
+    //   null;
 
-    if (!email) console.warn("⚠️ No email found in event data.");
+    // if (!email) console.warn("⚠️ No email found in event data.");
 
     // ✅ Handle event types
     switch (eventData.eventType) {
       case EventName.SubscriptionActivated:
         console.log(`✅ Subscription ${eventData.data.id} activated`);
-        await logWebhookEvent(eventData, "success", null, signature, req);
+        // await logWebhookEvent(eventData, "success", null, signature, req);
 
-        if (email) {
-          const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
-          await updateDoc(userRef, { premium: true });
-          console.log(`🔥 Firestore updated: ${email} -> premium: true`);
-        }
+        // if (email) {
+        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
+        //   await updateDoc(userRef, { premium: true });
+        //   console.log(`🔥 Firestore updated: ${email} -> premium: true`);
+        // }
         break;
 
       case EventName.SubscriptionCanceled:
         console.log(`⚠️ Subscription ${eventData.data.id} canceled`);
         await logWebhookEvent(eventData, "success", null, signature, req);
 
-        if (email) {
-          const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
-          await updateDoc(userRef, { premium: false });
-          console.log(`🧊 Firestore updated: ${email} -> premium: false`);
-        }
+        // if (email) {
+        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
+        //   await updateDoc(userRef, { premium: false });
+        //   console.log(`🧊 Firestore updated: ${email} -> premium: false`);
+        // }
         break;
 
       default:
