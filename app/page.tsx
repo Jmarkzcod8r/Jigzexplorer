@@ -166,15 +166,15 @@ const countryFlags: Record<string, string> = {
   return (
     <div
       className="font-sans flex flex-col items-center
-                 min-h-screen p-8 pb-20 sm:p-20
+                 min-h-screen p-8  sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
-      <div onClick={()=> {if(menu=='countries') {setMenu('main')}}}
+      <div className='' onClick={()=> {if(menu=='countries') {setMenu('main')}}}
       > <Logo/></div>
 
       {/* MAIN MENU */}
 {menu === "main" && (
-  <div className="flex flex-col gap-4 justify-center mt-40 max-w-xs sm:max-w-md">
+  <div className="flex flex-col gap-4 justify-center  max-w-xs sm:max-w-md">
     <button
       onClick={() => setMenu("countries")}
       className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80

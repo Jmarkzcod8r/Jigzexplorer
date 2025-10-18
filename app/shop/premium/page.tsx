@@ -10,9 +10,8 @@ import Link from "next/link";
 
 const PremiumWelcome = () => {
   const router = useRouter();
-
-  // keep your declaration but make it type-safe
-  const [paddle, setPaddle] = useState<Paddle | undefined>(undefined);
+  const [paddle, setPaddle] = useState<Paddle>();
+  const [loading, setLoading] = useState(false);
 
   const features = [
     "All access to countries",
@@ -21,29 +20,66 @@ const PremiumWelcome = () => {
     "An opportunity to share your pictures as puzzles for the world to see",
   ];
 
+  // ✅ Initialize Paddle.js
   useEffect(() => {
     initializePaddle({
-      environment: "sandbox", // either sandbox or production
+      environment: "sandbox", // keep "sandbox" for local testing
       token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!,
-    }).then((p) => setPaddle(p)); // ✅ safe now
+    }).then((p) => setPaddle(p));
   }, []);
 
   const handleCheckout = async () => {
     if (!paddle) return alert("⚠️ Paddle not initialized yet.");
+    setLoading(true);
 
-    const userEmail = JSON.parse(localStorage.getItem("email") || "null");
+    try {
+      // ✅ Get email safely
+      const rawEmail = localStorage.getItem("email");
+      let email = "guest@example.com";
+      if (rawEmail) {
+        try {
+          email = JSON.parse(rawEmail);
+        } catch {
+          email = rawEmail;
+        }
+      }
 
-    paddle.Checkout.open({
-      items: [{ priceId: "pri_01k56yns22wkpzrztxpc0ztr64", quantity: 1 }],
-      settings: {
-        displayMode: "overlay",
-        theme: "dark",
-        successUrl: "https://jigzexplorer.quest/checkout-success",
-      },
-      customData: {
-        email:  "guest@example.com", // This is useless since customData needs to be sent in the backend
-      },
-    });
+      // ✅ Create transaction via your backend
+      const response = await fetch("/api/paddle/activate-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to create checkout session");
+
+      console.log("Paddle response:", data);
+
+      // ✅ 1️⃣ Prefer the Paddle checkout overlay if available
+      if (data.transactionId && paddle.Checkout) {
+        paddle.Checkout.open({
+          transactionId: data.transactionId, //--> This is where your custom data is packaged along with other infos.
+          settings: {
+            displayMode: "overlay",
+            theme: "dark",
+            successUrl: "http://localhost:3000/checkout-success",
+            // cancelUrl: "http://localhost:3000/checkout-cancel",
+          },
+        });
+      }
+      // ✅ 2️⃣ Otherwise fallback: redirect to the returned checkout URL
+      else if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error("Missing checkoutUrl or transactionId from server");
+      }
+    } catch (err: any) {
+      console.error("Checkout failed:", err);
+      alert("Failed to start checkout. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,7 +106,6 @@ const PremiumWelcome = () => {
               {feature}
             </li>
           ))}
-
           <li className="flex items-center gap-2 text-gray-800">
             <CheckCircle className="text-green-500 w-5 h-5" />
             <span>
@@ -100,9 +135,10 @@ const PremiumWelcome = () => {
 
         <button
           onClick={handleCheckout}
-          className="cursor-pointer w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
+          disabled={loading}
+          className="cursor-pointer w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
         >
-          Start Exploring 🚀
+          {loading ? "Loading..." : "Start Exploring 🚀"}
         </button>
       </div>
     </div>

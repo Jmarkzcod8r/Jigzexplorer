@@ -129,7 +129,7 @@ const Page = () => {
 
   return (
     <div
-      className="font-sans flex flex-col items-center justify-center
+      className="font-sans flex flex-col items-center
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
@@ -146,6 +146,9 @@ const Page = () => {
             >
               🏠 Home
             </button>
+            <button
+              className="cursor-pointer hover:scale-140"
+              onClick={()=> {router.push("/profile/info")}}>
             <div>
               {photoURL ? (
                 <img
@@ -159,6 +162,7 @@ const Page = () => {
                 <User className="w-5 h-5" />
               )}
             </div>
+            </button>
             <button
               onClick={() => {
                 localStorage.clear();
@@ -171,8 +175,8 @@ const Page = () => {
           </div>
 
           {/* Info */}
-          <h1 className="text-gray-700 mt-2">Email: {profile?.email}</h1>
-          <p className="text-gray-700 font-medium">🎟️ Tickets: {score?.tickets ?? 0}</p>
+          {/* <h1 className="text-gray-700 mt-2">Email: {profile?.email}</h1> */}
+          <p className="text-gray-700 font-medium pt-5">🎟️ Tickets: {score?.tickets ?? 0}</p>
           <p className="text-gray-700 font-medium">⭐ Overall Score: {score?.overallscore ?? 0}</p>
           {/* <p className="text-gray-700 font-medium">🏆 Total Country Score: {totalScore}</p> */}
 

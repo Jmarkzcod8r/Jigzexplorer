@@ -52,8 +52,8 @@ export default function Login() {
             emailVerified: user.emailVerified,
             tickets: 0,
             tokens: 0,
-            trialpremium: false,
-            premium: false,
+            premium: {status: false, //-> status is either 'false','true' or 'trial'
+             subscriptionId: '' ,   },
             overallscore: 0,
             countryscore: {
               denmark: 0,

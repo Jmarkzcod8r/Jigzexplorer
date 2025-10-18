@@ -157,7 +157,13 @@ export async function POST(req: Request) {
 
     // ✅ Verify and decode Paddle event
     const eventData = await paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
-    console.log("📦 Paddle Webhook Received:", JSON.stringify(eventData, null, 2));
+    const JSONData = JSON.stringify(eventData, null, 2);
+    console.log("📦 Paddle Webhook Received:", JSONData);
+
+    // convert string back to object
+    const parsedData = JSON.parse(JSONData);
+    const email = parsedData.data?.customData?.userEmail
+    console.log('thiss is in customData',email);
 
     // const email =
     //   'jmgutierrez122091@gmail.com' ||
@@ -172,9 +178,14 @@ export async function POST(req: Request) {
         // await logWebhookEvent(eventData, "success", null, signature, req);
 
         // if (email) {
-        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
-        //   await updateDoc(userRef, { premium: true });
-        //   console.log(`🔥 Firestore updated: ${email} -> premium: true`);
+          const userRef = doc(db, "Firebase-jigzexplorer-profiles", 'AXAPdt9hjEU2EizoEgE7z1fICCB3');
+          await updateDoc(userRef, {
+            premium: {
+              status: true,
+              subscriptionId: eventData.data.id, // ✅ correct syntax
+            },
+          });
+          console.log(`🔥 Firestore updated: ${email} -> premium status: true`);
         // }
         break;
 
