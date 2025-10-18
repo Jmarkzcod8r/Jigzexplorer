@@ -105,6 +105,7 @@ import dbConnect from "../../mongodb/connection/dbConnection";
 import Profile from "../../mongodb/schemas/profile";
 import { NextResponse } from "next/server";
 import { setProfileInCache , getProfileFromCache} from "@/app/lib/getUser";
+
 export async function GET(req: Request) {
   await dbConnect();
 
@@ -189,5 +190,36 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("❌ Error saving profile:", error);
     return NextResponse.json({ success: false, error: "Failed to save profile" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  await dbConnect();
+
+  try {
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json({ success: false, error: "Email is required" }, { status: 400 });
+    }
+
+    // 🧹 Delete Profile and Score data from MongoDB
+    const Profile = (await import("../../mongodb/schemas/profile")).default;
+    const Score = (await import("../../mongodb/schemas/score")).default;
+
+    await Profile.deleteOne({ email });
+    await Score.deleteOne({ email });
+
+    return NextResponse.json({
+      success: true,
+      message: `User data for ${email} deleted successfully.`,
+    });
+  } catch (error) {
+    console.error("❌ Error deleting user data:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to delete user data" },
+      { status: 500 }
+    );
   }
 }

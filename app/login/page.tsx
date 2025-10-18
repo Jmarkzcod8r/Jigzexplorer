@@ -51,6 +51,8 @@ export default function Login() {
             photoURL: user.photoURL,
             emailVerified: user.emailVerified,
             tickets: 0,
+            tokens: 0,
+            trialpremium: false,
             premium: false,
             overallscore: 0,
             countryscore: {
