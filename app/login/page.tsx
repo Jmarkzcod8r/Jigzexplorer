@@ -3,11 +3,7 @@
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { apptry, db } from "../api/firebase/firebase-config";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import axios from "axios";
@@ -26,6 +22,9 @@ export default function Login() {
       localStorage.setItem("uid", uid);
 
       try {
+        // ✅ Prepare default premium object
+        const defaultPremium = { status: "false", subscriptionId: "" };
+
         // ✅ Save to MongoDB (upsert)
         await axios.post("/api/post/profile", {
           name: user.displayName,
@@ -33,11 +32,13 @@ export default function Login() {
           date: new Date().toISOString(),
           tickets: 0,
           overallscore: 0,
+          premium: defaultPremium,
         });
 
         // ✅ Local cache
         localStorage.setItem("email", JSON.stringify(user.email));
         localStorage.setItem("photoURL", JSON.stringify(user.photoURL));
+        localStorage.setItem("premium", defaultPremium.status);
 
         // ✅ Check Firestore
         const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
@@ -52,8 +53,7 @@ export default function Login() {
             emailVerified: user.emailVerified,
             tickets: 0,
             tokens: 0,
-            premium: {status: false, //-> status is either 'false','true' or 'trial'
-             subscriptionId: '' ,   },
+            premium: defaultPremium, // Use object instead of boolean
             overallscore: 0,
             countryscore: {
               denmark: 0,
@@ -103,14 +103,13 @@ export default function Login() {
           });
 
           console.log("✅ Firestore profile created");
-          localStorage.setItem("premium", "false");
         } else {
           // 🔹 If user already exists, read data
           const data = userSnap.data();
-          const isPremium = data?.premium === true;
+          const premiumStatus = data?.premium?.status ?? "false";
 
           console.log("ℹ️ Existing Firestore profile found:", data);
-          localStorage.setItem("premium", isPremium ? "true" : "false");
+          localStorage.setItem("premium", premiumStatus);
         }
 
         await axios.get("/api/post/score");

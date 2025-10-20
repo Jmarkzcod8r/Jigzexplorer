@@ -9,8 +9,9 @@ export async function POST(req: Request) {
   console.log("api/paddle/activate-subscription");
 
   try {
-    const { email } = await req.json();
+    const { email, uid } = await req.json();
     console.log("email:", email);
+    console.log("uid:", uid);
 
     if (!email) {
       return NextResponse.json({ error: "Missing email" }, { status: 400 });
@@ -20,29 +21,15 @@ export async function POST(req: Request) {
     const txn = await paddle.transactions.create({
       items: [
         {
-          quantity: 1,
-          price: {
-            name: "Premium Plan",
-            description: "Access to premium features",
-            billingCycle: {
-              interval: "month",
-              frequency: 1,
-            },
-            unitPrice: {
-              currencyCode: "USD",
-              amount: "500", // $5.00 subscription
-            },
-            product: {
-              name: "Premium Access",
-              description: "1-Month Premium Subscription",
-              taxCategory: "saas",
-            },
-          },
+
+          priceId: "pri_01k56yns22wkpzrztxpc0ztr64",
+          quantity: 1
         },
       ],
 
       customData: {
         userEmail: email, // optional, useful for tracking
+        uid: uid
       },
       // successUrl: "https://jigzexplorer.quest/checkout-success",
       // cancelUrl: "https://jigzexplorer.quest/checkout-cancel",

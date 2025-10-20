@@ -162,7 +162,9 @@ export async function POST(req: Request) {
 
     // convert string back to object
     const parsedData = JSON.parse(JSONData);
-    const email = parsedData.data?.customData?.userEmail
+    const email = parsedData.data?.customData?.userEmail;
+    const uid = parsedData.data?.customData?.uid;
+
     console.log('thiss is in customData',email);
 
     // const email =
@@ -178,14 +180,15 @@ export async function POST(req: Request) {
         // await logWebhookEvent(eventData, "success", null, signature, req);
 
         // if (email) {
-          const userRef = doc(db, "Firebase-jigzexplorer-profiles", 'AXAPdt9hjEU2EizoEgE7z1fICCB3');
+          const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
           await updateDoc(userRef, {
             premium: {
               status: true,
               subscriptionId: eventData.data.id, // ✅ correct syntax
             },
           });
-          console.log(`🔥 Firestore updated: ${email} -> premium status: true`);
+          console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
+          // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
         // }
         break;
 

@@ -100,11 +100,10 @@
 //     );
 //   }
 // }
-
 import dbConnect from "../../mongodb/connection/dbConnection";
 import Profile from "../../mongodb/schemas/profile";
 import { NextResponse } from "next/server";
-import { setProfileInCache , getProfileFromCache} from "@/app/lib/getUser";
+import { setProfileInCache, getProfileFromCache } from "@/app/lib/getUser";
 
 export async function GET(req: Request) {
   await dbConnect();
@@ -162,11 +161,17 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("request body:", body);
-    const { name, email, date, tickets, overallscore } = body;
+    const { name, email, date, tickets, overallscore, premium } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, error: "Email is required" }, { status: 400 });
     }
+
+    // Prepare premium object with defaults if not provided
+    const premiumData = {
+      status: premium?.status ?? 'false',
+      subscriptionId: premium?.subscriptionId ?? "",
+    };
 
     // ⬆️ Update DB
     const profile = await Profile.findOneAndUpdate(
@@ -177,7 +182,8 @@ export async function POST(req: Request) {
           email,
           updatedAt: date || new Date(),
           tickets,
-          overallscore
+          overallscore,
+          premium: premiumData, // Update the premium object
         },
       },
       { upsert: true, new: true }

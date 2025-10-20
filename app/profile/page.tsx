@@ -154,8 +154,8 @@ const Page = () => {
                 <img
                   src={photoURL.replace(/"/g, "")}
                   alt="Profile"
-                  width={40}
-                  height={40}
+                  width={60}
+                  height={60}
                   className="rounded-full object-cover"
                 />
               ) : (

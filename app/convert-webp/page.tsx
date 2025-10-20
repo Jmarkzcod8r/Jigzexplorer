@@ -283,7 +283,7 @@ const Page = () => {
         <ul className="space-y-2">
           <li className="flex items-start">
             <span className="text-green-600 mr-2">✔️</span>
-            <span>Up to <strong>30–40% smaller</strong> file sizes than JPEG or PNG — save more storage space.</span>
+            <span>Up to <strong>30–40% smaller</strong> file sizes smaller than JPEG, JPG or PNG — save more storage space.</span>
           </li>
           <li className="flex items-start">
             <span className="text-green-600 mr-2">✔️</span>
