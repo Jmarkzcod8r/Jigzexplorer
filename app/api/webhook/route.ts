@@ -109,7 +109,7 @@ import { db } from "@/app/lib/firebase";
 
 // ✅ Paddle setup
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.production,
+  environment: Environment.sandbox,
 });
 
 // ✅ Webhook logging function
