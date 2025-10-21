@@ -10,17 +10,18 @@ export async function POST(req: Request) {
       }
 
       try {
-        const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/pause`, {
+        // const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/pause`, {
 
+        const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/cancel`, { //-> This is for live
           method: "POST",
           headers: {
             Authorization: `Bearer ${process.env.PADDLE_SECRET_TOKEN}`,
             "Content-Type": "application/json",
           },
           // Pause immediately.. <start>
-              body: JSON.stringify({
-                "effective_from": "immediately"
-              }),
+              // body: JSON.stringify({
+              //   "effective_from": "immediately"
+              // }),
           //  <end> ...Pause immediately..
         });
 

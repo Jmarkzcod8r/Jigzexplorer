@@ -23,7 +23,7 @@ const PremiumWelcome = () => {
   // ✅ Initialize Paddle.js
   useEffect(() => {
     initializePaddle({
-      environment: "sandbox", // keep "sandbox" for local testing
+      environment: "production", // keep "sandbox" for local testing
       token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!,
     }).then((p) => setPaddle(p));
   }, []);
@@ -69,8 +69,8 @@ const PremiumWelcome = () => {
           settings: {
             displayMode: "overlay",
             theme: "dark",
-            successUrl: "http://localhost:3000/checkout-success",
-            // cancelUrl: "http://localhost:3000/checkout-cancel",
+            // successUrl: "http://localhost:3000/checkout-success",
+            successUrl: "https://jigzexplorer.quest/checkout-success",
           },
         });
       }

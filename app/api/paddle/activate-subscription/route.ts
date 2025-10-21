@@ -2,7 +2,7 @@ import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { NextResponse } from "next/server";
 
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.sandbox, // switch to .production in live mode
+  environment: Environment.production, // switch to .production in live mode
 });
 
 export async function POST(req: Request) {
@@ -22,7 +22,9 @@ export async function POST(req: Request) {
       items: [
         {
 
-          priceId: "pri_01k56yns22wkpzrztxpc0ztr64",
+          // priceId: "pri_01k56yns22wkpzrztxpc0ztr64",  // This is sandbox
+          priceId: "pri_01k83r3pxx8g69603hpc7bm27s",  // This is for production
+
           quantity: 1
         },
       ],
