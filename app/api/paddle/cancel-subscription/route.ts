@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       try {
         // const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/pause`, {
 
-        const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/cancel`, { //-> This is for live
+        const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, { //-> This is for live
           method: "POST",
           headers: {
             Authorization: `Bearer ${process.env.PADDLE_SECRET_TOKEN}`,
