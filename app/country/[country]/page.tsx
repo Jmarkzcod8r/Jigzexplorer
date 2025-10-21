@@ -18,7 +18,7 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(10);
+  const [quotaPics, setQuotaPics] = useState(1);
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
@@ -380,12 +380,18 @@ useEffect(() => {
           <b>Over-All Score:</br>
           <b> Raw Score + Streak + Time Spent</br>
           <b>Over-All Score:</b> ${score + (streak * 5) + elapsedTime}<br>
-
           <b>Tickets Earned:</b> +2 🎟
         `,
         icon: "success",
+        showCancelButton: true,
         confirmButtonText: "Nice!",
+        cancelButtonText: "Restart 🔄",
+      }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.cancel) {
+          window.location.reload(); // Refresh the page when Restart is clicked
+        }
       });
+
 
       // run async tasks safely
       const saveToFirestore = async () => {
