@@ -18,7 +18,7 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(10);
+  const [quotaPics, setQuotaPics] = useState(1);
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
@@ -373,13 +373,16 @@ useEffect(() => {
       Swal.fire({
         title: "🎉 Congratulations!",
         html: `
-          You solved <b>${quotaPics}</b> puzzles!<br>
+          <b>Over-All Score <b><br>
+        <div style="margin-top:10px; font-size:45px; font-weight:bold; color:green;">
+        🏆  ${score + (streak * 5) + elapsedTime} 🏆 </div><br>
+          <b>You solved <b>${quotaPics}</b> puzzles!<br>
           <b>Raw Score:</b> ${score}<br>
           <b>Streak:</b> ${streak} * 5<br>
           <b>Time Spent:</b> ${elapsedTime}s <br>
           <b>Over-All Score:</br>
           <b> Raw Score + Streak + Time Spent</br>
-          <b>Over-All Score:</b> ${score + (streak * 5) + elapsedTime} 🏆<br>
+
           <b>Tickets Earned:</b> +2 🎟
         `,
         icon: "success",
