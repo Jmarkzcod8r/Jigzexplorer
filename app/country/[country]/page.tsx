@@ -18,7 +18,7 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(1);
+  const [quotaPics, setQuotaPics] = useState(10);
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
