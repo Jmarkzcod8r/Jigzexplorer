@@ -622,6 +622,22 @@ useEffect(() => {
   );
 }, [currentIndex, puzzleFrames, originalPieces.length]);
 
+useEffect(() => {
+  const handleKeyPress = (event: { key: string; }) => {
+    if (event.key === "1") {
+      const firstFrame = document.getElementById("frame-1");
+      if (firstFrame) {
+        firstFrame.click(); // Simulate a click
+      }
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyPress);
+
+  // Cleanup
+  return () => window.removeEventListener("keydown", handleKeyPress);
+}, []);
+
 // useEffect(() => {
 //   let interval: NodeJS.Timeout;
 
