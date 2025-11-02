@@ -53,13 +53,32 @@ export default function TermsAndConditions() {
           </li>
         </ul>
 
+        {/* ✅ Updated Refund Policy Section */}
         <h2 className="text-xl font-semibold mt-6 mb-2">4. Refund Policy</h2>
         <ul className="list-disc pl-6 space-y-2">
-          <li>At this time, all payments are <strong>non-refundable</strong>.</li>
-          <li>Please review your purchase carefully before completing your transaction.</li>
+          <li>
+            In accordance with <strong>Paddle’s Terms and Conditions</strong>, customers are entitled to request a refund within
+            <strong> 14 days</strong> of their purchase date, provided that premium content has not been fully accessed or consumed.
+          </li>
+          <li>
+            Refund requests must be submitted through Paddle’s support system at{" "}
+            <Link
+              href="https://paddle.net"
+              className="text-blue-600 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              paddle.net
+            </Link>.
+          </li>
+          <li>
+            After 14 days, all payments are considered <strong>final and non-refundable</strong>.
+          </li>
+          <li>
+            JigzExplorer does not directly process refunds but will assist users in contacting Paddle if needed.
+          </li>
         </ul>
 
-        {/* ✅ New Section: Cancellation Policy */}
         <h2 className="text-xl font-semibold mt-6 mb-2">5. Cancellation Policy</h2>
         <ul className="list-disc pl-6 space-y-2">
           <li>
@@ -122,20 +141,20 @@ export default function TermsAndConditions() {
         </ul>
 
         <h2 className="text-xl font-semibold mt-6 mb-2">10. Account Suspension and Termination</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>
-                JigzExplorer reserves the right to suspend, restrict, or permanently terminate any account that violates these Terms and Conditions or engages in fraudulent, abusive, or harmful behavior.
-              </li>
-              <li>
-                Such actions may include, but are not limited to, cheating, exploiting bugs, using unauthorized software, or attempting to disrupt the service.
-              </li>
-              <li>
-                We may also suspend or remove accounts to comply with legal obligations, enforce payment terms, or protect the integrity of the platform.
-              </li>
-              <li>
-                JigzExplorer is not liable for any loss of progress, rewards, or subscription time resulting from account suspension or termination due to violation of these Terms.
-              </li>
-            </ul>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            JigzExplorer reserves the right to suspend, restrict, or permanently terminate any account that violates these Terms and Conditions or engages in fraudulent, abusive, or harmful behavior.
+          </li>
+          <li>
+            Such actions may include, but are not limited to, cheating, exploiting bugs, using unauthorized software, or attempting to disrupt the service.
+          </li>
+          <li>
+            We may also suspend or remove accounts to comply with legal obligations, enforce payment terms, or protect the integrity of the platform.
+          </li>
+          <li>
+            JigzExplorer is not liable for any loss of progress, rewards, or subscription time resulting from account suspension or termination due to violation of these Terms.
+          </li>
+        </ul>
       </div>
     </div>
   );

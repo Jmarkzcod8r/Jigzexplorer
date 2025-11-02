@@ -2,7 +2,7 @@ import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { NextResponse } from "next/server";
 
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.production, // switch to .production in live mode
+  environment: Environment.sandbox, // switch to .production in live mode
 });
 
 export async function POST(req: Request) {
@@ -22,8 +22,8 @@ export async function POST(req: Request) {
       items: [
         {
 
-          // priceId: "pri_01k56yns22wkpzrztxpc0ztr64",  // This is sandbox
-          priceId: "pri_01k83r3pxx8g69603hpc7bm27s",  // This is for production
+          priceId: "pri_01k56yns22wkpzrztxpc0ztr64",  // This is sandbox
+          // priceId: "pri_01k83r3pxx8g69603hpc7bm27s",  // This is for production
 
           quantity: 1
         },
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     console.log("Created Paddle transaction:", txn);
 
     // ✅ Return checkout URL to frontend
-    return NextResponse.json({ transactionId: txn.id, checkoutUrl: txn.checkout });
+    return NextResponse.json({ transactionId: txn.id });
   } catch (error: any) {
     console.error("Paddle Checkout Error:", error);
     return NextResponse.json(

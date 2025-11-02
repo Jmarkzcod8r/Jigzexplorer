@@ -7,11 +7,15 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { apptry, db } from "../api/firebase/firebase-config";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import axios from "axios";
+import { useUpdateUserProfile } from "../lib/zustand/updateUserProfile";
 
 export default function Login() {
   const firebaseAuth = getAuth(apptry);
   const provider = new GoogleAuthProvider();
   const router = useRouter();
+
+  // ✅ Zustand store hook
+  const { updateUserProfile, resetUserProfile } = useUpdateUserProfile();
 
   const signIn = async () => {
     try {
@@ -22,10 +26,9 @@ export default function Login() {
       localStorage.setItem("uid", uid);
 
       try {
-        // ✅ Prepare default premium object
-        const defaultPremium = { status: "false", subscriptionId: "" };
+        const defaultPremium = { active: false, expiryDate: "" };
 
-        // ✅ Save to MongoDB (upsert)
+        // ✅ Save to MongoDB
         await axios.post("/api/post/profile", {
           name: user.displayName,
           email: user.email,
@@ -38,78 +41,59 @@ export default function Login() {
         // ✅ Local cache
         localStorage.setItem("email", JSON.stringify(user.email));
         localStorage.setItem("photoURL", JSON.stringify(user.photoURL));
-        localStorage.setItem("premium", defaultPremium.status);
+        localStorage.setItem("premium", JSON.stringify(defaultPremium.active));
 
-        // ✅ Check Firestore
+        // ✅ Firestore user check
         const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
-          // 🔹 If new user, create profile
-          await setDoc(userRef, {
+          // 🔹 Create new Firestore profile
+          const newUserData = {
             displayName: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
             emailVerified: user.emailVerified,
             tickets: 0,
             tokens: 0,
-            premium: defaultPremium, // Use object instead of boolean
+            premium: defaultPremium,
             overallscore: 0,
-            countryscore: {
-              denmark: 0,
-              estonia: 0,
-              finland: 0,
-              iceland: 0,
-              ireland: 0,
-              latvia: 0,
-              lithuania: 0,
-              norway: 0,
-              sweden: 0,
-              "united kingdom": 0,
-              austria: 0,
-              belgium: 0,
-              france: 0,
-              germany: 0,
-              liechtenstein: 0,
-              luxembourg: 0,
-              monaco: 0,
-              netherlands: 0,
-              switzerland: 0,
-              albania: 0,
-              andorra: 0,
-              "bosnia and herzegovina": 0,
-              croatia: 0,
-              greece: 0,
-              italy: 0,
-              malta: 0,
-              montenegro: 0,
-              "north macedonia": 0,
-              portugal: 0,
-              "san marino": 0,
-              serbia: 0,
-              slovenia: 0,
-              spain: 0,
-              "vatican city": 0,
-              belarus: 0,
-              bulgaria: 0,
-              czechia: 0,
-              hungary: 0,
-              moldova: 0,
-              poland: 0,
-              romania: 0,
-              slovakia: 0,
-              ukraine: 0,
-            },
-          });
+            countryscore: Object.fromEntries(
+              [
+                "denmark","estonia","finland","iceland","ireland","latvia","lithuania","norway","sweden","united kingdom",
+                "austria","belgium","france","germany","liechtenstein","luxembourg","monaco","netherlands","switzerland",
+                "albania","andorra","bosnia and herzegovina","croatia","greece","italy","malta","montenegro","north macedonia",
+                "portugal","san marino","serbia","slovenia","spain","vatican city","belarus","bulgaria","czechia","hungary",
+                "moldova","poland","romania","slovakia","ukraine"
+              ].map((country) => [country, 0])
+            ),
+            countryATH: Object.fromEntries(
+              [
+                "denmark","estonia","finland","iceland","ireland","latvia","lithuania","norway","sweden","united kingdom",
+                "austria","belgium","france","germany","liechtenstein","luxembourg","monaco","netherlands","switzerland",
+                "albania","andorra","bosnia and herzegovina","croatia","greece","italy","malta","montenegro","north macedonia",
+                "portugal","san marino","serbia","slovenia","spain","vatican city","belarus","bulgaria","czechia","hungary",
+                "moldova","poland","romania","slovakia","ukraine"
+              ].map((country) => [country, 0])
+            ),
+          };
 
+          await setDoc(userRef, newUserData);
           console.log("✅ Firestore profile created");
+
+          // ✅ Update Zustand store
+          resetUserProfile(); // Clear existing
+          updateUserProfile(newUserData); // Load fresh Firestore data into Zustand
         } else {
-          // 🔹 If user already exists, read data
           const data = userSnap.data();
-          const premiumStatus = data?.premium?.status ?? "false";
+          const premiumStatus = data?.premium?.active ?? false;
 
           console.log("ℹ️ Existing Firestore profile found:", data);
-          localStorage.setItem("premium", premiumStatus);
+          localStorage.setItem("premium", JSON.stringify(premiumStatus));
+
+          // ✅ Also update Zustand with Firestore data
+          resetUserProfile();
+          updateUserProfile(data);
         }
 
         await axios.get("/api/post/score");

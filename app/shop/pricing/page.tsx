@@ -13,139 +13,196 @@ const PremiumWelcome = () => {
   const [paddle, setPaddle] = useState<Paddle>();
   const [loading, setLoading] = useState(false);
 
-  const features = [
+  const premiumFeatures = [
     "All access to countries",
-    "All access to reusable pictures",
+    // "All access to reusable pictures",
     "Early access to future new features and updates",
     "An opportunity to share your pictures as puzzles for the world to see",
+  ];
+
+  const freeFeatures = [
+    "Limited access to countries",
+    "Play to Unlcok feature",
+    "Limited access to webp converter",
+    // "Limited access to continents",
   ];
 
   // ✅ Initialize Paddle.js
   useEffect(() => {
     initializePaddle({
-      environment: "production", // keep "sandbox" for local testing
+      environment: "sandbox", // Use "sandbox" for testing
       token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!,
     }).then((p) => setPaddle(p));
   }, []);
 
   const handleCheckout = async () => {
-    if (!paddle) return alert("⚠️ Paddle not initialized yet.");
+    if (!paddle) {
+      alert("⚠️ Paddle not initialized yet.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // ✅ Get email safely
+      // Optional: show a temporary "processing" page
+      router.push("/checkout");
+
       const rawEmail = localStorage.getItem("email");
       const rawuid = localStorage.getItem("uid");
+
       let email = "guest@example.com";
-      let uid = '...uid...';
+      let uid = "...uid...";
+
       if (rawEmail && rawuid) {
         try {
           email = JSON.parse(rawEmail);
-          uid = rawuid
+          uid = rawuid;
         } catch {
           email = rawEmail;
-
         }
       }
 
-      // ✅ Create transaction via your backend
-      console.log('creating transaction via backend. email:', email)
-      console.log('creating transaction via backend. uid:', uid)
       const response = await fetch("/api/paddle/activate-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email , uid}),
+        body: JSON.stringify({ email, uid }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to create checkout session");
 
-      console.log("Paddle response:", data);
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
 
-      // ✅ 1️⃣ Prefer the Paddle checkout overlay if available
+      // ✅ Paddle checkout (Overlay or Redirect)
       if (data.transactionId && paddle.Checkout) {
         paddle.Checkout.open({
-          transactionId: data.transactionId, //--> This is where your custom data is packaged along with other infos.
+          transactionId: data.transactionId,
           settings: {
-            displayMode: "overlay",
+            displayMode: "overlay", // in-page checkout
             theme: "dark",
-            // successUrl: "http://localhost:3000/checkout-success",
-            successUrl: "https://jigzexplorer.quest/checkout-success",
+            successUrl: "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
+            // closeCallback: () => {
+            //   // If user closes/cancels checkout
+            //   router.push("/shop/pricing");
+            // },
           },
         });
-      }
-      // ✅ 2️⃣ Otherwise fallback: redirect to the returned checkout URL
-      else if (data.checkoutUrl) {
+      } else if (data.checkoutUrl) {
+        // ✅ Redirect method fallback
         window.location.href = data.checkoutUrl;
-      } else {
+      }
+      else {
         throw new Error("Missing checkoutUrl or transactionId from server");
       }
     } catch (err: any) {
       console.error("Checkout failed:", err);
-      alert("Failed to start checkout. Please try again.");
+      alert("Checkout failed. Please try again.");
+      router.push("/shop/pricing");
     } finally {
       setLoading(false);
     }
   };
 
+
   return (
     <div className="font-sans flex flex-col items-center justify-center min-h-screen p-6 sm:p-10 bg-[url('/Bg.png')] bg-cover bg-center">
       <Logo />
-      <div className="bg-white shadow-xl rounded-2xl max-w-lg w-full p-8 text-center">
-        <h1 className="text-3xl font-bold text-blue-600 mb-2">
-          🎉 We’re glad to have you on board!
-        </h1>
 
-        <p className="text-gray-500 mb-6 text-lg font-medium">
-          Premium Package – Only{" "}
-          <span className="text-blue-600 font-bold">$3/month</span>
-        </p>
+      {/* Cards Container */}
+      <div className="flex flex-col sm:flex-row gap-8 mt-8">
+        {/* Free Package Card */}
+        <div className="bg-white shadow-xl rounded-2xl max-w-lg w-full p-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-700 mb-2">🆓 Free Package</h1>
 
-        <p className="text-gray-700 mb-6">
-          Accelerate your exploration with these cool features:
-        </p>
+          <p className="text-gray-500 mb-6 text-lg font-medium">Enjoy the basics for free</p>
 
-        <ul className="text-left space-y-3 mb-6">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-center gap-2 text-gray-800">
-              <CheckCircle className="text-green-500 w-5 h-5" />
-              {feature}
-            </li>
-          ))}
-          <li className="flex items-center gap-2 text-gray-800">
-            <CheckCircle className="text-green-500 w-5 h-5" />
+          <ul className="text-left space-y-3 mb-6">
+            {freeFeatures.map((feature, index) => (
+              <li key={index} className="flex items-center gap-2 text-gray-800">
+                <CheckCircle className="text-green-500 w-5 h-5" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+
+          <div className="text-center mb-6">
             <span>
-              <Link
-                href="/convert-webp"
-                className="text-blue-600 hover:underline font-semibold"
+              See our{" "}
+              <span
+                className="cursor-pointer text-blue-600 hover:underline"
+                onClick={() => router.push("/terms-and-conditions")}
               >
-                WebP image converter
-              </Link>{" "}
-              – Save up space for more adventures to capture.
+                Terms and Conditions
+              </span>{" "}
+              for more.
             </span>
-          </li>
-        </ul>
+          </div>
 
-        <div className="text-center mb-6">
-          <span>
-            See our{" "}
-            <span
-              className="cursor-pointer text-blue-600 hover:underline"
-              onClick={() => router.push("/terms-and-conditions")}
-            >
-              Terms and Conditions
-            </span>{" "}
-            for more.
-          </span>
+          <button
+            onClick={() => router.push("/")}
+            className="cursor-pointer w-full bg-gray-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-gray-600 transition-transform transform hover:scale-105"
+          >
+            Continue Free 🚶‍♂️
+          </button>
         </div>
 
-        <button
-          onClick={handleCheckout}
-          disabled={loading}
-          className="cursor-pointer w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
-        >
-          {loading ? "Loading..." : "Start Exploring 🚀"}
-        </button>
+        {/* Premium Package Card */}
+        <div className="bg-white shadow-xl rounded-2xl max-w-lg w-full p-8 text-center">
+          <h1 className="text-3xl font-bold text-blue-600 mb-2">
+            🎉 Premium Package
+          </h1>
+
+          <p className="text-gray-500 mb-6 text-lg font-medium">
+            Only <span className="text-blue-600 font-bold">$3/month</span>
+          </p>
+
+          {/* <p className="text-gray-700 mb-6">
+            Accelerate your exploration with these cool features:
+          </p> */}
+
+          <ul className="text-left space-y-3 mb-6">
+            {premiumFeatures.map((feature, index) => (
+              <li key={index} className="flex items-center gap-2 text-gray-800">
+                <CheckCircle className="text-green-500 w-5 h-5" />
+                {feature}
+              </li>
+            ))}
+            <li className="flex items-center gap-2 text-gray-800">
+              <CheckCircle className="text-green-500 w-5 h-5" />
+              <span>
+                <Link
+                  href="/convert-webp"
+                  className="text-blue-600 hover:underline font-semibold"
+                >
+                  WebP image converter
+                </Link>{" "}
+                – Save up space for more adventures to capture.
+              </span>
+            </li>
+          </ul>
+
+          <div className="text-center mb-6">
+            <span>
+              See our{" "}
+              <span
+                className="cursor-pointer text-blue-600 hover:underline"
+                onClick={() => router.push("/terms-and-conditions")}
+              >
+                Terms and Conditions
+              </span>{" "}
+              for more.
+            </span>
+          </div>
+
+          <button
+            onClick={handleCheckout}
+            disabled={loading}
+            className="cursor-pointer w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
+          >
+            {loading ? "Loading..." : "Subscribe 🚀"}
+          </button>
+        </div>
       </div>
     </div>
   );
