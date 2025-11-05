@@ -57,10 +57,10 @@ export default function TermsAndConditions() {
         <h2 className="text-xl font-semibold mt-6 mb-2">4. Refund Policy</h2>
         <ul className="list-disc pl-6 space-y-2">
           <li>
-            In accordance with <strong>Paddle’s Terms and Conditions</strong>, customers are entitled to request a refund within
-            <strong> 14 days</strong> of their purchase date, provided that premium content has not been fully accessed or consumed.
+            Ccustomers are entitled to request a refund within
+            <strong> 14 days</strong> of their purchase date.
           </li>
-          <li>
+          {/* <li>
             Refund requests must be submitted through Paddle’s support system at{" "}
             <Link
               href="https://paddle.net"
@@ -70,7 +70,7 @@ export default function TermsAndConditions() {
             >
               paddle.net
             </Link>.
-          </li>
+          </li> */}
           <li>
             After 14 days, all payments are considered <strong>final and non-refundable</strong>.
           </li>

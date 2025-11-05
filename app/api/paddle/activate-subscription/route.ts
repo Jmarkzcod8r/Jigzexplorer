@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     console.log("Created Paddle transaction:", txn);
 
     // ✅ Return checkout URL to frontend
-    return NextResponse.json({ transactionId: txn.id });
+    return NextResponse.json({ transactionId: txn.id, checkoutUrl: txn.checkout });
   } catch (error: any) {
     console.error("Paddle Checkout Error:", error);
     return NextResponse.json(
