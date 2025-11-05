@@ -57,7 +57,7 @@ export default function TermsAndConditions() {
         <h2 className="text-xl font-semibold mt-6 mb-2">4. Refund Policy</h2>
         <ul className="list-disc pl-6 space-y-2">
           <li>
-            Ccustomers are entitled to request a refund within
+            Customers are entitled to request a refund within
             <strong> 14 days</strong> of their purchase date.
           </li>
           {/* <li>
