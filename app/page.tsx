@@ -17,8 +17,11 @@ import Swal from "sweetalert2";
 // import Image from "next/image";
 import Logo from "./component/logo";
 import GlobeButton from "./component/globe";
+import { Compass } from 'lucide-react';
 import { detectDevTools } from "./component/checkdevtools";
 import { checkPremiumStatus } from "./lib/checkPremiumStatus";
+import { isUserLoggedIn } from "./lib/zushelper";
+import { setupCompleteReloadProtection } from "./lib/reloadHelper";
 
 
 export default function Home() {
@@ -46,6 +49,8 @@ export default function Home() {
   // 🔹 On mount, load localStorage countryList and merge
   useEffect(() => {
     // detectDevTools();
+    const userIsLoggedIn = isUserLoggedIn();
+    if (!userIsLoggedIn) { localStorage.clear() }
 
     setPhotoURL(localStorage.getItem("photoURL"));
     const storedList = localStorage.getItem("countryList");
@@ -78,6 +83,25 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    // ✅ SET UP RELOAD PROTECTION HERE
+    const cleanup = setupCompleteReloadProtection({
+     reloadOptions: {
+         title: "Reload Page?",
+         text: "Are you sure you want to reload? Your progress may be lost.",
+         confirmButtonText: "Yes, reload!",
+         clearLocalStorage: true, // Clear storage on reload
+         clearKeys: ["countryList", "photoURL", "gameProgress"] // Specific keys to clear
+     },
+     beforeUnloadMessage: "Your progress will be lost if you leave this page."
+ });
+
+ // Return cleanup function to remove event listeners when component unmounts
+ return cleanup;
+
+   setPhotoURL(localStorage.getItem("photoURL"));
+ }, []);
+
 
   const redirect_login_profile = () => {
     const email = localStorage.getItem("email");
@@ -104,8 +128,24 @@ export default function Home() {
 
   const redirect_login_shop = () => {
     const email = localStorage.getItem("email");
+
     if (email) {
       router.push("/shop");
+    } else {
+      Swal.fire({
+        title: "Sign In Required",
+        text: "Proceed to Login page?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Proceed",
+        cancelButtonText: "Stay",
+        confirmButtonColor: "#2563eb",
+        cancelButtonColor: "#6b7280",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
+      });
     }
   };
 
@@ -262,6 +302,7 @@ const countryFlags: Record<string, string> = {
           //           text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300 text-sm sm:text-base"
         >
           {/* <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> */}
+
           <GlobeButton setMenu={function (menu: string): void {
                 throw new Error("Function not implemented.");
               } }/>

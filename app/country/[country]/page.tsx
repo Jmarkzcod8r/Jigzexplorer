@@ -13,12 +13,15 @@ import { updateOverallScore } from "@/app/lib/updateOverallScore";
 
 import Image from "next/image";
 
+import { setupCompleteReloadProtection } from "@/app/lib/reloadHelper";
+import { isUserLoggedIn } from "@/app/lib/zushelper";
+
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(10);
+  const [quotaPics, setQuotaPics] = useState(1);
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
@@ -368,68 +371,80 @@ useEffect(() => {
 
   useEffect(() => {
     if (solvedPuzzlesCount === quotaPics && !hasFiredRef.current) {
-      hasFiredRef.current = true;
+      hasFiredRef.current = true
+
+      const loggedIn = isUserLoggedIn()
 
       Swal.fire({
         title: "🎉 Congratulations!",
         html: `
-          <b>Over-All Score <b><br>
-        <div style="margin-top:10px; font-size:45px; font-weight:bold; color:green;">
-        🏆  ${score + (streak * 5) + elapsedTime} 🏆 </div><br>
-          <b>You solved <b>${quotaPics}</b> puzzles!<br>
-          <b>Raw Score:</b> ${score}<br>
-          <b>Streak:</b> ${streak} * 5<br>
-          <b>Time Spent:</b> ${elapsedTime}s <br>
-          <b>Over-All Score:</br>
-          <b> Raw Score + Streak + Time Spent</br>
+        <div style="text-align: center; width: 100%;">
+          <b style="font-size: 18px; display: block;">Over-All Score</b>
+          <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            🏆 ${score + streak * 10 + elapsedTime} 🏆
+          </div>
 
-          <b>Tickets Earned:</b> +2 🎟
-        `,
+          <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
+            <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
+            <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
+              <div><b>Raw Score:</b> ${score}</div>
+              <div><b>Streak:</b> ${streak} × 10</div>
+              <div><b>Time Spent:</b> ${elapsedTime}s</div>
+              <div style="margin-top: 10px;"><b>Over-All Score Formula:</b></div>
+              <div>Raw Score + Streak + Time Spent</div>
+              <div style="margin-top: 10px;"><b>Tickets Earned:</b> +2 🎟</div>
+            </div>
+          </div>
+
+          ${loggedIn
+            ? `<div style="color: #059669; margin-top: 15px; display: block;">✅ Your score has been saved!</div>`
+            : `<div style="color: #2563eb; margin-top: 15px; display: block;"><b>🔒 Login to save and share your score!</b></div>`
+          }
+        </div>
+      `,
         icon: "success",
         showCancelButton: true,
         confirmButtonText: "Nice!",
         cancelButtonText: "Restart 🔄",
       }).then((result) => {
         if (result.dismiss === Swal.DismissReason.cancel) {
-          window.location.reload(); // Refresh the page when Restart is clicked
+          window.location.reload()
         }
-      });
+      })
 
+      if (loggedIn) {
+        // Save to Firestore / backend
+        const saveToFirestore = async () => {
+          const rawEmail = localStorage.getItem("email")
+          const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : ""
+          const rawUID = localStorage.getItem("uid")
+          const cleanUID = rawUID ? rawUID.replace(/^"+|"+$/g, "") : ""
 
-      // run async tasks safely
-      const saveToFirestore = async () => {
-        const rawEmail = localStorage.getItem("email");
-        const cleanEmail = rawEmail ? rawEmail.replace(/^"+|"+$/g, "") : "";
-        const rawUID = localStorage.getItem("uid");
-        const cleanUID = rawUID ? rawUID.replace(/^"+|"+$/g, "") : "";
+          const payload = {
+            email: cleanEmail,
+            country,
+            score: score + streak * 10 + elapsedTime,
+            datePlayed: Date.now(),
+            tickets: 0,
+          }
 
-        const payload = {
-          email: cleanEmail,
-          country,
-          score: score + (streak * 10) + elapsedTime,
-          datePlayed: Date.now(),
-          tickets: 0,
-        };
+          await fetch("/api/post/country", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }).catch(console.error)
 
-        // send to backend
-        await fetch("/api/post/country", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }).catch(console.error);
+          await updateOverallScore(
+            cleanUID,
+            country.toLowerCase(),
+            score + streak * 10 + elapsedTime
+          )
+        }
 
-        // update Firestore
-        await updateOverallScore(
-          cleanUID,
-          country.toLowerCase(),
-          score + streak * 10
-        );
-      };
-
-      saveToFirestore();
+        saveToFirestore()
+      }
     }
-  }, [solvedPuzzlesCount]);
-
+  }, [solvedPuzzlesCount])
 
 
 
@@ -649,7 +664,21 @@ useEffect(() => {
 
 //   return () => clearInterval(interval);
 // }, [isPaused]);
+useEffect(() => {
+  // Setup reload protection when component mounts
+  const cleanup = setupCompleteReloadProtection({
+    reloadOptions: {
+      title: 'Reload JigzExplorer?',
+      text: 'Are you sure you want to reload the page?',
+      clearLocalStorage: true,
+      clearKeys: ["gameProgress", "currentSession"]
+    },
+    beforeUnloadMessage: 'Are you sure you want to leave JigzExplorer?'
+  });
 
+  // Cleanup on component unmount
+  return cleanup;
+}, []);
 
 
   // ---------------- Render ----------------
@@ -923,6 +952,8 @@ useEffect(() => {
            {puzzlePieces.map((piece, index) => {
               const isPlaced = framePieces.includes(piece);
               const isSelected = selectedPieces.includes(piece);
+
+
 
               return (
                 <button key={index} onClick={() => handlePieceClick(piece)}>

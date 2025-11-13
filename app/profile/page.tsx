@@ -99,6 +99,8 @@ const Page = () => {
   }, [router]);
 
   useEffect(() => {
+
+
     setPhotoURL(localStorage.getItem("photoURL"));
   }, []);
 
@@ -133,6 +135,7 @@ const Page = () => {
                  min-h-screen p-8 pb-20 sm:p-20
                  bg-[url('/Bg.png')] bg-cover bg-center"
     >
+
         {/* // This is for logo */}
         {profile && countries &&  <Logo/>}
 

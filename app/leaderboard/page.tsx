@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { db } from "../api/firebase/firebase-config";
 import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import Logo from "../component/logo";
+import { useUpdateUserProfile } from "../lib/zustand/updateUserProfile";
 
+//For Typesccript Object
 interface Player {
   displayName: string;
   email: string;
@@ -15,9 +16,13 @@ interface Player {
   tickets?: number;
 }
 
+
 const LeaderboardPage = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [players, setPlayers] = useState<Player[]>([]);
+
+  // ✅ Get logged-in user from Zustand
+  const user = useUpdateUserProfile(state => state.user);
 
   useEffect(() => {
     const q = query(
@@ -31,11 +36,11 @@ const LeaderboardPage = () => {
         ...(doc.data() as Player),
       }));
 
-      // 🔹 Exclude players with 0 score
+      // Exclude players with 0 score
       playerList = playerList.filter((p) => (p.overallscore ?? 0) > 0);
 
-      // 🔹 Ensure sorting stays correct
-      playerList = playerList.sort((a, b) => b.overallscore - a.overallscore);
+      // Ensure sorting stays correct
+      playerList = playerList.sort((a, b) => (b.overallscore ?? 0) - (a.overallscore ?? 0));
 
       setPlayers(playerList);
     });
@@ -45,16 +50,26 @@ const LeaderboardPage = () => {
 
   return (
     <div className="font-sans flex flex-col items-center min-h-screen p-6 bg-[url('/Bg.png')] bg-cover bg-center">
-        <Logo/>
-       {/* <button
-            onClick={() => router.push("/")}
-            className="cursor-pointer col-span-4 mb-4 flex items-center gap-2 px-4 py-2 bg-gray-200
-                       text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back
-          </button> */}
+      <Logo />
+
+      {/* Optional back button */}
+      {/*
+      <button
+        onClick={() => router.push("/")}
+        className="cursor-pointer col-span-4 mb-4 flex items-center gap-2 px-4 py-2 bg-gray-200
+                   text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300"
+      >
+        Back
+      </button>
+      */}
+
+      {/* Display logged-in user email */}
+      {user?.email && (
+        <p className="text-white mb-2">Logged in as: {user.email}</p>
+      )}
+
       <h1 className="text-3xl font-bold text-white mb-6">🏆 Leaderboard</h1>
+
       <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-2xl">
         <ul className="divide-y divide-gray-200">
           {players.map((player, index) => (
@@ -78,16 +93,12 @@ const LeaderboardPage = () => {
                   </div>
                 )}
                 <div>
-                  <p className="font-semibold text-gray-800">
-                    {player.displayName}
-                  </p>
+                  <p className="font-semibold text-gray-800">{player.displayName}</p>
                   {/* <p className="text-sm text-gray-500">{player.email}</p> */}
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-bold text-blue-600 text-lg">
-                  {player.overallscore ?? 0}
-                </p>
+                <p className="font-bold text-blue-600 text-lg">{player.overallscore ?? 0}</p>
                 <p className="text-xs text-gray-500">Score</p>
               </div>
             </li>
@@ -99,15 +110,3 @@ const LeaderboardPage = () => {
 };
 
 export default LeaderboardPage;
-
-// import React from 'react'
-
-// const page = () => {
-//   return (
-//     <div>
-//       Leaderboard
-//     </div>
-//   )
-// }
-
-// export default page
