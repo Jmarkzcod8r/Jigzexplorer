@@ -16,12 +16,14 @@ import Image from "next/image";
 import { setupCompleteReloadProtection } from "@/app/lib/reloadHelper";
 import { isUserLoggedIn } from "@/app/lib/zushelper";
 
+import { useUpdateUserProfile } from "@/app/lib/zustand/updateUserProfile";
+
 const JigsawPuzzle: React.FC = () => {
   const router = useRouter();
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(1);
+  const [quotaPics, setQuotaPics] = useState(2);
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
@@ -42,6 +44,8 @@ const JigsawPuzzle: React.FC = () => {
 
   }, [country]);
 
+  const user = useUpdateUserProfile()
+
   // ---------------- existing game state ----------------
   const [currentIndex, setCurrentIndex] = useState(0);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
@@ -55,7 +59,12 @@ const JigsawPuzzle: React.FC = () => {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [turbo, setTurbo] = useState(false);
+  const [baseCoins, setBaseCoins] = useState (10);
+  const [turbobonus,setTurbobonus] = useState (200) ;
+  const [puzzlecompletionscore, setPuzzlecompletionscore] = useState (100) ;
   const [countdown, setCountdown] = useState(0);
+  const [duration, setduration] = useState(180);
+  const [turbocountdown, setTurbocountdown] = useState (30);
   const [cooldown, setCooldown] = useState(false); // 🔒 stays disabled after Turbo ends
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -64,6 +73,7 @@ const JigsawPuzzle: React.FC = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  const [showCoinGain, setShowCoinGain] = useState(false);
 
   const [puzzleSize, setPuzzleSize] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -142,9 +152,11 @@ if (originalPieces[frameIndex] === piece) {
   if (!startTime) setStartTime(Date.now());
 
   // if (enableCoins) {
-    const baseCoins = turbo? 22: 10;
+    // const baseCoins = turbo? 22: 10;
     const bonusCoins = streak > 0 ? 5 : 0;
     setCoins((prev) => prev + baseCoins + bonusCoins );
+    setShowCoinGain(true);
+    setTimeout(() => setShowCoinGain(false), 2000);
   // }
 } else {
   setStreak(0);
@@ -210,7 +222,7 @@ useEffect(() => {
     let timerInterval: NodeJS.Timeout | null = null;
 
     if (startTime && !endTime) {
-      const countdownStart = 180; // 3 minutes = 300 seconds
+      const countdownStart = duration; // 3 minutes = 300 seconds
       setElapsedTime(countdownStart);
 
       timerInterval = setInterval(() => {
@@ -331,7 +343,8 @@ useEffect(() => {
       // const bonusCoins = streak > 0 ? 5 : 0;
       const bonusCoins = 0;
       setCoins((prev) => prev + baseCoins + bonusCoins);
-
+      setShowCoinGain(true);
+      setTimeout(() => setShowCoinGain(false), 2000);
 
     } else {
       setStreak(0);
@@ -345,7 +358,7 @@ useEffect(() => {
       const updatedStatus = [...completedStatus];
       updatedStatus[currentIndex] = true;
       setCompletedStatus(updatedStatus);
-      setScore(prevScore => prevScore + (turbo ? 200 : 100));
+      setScore(prevScore => prevScore + (turbo ? turbobonus : puzzlecompletionscore));
 
       fireConfetti();
       goNext();
@@ -369,6 +382,29 @@ useEffect(() => {
   const hasFiredRef = useRef(false);
   const confettiIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const restartGame = () => {
+    // reshuffle images
+    const reshuffled = [...imageList].sort(() => Math.random() - 0.5);
+    setImageList(reshuffled);
+
+    // reset all states
+    setSolvedPuzzlesCount(0);
+    setCompletedStatus(Array(reshuffled.length).fill(false));
+    setCurrentIndex(0);
+    setScore(0);
+    setStreak(0);
+    setCoins(0);
+    setStartTime(0);
+    setEndTime(null);
+    setElapsedTime(0);
+    setSelectedPieces([]);
+    setFramePieces(Array(9).fill(null));
+
+    // reset confetti lock
+    hasFiredRef.current = false;
+  };
+
+
   useEffect(() => {
     if (solvedPuzzlesCount === quotaPics && !hasFiredRef.current) {
       hasFiredRef.current = true
@@ -376,14 +412,14 @@ useEffect(() => {
       const loggedIn = isUserLoggedIn()
 
       Swal.fire({
-        title: "🎉 Congratulations!",
+        title: "🎉 Congratulationssss!",
         html: `
         <div style="text-align: center; width: 100%;">
           <b style="font-size: 18px; display: block;">Over-All Score</b>
           <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
             🏆 ${score + streak * 10 + elapsedTime} 🏆
           </div>
-
+          <div> Previous ATH:  ${user.user.countries[country].ATH}  </div>
           <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
             <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
             <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
@@ -405,10 +441,11 @@ useEffect(() => {
         icon: "success",
         showCancelButton: true,
         confirmButtonText: "Nice!",
-        cancelButtonText: "Restart 🔄",
+        cancelButtonText: "Restart s🔄",
       }).then((result) => {
         if (result.dismiss === Swal.DismissReason.cancel) {
-          window.location.reload()
+          restartGame();
+          // window.location.reload()
         }
       })
 
@@ -507,7 +544,7 @@ useEffect(() => {
   const handleClick = () => {
     if (!turbo && !cooldown) {
       setTurbo(true);
-      setCountdown(30);
+      setCountdown(turbocountdown);
     }
   };
 
@@ -837,9 +874,20 @@ useEffect(() => {
   {isPaused ? "Resume" : "Pause"}
 </button> */}
 
-          <div className="flex items-center justify-center px-2 py-1 sm:py-2 text-xs text-white sm:text-lg rounded-lg font-bold">
-            💰 {coins}
-          </div>
+<div className="relative flex items-center justify-center">
+<span className="text-yellow-500 font-bold text-xl drop-shadow-[0_0_3px_white]">
+  💰 {coins}
+</span>
+
+  {/* {showCoinGain && (
+    <span
+      className="absolute left-1/2 top-[-20px] transform -translate-x-1/2 text-green-400 font-bold text-lg transition-opacity duration-500"
+    >
+      +{baseCoins}
+    </span>
+  )} */}
+</div>
+
         <button
           onClick={goNext}
           className="cursor-pointer px-2 sm:px-4 py-2 rounded-lg text-white bg-green-500 hover:bg-green-600
@@ -1021,14 +1069,3 @@ useEffect(() => {
 
 export default JigsawPuzzle;
 
-// import React from 'react'
-
-// const page = () => {
-//   return (
-//     <div>
-//       This is country country page
-//     </div>
-//   )
-// }
-
-// export default page

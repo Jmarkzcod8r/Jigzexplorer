@@ -30,14 +30,14 @@ export default function Login() {
         const defaultPremium = { active: false, expiryDate: "" };
 
         // ✅ Save to MongoDB
-        await axios.post("/api/post/profile", {
-          name: user.displayName,
-          email: user.email,
-          date: new Date().toISOString(),
-          tickets: 0,
-          overallscore: 0,
-          premium: defaultPremium,
-        });
+        // await axios.post("/api/post/profile", {
+        //   name: user.displayName,
+        //   email: user.email,
+        //   date: new Date().toISOString(),
+        //   tickets: 0,
+        //   overallscore: 0,
+        //   premium: defaultPremium,
+        // });
 
         // ✅ Local cache
         localStorage.setItem("email", JSON.stringify(user.email));
@@ -48,34 +48,53 @@ export default function Login() {
         const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
         const userSnap = await getDoc(userRef);
 
+          // This is negligible if user is already saved to firestore
         if (!userSnap.exists()) {
           // 🔹 Create new Firestore profile
+          const unlockedCountries = ["estonia", "finland", "france", "germany", "switzerland"];
+
           const newUserData = {
+            uid: user.uid,
             displayName: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
             emailVerified: user.emailVerified,
+
             tickets: 0,
-            tokens: 0,
-            premium: defaultPremium,
             overallscore: 0,
-            countryscore: Object.fromEntries(
+
+            // 🔹 Matches new Zustand structure
+            premium: {
+              active: false,
+              status: 'Freemium',
+              expiryDate: "",
+            },
+
+            settings: {
+              tokens: 0,
+              streakMultiplier: 10,
+              timeMultiplier: 10,
+              timeDuration: 180,
+              turboBonus: 200,
+              turbocountdown: 30,
+              puzzlecompletionscore: 100,
+            },
+
+            countries: Object.fromEntries(
               [
                 "denmark","estonia","finland","iceland","ireland","latvia","lithuania","norway","sweden","united kingdom",
                 "austria","belgium","france","germany","liechtenstein","luxembourg","monaco","netherlands","switzerland",
                 "albania","andorra","bosnia and herzegovina","croatia","greece","italy","malta","montenegro","north macedonia",
                 "portugal","san marino","serbia","slovenia","spain","vatican city","belarus","bulgaria","czechia","hungary",
                 "moldova","poland","romania","slovakia","ukraine"
-              ].map((country) => [country, 0])
-            ),
-            countryATH: Object.fromEntries(
-              [
-                "denmark","estonia","finland","iceland","ireland","latvia","lithuania","norway","sweden","united kingdom",
-                "austria","belgium","france","germany","liechtenstein","luxembourg","monaco","netherlands","switzerland",
-                "albania","andorra","bosnia and herzegovina","croatia","greece","italy","malta","montenegro","north macedonia",
-                "portugal","san marino","serbia","slovenia","spain","vatican city","belarus","bulgaria","czechia","hungary",
-                "moldova","poland","romania","slovakia","ukraine"
-              ].map((country) => [country, 0])
+              ].map((country) => [
+                country,
+                {
+                  ATH: 0,
+                  score: 0,
+                  unlock: unlockedCountries.includes(country) ? true : false,
+                },
+              ])
             ),
           };
 
@@ -83,8 +102,11 @@ export default function Login() {
           console.log("✅ Firestore profile created");
 
           // ✅ Update Zustand store
-          // resetUserProfile(); // Clear existing
-          updateUserProfile(newUserData); // Load fresh Firestore data into Zustand
+          updateUserProfile(newUserData);
+
+          // ✅ Save to localStorage
+          localStorage.setItem('user', JSON.stringify(newUserData));
+          console.log("✅ User data saved to localStorage");
         } else {
           const data = userSnap.data();
           const premiumStatus = data?.premium?.active ?? false;

@@ -124,6 +124,7 @@
 
 // export default ProfilePage;
 
+
 "use client";
 
 import React from "react";
@@ -146,6 +147,7 @@ export default function ProfileView() {
         <p><strong>Name:</strong> {user.displayName ?? "N/A"}</p>
         <p><strong>Email:</strong> {user.email ?? "N/A"}</p>
         <p><strong>Email Verified:</strong> {user.emailVerified ? "Yes" : "No"}</p>
+        <p><strong>UID:</strong> {user.uid ?? "N/A"}</p>
         {user.photoURL && (
           <img
             src={user.photoURL}
@@ -158,29 +160,69 @@ export default function ProfileView() {
       {/* Premium & Scores */}
       <div className="mb-6 p-4 bg-white shadow rounded">
         <h2 className="text-xl font-semibold mb-2">Account Info</h2>
+        <p><strong>Premium Status:</strong> {user.premium.status}</p>
         <p><strong>Premium Active:</strong> {user.premium.active ? "Yes" : "No"}</p>
         {user.premium.expiryDate && (
           <p><strong>Premium Expiry:</strong> {user.premium.expiryDate}</p>
         )}
         <p><strong>Tickets:</strong> {user.tickets}</p>
-        <p><strong>Tokens:</strong> {user.tokens}</p>
         <p><strong>Overall Score:</strong> {user.overallscore}</p>
+      </div>
+
+      {/* Settings */}
+      <div className="mb-6 p-4 bg-white shadow rounded">
+        <h2 className="text-xl font-semibold mb-2">Game Settings</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <p><strong>Tokens:</strong> {user.settings.tokens}</p>
+          <p><strong>Streak Multiplier:</strong> {user.settings.streakMultiplier}x</p>
+          <p><strong>Time Multiplier:</strong> {user.settings.timeMultiplier}x</p>
+          <p><strong>Time Duration:</strong> {user.settings.timeDuration}s</p>
+          <p><strong>Turbo Bonus:</strong> {user.settings.turboBonus}</p>
+          <p><strong>Turbo Countdown:</strong> {user.settings.turbocountdown}s</p>
+          <p><strong>Puzzle Completion Score:</strong> {user.settings.puzzlecompletionscore}</p>
+        </div>
       </div>
 
       {/* Country Scores */}
       <div className="p-4 bg-white shadow rounded">
         <h2 className="text-xl font-semibold mb-2">Country Scores</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {Object.entries(user.countryscore).map(([country, score]) => (
-            <div
-              key={country}
-              className="p-2 bg-gray-50 rounded border text-sm flex justify-between"
-            >
-              <span>{country}</span>
-              <span>{score}</span>
-            </div>
-          ))}
-        </div>
+        {Object.keys(user.countries).length === 0 ? (
+          <p className="text-gray-500">No country scores yet. Start playing to earn scores!</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {Object.entries(user.countries).map(([country, data]) => (
+              <div
+                key={country}
+                className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+              >
+                <div className="font-semibold text-blue-600 capitalize">
+                  {country.replace(/_/g, ' ')}
+                </div>
+                <div className="text-sm text-gray-600 mt-1">
+                  <div>Score: <span className="font-medium">{data.score}</span></div>
+                  <div>ATH: <span className="font-medium">{data.ATH}</span></div>
+                  <div>Unlocked: <span className={data.unlock ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                    {data.unlock ? "Yes" : "No"}
+                  </span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Debug Info (optional - remove in production) */}
+      <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
+        <h3 className="text-lg font-semibold mb-2 text-yellow-800">Debug Info</h3>
+        <p className="text-sm text-yellow-700">
+          Total Countries: {Object.keys(user.countries).length}
+        </p>
+        <details className="mt-2">
+          <summary className="cursor-pointer text-sm text-yellow-700">Raw User Data</summary>
+          <pre className="text-xs mt-2 p-2 bg-white rounded border overflow-auto">
+            {JSON.stringify(user, null, 2)}
+          </pre>
+        </details>
       </div>
     </div>
   );

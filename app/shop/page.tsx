@@ -122,6 +122,7 @@ const calculatedCost = useMemo(() => {
       countries: countriesPayload,
     };
 
+    // Save to Mongodb
     const res = await fetch("/api/post/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -151,7 +152,7 @@ const calculatedCost = useMemo(() => {
 
         setScores((prev) => [...prev, data.data]);
         setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }]);
-        window.location.reload()
+        // window.location.reload()
       }
     }
      else {

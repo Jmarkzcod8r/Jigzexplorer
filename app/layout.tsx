@@ -23,7 +23,7 @@ const defaultCountryScores = {
 };
 
 // ✅ Default premium structure
-const defaultPremium = { active: false, expiryDate: "" };
+const defaultPremium = { status: 'Freemium', active: false, expiryDate: "" };
 
 // ✅ List of countries for countryATH
 const countriesList = [

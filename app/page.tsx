@@ -23,12 +23,15 @@ import { checkPremiumStatus } from "./lib/checkPremiumStatus";
 import { isUserLoggedIn } from "./lib/zushelper";
 import { setupCompleteReloadProtection } from "./lib/reloadHelper";
 
+import { useUpdateUserProfile } from "./lib/zustand/updateUserProfile";
+
 
 export default function Home() {
   const router = useRouter();
   const [menu, setMenu] = useState<"main" | "countries">("main");
   const [photoURL, setPhotoURL] = useState<string | null>(null);
 
+  const user = useUpdateUserProfile()
   // 🔹 Default countries
   const default_countries = [ "Estonia", "Finland", "France", "Germany", "Switzerland"];
 
@@ -104,8 +107,8 @@ export default function Home() {
 
 
   const redirect_login_profile = () => {
-    const email = localStorage.getItem("email");
-
+    const email = user.user.email
+    // console.log(user.user.photoURL)
     if (email) {
       router.push("/profile");
     } else {
@@ -127,7 +130,7 @@ export default function Home() {
   };
 
   const redirect_login_shop = () => {
-    const email = localStorage.getItem("email");
+    const email = user.user.email
 
     if (email) {
       router.push("/shop");
