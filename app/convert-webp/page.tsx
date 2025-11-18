@@ -191,7 +191,7 @@ const Page = () => {
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
 
-        canvas.toBlob((blob) => resolve(blob), 'image/webp', 0.95);
+        canvas.toBlob((blob) => resolve(blob), 'image/webp', 1);
       };
 
       img.onerror = () => resolve(null);

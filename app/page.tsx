@@ -1,6 +1,6 @@
 "use client";
 
-
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Image,
@@ -32,6 +32,13 @@ export default function Home() {
   const [photoURL, setPhotoURL] = useState<string | null>(null);
 
   const user = useUpdateUserProfile()
+
+  const countriesUnlock: string[] = useMemo(() => {
+    return Object.entries(user.user.countries)
+      .filter(([_, countryData]) => countryData.unlock)
+      .map(([countryName, _]) => countryName.toLowerCase());
+  }, [user.user.countries]);
+
   // 🔹 Default countries
   const default_countries = [ "Estonia", "Finland", "France", "Germany", "Switzerland"];
 
@@ -51,40 +58,29 @@ export default function Home() {
 
   // 🔹 On mount, load localStorage countryList and merge
   useEffect(() => {
-    // detectDevTools();
     const userIsLoggedIn = isUserLoggedIn();
-    if (!userIsLoggedIn) { localStorage.clear() }
+    if (!userIsLoggedIn) {
+      localStorage.clear();
+    }
 
     setPhotoURL(localStorage.getItem("photoURL"));
-    const storedList = localStorage.getItem("countryList");
 
-    if (storedList) {
-      try {
-        const parsedList: string[] = JSON.parse(storedList);
+    if (countriesUnlock.length > 0) {
+      const normalizedList = countriesUnlock.map((item) =>
+        item
+          .trim()
+          .toLowerCase()
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      );
 
-            if (Array.isArray(parsedList)) {
-              // Title Case: every word's first letter capitalized
-              const normalizedList = parsedList.map((item: string) =>
-                item
-                  .trim()
-                  .toLowerCase()
-                  .split(" ")
-                  .map(
-                    (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                  )
-                  .join(" ")
-              );
-
-              setAvailableCountries([
-                ...new Set([...default_countries, ...normalizedList]),
-              ]);
-            }
-
-      } catch (e) {
-        console.error("Invalid countryList in localStorage:", e);
-      }
+      setAvailableCountries([
+        ...new Set([...default_countries, ...normalizedList]),
+      ]);
     }
-  }, []);
+  }, [countriesUnlock]);
+
 
   useEffect(() => {
     // ✅ SET UP RELOAD PROTECTION HERE

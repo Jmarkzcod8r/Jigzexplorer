@@ -156,7 +156,7 @@ interface UserProfileState {
 
   updateUserProfile: (data: Partial<UserProfile>) => void;
   updateSettings: (data: Partial<UserSettings>) => void;
-  updateCountry: (name: string, data: Partial<CountryData>) => void;
+  updatezCountry: (name: string, data: Partial<CountryData>) => void;
 
   updateCountryScore: (name: string | number, points: number) => void; // <-- add this
 
@@ -209,7 +209,7 @@ export const useUpdateUserProfile = create<UserProfileState>()(
         Object.assign(state.user.settings, data);
       }),
 
-    updateCountry: (name, data) =>
+    updatezCountry: (name, data) =>
       set((state) => {
         if (!state.user.countries[name]) return;
         Object.assign(state.user.countries[name], data);
@@ -245,3 +245,6 @@ export const useUpdateUserProfile = create<UserProfileState>()(
       }),
   }))
 );
+
+// Use this to copy paste on pages.
+// const { user,updatezCountry , updateCountryScore,  updateUserProfile, resetUserProfile, updateSettings } = useUpdateUserProfile();

@@ -6,10 +6,14 @@ import Swal from "sweetalert2";
 import { db } from "../api/firebase/firebase-config";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import Logo from "../component/logo";
+import { useUpdateUserProfile } from "../lib/zustand/updateUserProfile";
+import { updateUnlockCountry } from "../lib/updateUnlockCountry";
+import { SyncZustandFirestore } from "../lib/SyncZustandFirestore";
+
 
 interface PlayerScore {
   tickets?: number;
-  countries?: Record<string, { score: number; datePlayed?: string }>;
+  countries?: Record<string, { score: number; ATH?: string }>;
 }
 
 export default function Shop() {
@@ -31,8 +35,8 @@ export default function Shop() {
   const [scores, setScores] = useState<any[]>([]);
 
   const [countries, setCountries] = useState<
-    { name: string; unlock: boolean; score: number; datePlayed: string }[]
-  >([{ name: "", unlock: true, score: 0, datePlayed: "" }]);
+    { name: string; unlock: boolean; score: number; ATH: number}[]
+  >([{ name: "", unlock: true, score: 0, ATH: 0 }]); // list of objects
 
   const [availableCountries, setAvailableCountries] = useState<string[]>(defcountries);
 
@@ -43,7 +47,19 @@ export default function Shop() {
     "germany",
     "switzerland"
   ];
+  // updateUserProfile: (data: Partial<UserProfile>) => void;
+  // updateSettings: (data: Partial<UserSettings>) => void;
+  // updateCountry: (name: string, data: Partial<CountryData>) => void;
+  const { user,updatezCountry , updateCountryScore,  updateUserProfile, resetUserProfile, updateSettings } = useUpdateUserProfile();
+  useEffect(() => {
+    if (!user.uid) return;
 
+    // Call the helper
+    const unsubscribe = SyncZustandFirestore(user.uid);
+
+    // Clean up on unmount
+    return () => unsubscribe?.();
+  }, [user.uid]);
   useEffect(() => {
     const savedList = JSON.parse(localStorage.getItem("countryList") || "[]").map(
       (c: string) => c.charAt(0).toUpperCase() + c.slice(1)
@@ -57,8 +73,8 @@ export default function Shop() {
   const addCountry = () => {
     setCountries([
       ...countries,
-      { name: "", unlock: true, score: 0, datePlayed: "" },
-    ]);
+      { name: "", unlock: true, score: 0, ATH: 0 },
+    ]); // Add another country to the list
   };
 
   const updateCountry = (index: number, field: string, value: any) => {
@@ -94,102 +110,119 @@ const calculatedCost = useMemo(() => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // For Mongodb
     const countriesPayload: Record<string, any> = {};
     countries.forEach((c) => {
       if (c.name.trim()) {
         countriesPayload[c.name] = {
           unlock: true,
           score: c.score,
-          datePlayed: c.datePlayed ? new Date(c.datePlayed) : null,
+          // ATH: c.ATH ? new Date(c.ATH) : null,
+          ATH: 0
         };
       }
     });
 
-    const email = (localStorage.getItem("email") || "").replace(/^"+|"+$/g, "");
-    const uid = (localStorage.getItem("uid") || "").replace(/^"+|"+$/g, "");
+    // const email = (localStorage.getItem("email") || "").replace(/^"+|"+$/g, "");
+    // const uid = (localStorage.getItem("uid") || "").replace(/^"+|"+$/g, "");
+    const email = user.email
+    const uid = user.uid
     if (!email || !uid) return;
 
-    if ((score?.tickets ?? 0) < calculatedCost) {
+    if ((user?.tickets ?? 0) < calculatedCost) {
       alert("❌ Not enough tickets.");
-      setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }]); // reset
+      setCountries([{ name: "", unlock: true, score: 0, ATH: 0 }]); // reset
       return;
     }
 
-    const payload = {
-      email,
-      tickets: (score?.tickets ?? 0) - calculatedCost,
-      overallScore,
-      countries: countriesPayload,
-    };
+    // For Mongodb
+    // const payload = {
+    //   email,
+    //   tickets: (score?.tickets ?? 0) - calculatedCost,
+    //   overallScore,
+    //   countries: countriesPayload,
+    // };
+
+    // update Firebase
+    // await updateDoc(doc(db, "Firebase-jigzexplorer-profiles", uid), {
+    //   tickets: (score?.tickets ?? 0) - calculatedCost,
+    // });
+
+      const countryNames = countries
+    .filter(c => c.name.trim()) // remove empty selections
+    .map(c => c.name);
+
+    // Pass it to your function
+    updateUnlockCountry(uid, countryNames, calculatedCost);
 
     // Save to Mongodb
-    const res = await fetch("/api/post/score", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // const res = await fetch("/api/post/score", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(payload),
+    // });
 
-    const data = await res.json();
+    // const data = await res.json();
 
-    if (data.success) {
-      alert(`✅ Purchase Successful! You spent ${calculatedCost} tickets.`);
+    // if (data.success) {
+    //   alert(`✅ Purchase Successful! You spent ${calculatedCost} tickets.`);
 
-      await updateDoc(doc(db, "Firebase-jigzexplorer-profiles", uid), {
-        tickets: (score?.tickets ?? 0) - calculatedCost,
-      });
 
-      if (data.data?.countries) {
-        const countryList = Object.keys(data.data.countries);
-        const existing = JSON.parse(localStorage.getItem("countryList") || "[]");
-        const updatedList = Array.from(new Set([...existing, ...countryList]));
 
-        // ✅ Update localStorage + ownedCountries state
-        localStorage.setItem("countryList", JSON.stringify(updatedList));
-        setOwnedCountries(updatedList);
+    //   if (data.data?.countries) {
+    //     const countryList = Object.keys(data.data.countries);
+    //     const existing = JSON.parse(localStorage.getItem("countryList") || "[]");
+    //     const updatedList = Array.from(new Set([...existing, ...countryList]));
 
-        const filtered = defcountries.filter((c) => !updatedList.includes(c));
-        setAvailableCountries(filtered);
+    //     // ✅ Update localStorage + ownedCountries state
+    //     localStorage.setItem("countryList", JSON.stringify(updatedList));
+    //     setOwnedCountries(updatedList);
 
-        setScores((prev) => [...prev, data.data]);
-        setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }]);
-        // window.location.reload()
-      }
-    }
-     else {
-      alert("❌ Failed to save score.");
-    }
+    //     const filtered = defcountries.filter((c) => !updatedList.includes(c));
+    //     setAvailableCountries(filtered);
+
+    //     setScores((prev) => [...prev, data.data]);
+    //     setCountries([{ name: "", unlock: true, score: 0, ATH: 0 }]);
+    //     // window.location.reload()
+    //   }
+    // }
+    //  else {
+    //   alert("❌ Failed to save score.");
+    // }
 
   };
 
-  useEffect(() => {
-    const uid = localStorage.getItem("uid");
-    const email = localStorage.getItem("email");
-    if (!uid || !email) return;
 
-    const cleanUid = uid.replace(/^"+|"+$/g, "");
-    const cleanEmail = email.replace(/^"+|"+$/g, "");
-    if (!cleanUid || !cleanEmail) return;
+  // useEffect(() => {
 
-    const unsubscribe = onSnapshot(
-      doc(db, "Firebase-jigzexplorer-profiles", cleanUid),
-      (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          setScore((prev) => ({
-            tickets: data?.tickets ?? 0,
-            countries: prev?.countries ?? {},
-          }));
-          setProfile({
-            displayName: data.displayName,
-            email: data.email,
-            photoURL: data.photoURL,
-          });
-        }
-      }
-    );
+  //   const uid = localStorage.getItem("uid");
+  //   const email = localStorage.getItem("email");
+  //   if (!uid || !email) return;
 
-    return () => unsubscribe();
-  }, []);
+  //   const cleanUid = uid.replace(/^"+|"+$/g, "");
+  //   const cleanEmail = email.replace(/^"+|"+$/g, "");
+  //   if (!cleanUid || !cleanEmail) return;
+
+  //   const unsubscribe = onSnapshot(
+  //     doc(db, "Firebase-jigzexplorer-profiles", cleanUid),
+  //     (snapshot) => {
+  //       if (snapshot.exists()) {
+  //         const data = snapshot.data();
+  //         setScore((prev) => ({
+  //           tickets: data?.tickets ?? 0,
+  //           countries: prev?.countries ?? {},
+  //         }));
+  //         setProfile({
+  //           displayName: data.displayName,
+  //           email: data.email,
+  //           photoURL: data.photoURL,
+  //         });
+  //       }
+  //     }
+  //   );
+
+  //   return () => unsubscribe();
+  // }, []);
 
   return (
     <div
@@ -207,7 +240,7 @@ const calculatedCost = useMemo(() => {
       </button>
       <h1 className="text-xl sm:text-2xl font-bold text-gray-800">🛍️ Shop</h1>
       <h2 className="text-base sm:text-lg font-semibold text-gray-700">
-        🎟️ Tickets: <span className="text-blue-600">{score?.tickets ?? 0}</span>
+        🎟️ Tickets: <span className="text-blue-600">{user.tickets}</span>
       </h2>
     </div>
 
@@ -217,7 +250,8 @@ const calculatedCost = useMemo(() => {
       className="w-full max-w-3xl bg-white shadow-lg rounded-2xl p-6 space-y-6"
     >
       <div className="space-y-4">
-        <h3 className="text-center">Solve puzzles and gain tickets to unlock more countries</h3>
+
+        <h3 className="text-center"> Solve puzzles and gain tickets to unlock more countries</h3>
         <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
           🌍 Countries
           <span className="text-sm font-normal text-gray-500">
@@ -264,7 +298,7 @@ const calculatedCost = useMemo(() => {
         <button
     type="button"
     onClick={() =>
-      setCountries([{ name: "", unlock: true, score: 0, datePlayed: "" }])
+      setCountries([{ name: "", unlock: true, score: 0, ATH: 0 }])
     }
     className="cursor-pointer bg-orange-500 text-white mx-2 px-4 py-2 rounded-lg hover:bg-red-700 shadow-md transition-transform transform hover:scale-105"
   >

@@ -64,9 +64,9 @@ const LeaderboardPage = () => {
       */}
 
       {/* Display logged-in user email */}
-      {user?.email && (
+      {/* {user?.email && (
         <p className="text-white mb-2">Logged in as: {user.email}</p>
-      )}
+      )} */}
 
       <h1 className="text-3xl font-bold text-white mb-6">🏆 Leaderboard</h1>
 

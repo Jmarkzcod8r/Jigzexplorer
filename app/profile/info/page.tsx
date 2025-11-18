@@ -214,9 +214,9 @@ export default function ProfileView() {
       {/* Debug Info (optional - remove in production) */}
       <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
         <h3 className="text-lg font-semibold mb-2 text-yellow-800">Debug Info</h3>
-        <p className="text-sm text-yellow-700">
+        <h2 className="text-sm text-yellow-700">
           Total Countries: {Object.keys(user.countries).length}
-        </p>
+        </h2>
         <details className="mt-2">
           <summary className="cursor-pointer text-sm text-yellow-700">Raw User Data</summary>
           <pre className="text-xs mt-2 p-2 bg-white rounded border overflow-auto">

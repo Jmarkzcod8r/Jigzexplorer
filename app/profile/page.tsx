@@ -8,7 +8,7 @@ import { useUpdateUserProfile } from "../lib/zustand/updateUserProfile";
 
 const Page = () => {
   const router = useRouter();
-  const { user, updateCountryScore, updateCountry } = useUpdateUserProfile();
+  const { user, updateCountryScore, updatezCountry, resetUserProfile } = useUpdateUserProfile();
   const [sortType, setSortType] = useState<"country" | "score" | "ATH">("country");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
@@ -73,6 +73,7 @@ const Page = () => {
           onClick={() => {
             localStorage.clear();
             router.push("/");
+            resetUserProfile();
           }}
           className="cursor-pointer px-2 py-2 text-xs sm:text-lg rounded-lg text-white bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
         >
