@@ -68,6 +68,8 @@ export async function updateUnlockCountry(
 //       tokens: (userStore.user.settings.tokens || 0) + totalTokensIncrement,
 //     },
 //   });
+
+return (countries)
 }
 
 // userStore.updatezCountry(countryKey, { score: newScore, ATH: newATH, unlock });

@@ -13,7 +13,7 @@ import { SyncZustandFirestore } from "../lib/SyncZustandFirestore";
 
 interface PlayerScore {
   tickets?: number;
-  countries?: Record<string, { score: number; ATH?: string }>;
+  countries?: Record<string, { score: number; ATH?: string; lastplayed: number }>;
 }
 
 export default function Shop() {
@@ -35,8 +35,8 @@ export default function Shop() {
   const [scores, setScores] = useState<any[]>([]);
 
   const [countries, setCountries] = useState<
-    { name: string; unlock: boolean; score: number; ATH: number}[]
-  >([{ name: "", unlock: true, score: 0, ATH: 0 }]); // list of objects
+    { name: string; unlock: boolean; score: number; ATH: number; lastplayed: number}[]
+  >([{ name: "", unlock: true, score: 0, ATH: 0, lastplayed: 0 }]); // list of objects
 
   const [availableCountries, setAvailableCountries] = useState<string[]>(defcountries);
 
@@ -51,15 +51,15 @@ export default function Shop() {
   // updateSettings: (data: Partial<UserSettings>) => void;
   // updateCountry: (name: string, data: Partial<CountryData>) => void;
   const { user,updatezCountry , updateCountryScore,  updateUserProfile, resetUserProfile, updateSettings } = useUpdateUserProfile();
-  useEffect(() => {
-    if (!user.uid) return;
+  // useEffect(() => {
+  //   if (!user.uid) return;
 
-    // Call the helper
-    const unsubscribe = SyncZustandFirestore(user.uid);
+  //   // Call the helper
+  //   const unsubscribe = SyncZustandFirestore(user.uid);
 
-    // Clean up on unmount
-    return () => unsubscribe?.();
-  }, [user.uid]);
+  //   // Clean up on unmount
+  //   return () => unsubscribe?.();
+  // }, [user.uid]);
   useEffect(() => {
     const savedList = JSON.parse(localStorage.getItem("countryList") || "[]").map(
       (c: string) => c.charAt(0).toUpperCase() + c.slice(1)
@@ -73,7 +73,7 @@ export default function Shop() {
   const addCountry = () => {
     setCountries([
       ...countries,
-      { name: "", unlock: true, score: 0, ATH: 0 },
+      { name: "", unlock: true, score: 0, ATH: 0 , lastplayed: 0},
     ]); // Add another country to the list
   };
 
@@ -94,18 +94,27 @@ useEffect(() => {
 }, []);
 
 const calculatedCost = useMemo(() => {
-  const alreadyPurchased = ownedCountries.filter(
-    (c) => !default_countries.includes(c.toLowerCase())
-  ).length;
+  if (!user?.countries) return 0;
 
-  const numCountries = countries.filter((c) => c.name.trim()).length;
+  // Count currently unlocked countries
+  const numUnlocked = Object.values(user.countries).filter(c => c.unlock).length;
 
+  // Number of countries the user is trying to purchase now
+  const numToPurchase = countries.filter(c => c.name.trim()).length;
+
+  // Progressive cost calculation
   let cost = 0;
-  for (let i = 0; i < numCountries; i++) {
-    cost += 10 + alreadyPurchased + i; // progressive cost
+  for (let i = 0; i < numToPurchase; i++) {
+    // Example: first new country costs 10 + 2*number_of_unlocked
+    // But your requirement: 5 unlocked -> next cost 12, 6 unlocked -> next cost 14, 7 unlocked -> next cost 16
+    // Pattern: nextCost = 10 + 2 * numUnlocked
+    const nextCost = 10 + 1 * (numUnlocked + i);
+    cost += nextCost;
   }
+
   return cost;
-}, [countries, ownedCountries, default_countries]);
+}, [countries, user?.countries]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,10 +139,11 @@ const calculatedCost = useMemo(() => {
     if (!email || !uid) return;
 
     if ((user?.tickets ?? 0) < calculatedCost) {
-      alert("❌ Not enough tickets.");
-      setCountries([{ name: "", unlock: true, score: 0, ATH: 0 }]); // reset
+      alert(`❌ Not enough tickets. You need ${calculatedCost} 🎟️`);
+      setCountries([{ name: "", unlock: true, score: 0, ATH: 0 , lastplayed: 0 }]); // reset
       return;
     }
+
 
     // For Mongodb
     // const payload = {
@@ -153,7 +163,25 @@ const calculatedCost = useMemo(() => {
     .map(c => c.name);
 
     // Pass it to your function
-    updateUnlockCountry(uid, countryNames, calculatedCost);
+    try {
+      // Call the function and get the unlocked countries
+      const unlockedCountries = await updateUnlockCountry(uid, countryNames, calculatedCost);
+
+      if (unlockedCountries && unlockedCountries.length > 0) {
+        alert(`✅ Purchase successful! You unlocked: ${unlockedCountries.join(", ")}`);
+
+        // Optional: Update your state / dropdown here
+        setOwnedCountries((prev) => [...prev, ...unlockedCountries]);
+        const filtered = defcountries.filter((c) => ![...ownedCountries, ...unlockedCountries].includes(c));
+        setAvailableCountries(filtered);
+      } else {
+        alert("⚠️ No countries were unlocked.");
+      }
+    } catch (error) {
+      console.error("Error unlocking countries:", error);
+      alert("❌ Failed to unlock countries. Please try again.");
+    }
+
 
     // Save to Mongodb
     // const res = await fetch("/api/post/score", {
@@ -224,6 +252,20 @@ const calculatedCost = useMemo(() => {
   //   return () => unsubscribe();
   // }, []);
 
+  // 1️⃣ Add a new state for unlocked countries
+const [userCountries, setUserCountries] = useState<string[]>([]);
+
+// 2️⃣ Keep track of available countries dynamically
+useEffect(() => {
+  if (!user?.countries) return;
+
+  const unlocked = Object.entries(user.countries)
+    .filter(([name, data]: any) => !data.unlock) // Only locked countries are available for purchase
+    .map(([name]) => name.toLowerCase());
+
+  setUserCountries(unlocked);
+}, [user.countries]);
+
   return (
     <div
     className="font-sans flex flex-col items-center justify-center
@@ -242,6 +284,7 @@ const calculatedCost = useMemo(() => {
       <h2 className="text-base sm:text-lg font-semibold text-gray-700">
         🎟️ Tickets: <span className="text-blue-600">{user.tickets}</span>
       </h2>
+      <h3>{user.overallscore}</h3>
     </div>
 
     {/* Score Form */}
@@ -270,7 +313,7 @@ const calculatedCost = useMemo(() => {
               className="cursor-pointer w-full sm:w-1/2 border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
             >
               <option value="">-- Select Country --</option>
-              {availableCountries
+              {userCountries
                 .filter(
                   (c) =>
                     !ownedCountries.includes(c) &&
@@ -298,7 +341,7 @@ const calculatedCost = useMemo(() => {
         <button
     type="button"
     onClick={() =>
-      setCountries([{ name: "", unlock: true, score: 0, ATH: 0 }])
+      setCountries([{ name: "", unlock: true, score: 0, ATH: 0 , lastplayed: 0}])
     }
     className="cursor-pointer bg-orange-500 text-white mx-2 px-4 py-2 rounded-lg hover:bg-red-700 shadow-md transition-transform transform hover:scale-105"
   >
@@ -314,9 +357,7 @@ const calculatedCost = useMemo(() => {
   Purchase
 </button>
 
-      <div className="flex items-center justify-center flex-col">
 
-</div>
     </form>
     <div className="flex items-center flex-col justify-between w-full max-w-3xl bg-gray-100 backdrop-blur-sm rounded-2xl shadow-md px-4 py-2 mt-6"  >
     <h1>Accelerate Your Account with these premium offers:</h1>

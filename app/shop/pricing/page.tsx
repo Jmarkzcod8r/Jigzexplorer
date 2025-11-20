@@ -7,6 +7,10 @@ import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Logo from "@/app/component/logo";
 import Link from "next/link";
+import { updateEnv} from "@/app/lib/zustand/updateEnvironmet";
+import { useUpdateUserProfile } from "@/app/lib/zustand/updateUserProfile";
+
+import { Environment } from "@paddle/paddle-node-sdk";
 
 const PremiumWelcome = () => {
   const router = useRouter();
@@ -28,14 +32,36 @@ const PremiumWelcome = () => {
   ];
 
   // ✅ Initialize Paddle.js
+  const user=useUpdateUserProfile()
+  const env = updateEnv()
+
+
   useEffect(() => {
-    initializePaddle({
-      environment: "sandbox", // Use "sandbox" for testing
-      token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN!,
-    }).then((p) => setPaddle(p));
+    if (env.env == 'sandbox') {
+      initializePaddle({
+        environment: "sandbox", // Use "sandbox" for testing
+        token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_SANDBOX!,
+
+      }).then((p) => setPaddle(p));
+    }
+
+    if (env.env == 'production') {
+      initializePaddle({
+        environment: "production", // Use "sandbox" for testing
+        token: process.env.NEXT_PUBLIC_PADDLE_TOKEN_LIVE!,
+
+      }).then((p) => setPaddle(p));
+    }
+
+
   }, []);
 
+  const isLocalhost = typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+   window.location.hostname === "127.0.0.1");
+
   const handleCheckout = async () => {
+    localStorage.setItem('uid', JSON.stringify(user.user.uid))
     if (!paddle) {
       alert("⚠️ Paddle not initialized yet.");
       return;
@@ -45,43 +71,55 @@ const PremiumWelcome = () => {
 
     try {
       // Optional: show a temporary "processing" page
-      router.push("/checkout");
+      // router.push("/checkout");
 
-      const rawEmail = localStorage.getItem("email");
-      const rawuid = localStorage.getItem("uid");
+      const rawEmail = user.user.email
+      const rawuid =  user.user.uid
 
       let email = "guest@example.com";
       let uid = "...uid...";
 
       if (rawEmail && rawuid) {
         try {
-          email = JSON.parse(rawEmail);
+          email = rawEmail
           uid = rawuid;
         } catch {
           email = rawEmail;
         }
       }
 
-      const response = await fetch("/api/paddle/activate-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, uid }),
-      });
 
-      const data = await response.json();
+      let response;
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create checkout session");
+      if (env.env === "sandbox") {
+        response = await fetch("/api/paddle/activate-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, uid, env: "sandbox" }),
+        });
+      } else {
+        response = await fetch("/api/paddle/activate-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, uid, env: "production" }),
+        });
       }
 
-      // ✅ Paddle checkout (Overlay or Redirect)
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to create checkout session");
+        }
+         // ✅ Paddle checkout (Overlay or Redirect)
       if (data.transactionId && paddle.Checkout) {
         paddle.Checkout.open({
           transactionId: data.transactionId,
           settings: {
             displayMode: "overlay", // in-page checkout
             theme: "dark",
-            successUrl: "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
+            successUrl: isLocalhost
+            ? "http://localhost:3000/checkout-success"
+            : "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
             // closeCallback: () => {
             //   // If user closes/cancels checkout
             //   router.push("/shop/pricing");
@@ -95,6 +133,7 @@ const PremiumWelcome = () => {
       else {
         throw new Error("Missing checkoutUrl or transactionId from server");
       }
+
     } catch (err: any) {
       console.error("Checkout failed:", err);
       alert("Checkout failed. Please try again.");
@@ -104,17 +143,28 @@ const PremiumWelcome = () => {
     }
   };
 
-
   return (
     <div className="font-sans flex flex-col items-center justify-center min-h-screen p-6 sm:p-10 bg-[url('/Bg.png')] bg-cover bg-center">
       <Logo />
 
       {/* Cards Container */}
+      <div>
+      {isLocalhost ? (
+        <div className="p-3 bg-yellow-200 text-black rounded">
+          🔧 You are using <b>localhost</b>
+        </div>
+      ) : (
+        <div className="p-3 bg-green-200 text-black rounded">
+          {/* 🌍 You are in <b>Production / Online</b> */}
+        </div>
+      )}
+    </div>
       <div className="flex flex-col sm:flex-row gap-8 mt-8">
         {/* Free Package Card */}
         <div className="bg-white shadow-xl rounded-2xl max-w-lg w-full p-8 text-center">
           <h1 className="text-3xl font-bold text-gray-700 mb-2">🆓 Free Package</h1>
-
+            <h2>{user.user.email}</h2>
+            {/* <h2>{Environment.env}</h2> */}
           <p className="text-gray-500 mb-6 text-lg font-medium">Enjoy the basics for free</p>
 
           <ul className="text-left space-y-3 mb-6">

@@ -24,7 +24,7 @@ export default function Login() {
       if (!user) return;
 
       const uid = user.uid;
-      localStorage.setItem("uid", uid);
+      // localStorage.setItem("uid", uid);
 
       try {
         const defaultPremium = { active: false, expiryDate: "" };
@@ -40,9 +40,9 @@ export default function Login() {
         // });
 
         // ✅ Local cache
-        localStorage.setItem("email", JSON.stringify(user.email));
-        localStorage.setItem("photoURL", JSON.stringify(user.photoURL));
-        localStorage.setItem("premium", JSON.stringify(defaultPremium.active));
+        // localStorage.setItem("email", JSON.stringify(user.email));
+        // localStorage.setItem("photoURL", JSON.stringify(user.photoURL));
+        // localStorage.setItem("premium", JSON.stringify(defaultPremium.active));
 
         // ✅ Firestore user check
         const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
@@ -93,6 +93,7 @@ export default function Login() {
                   ATH: 0,
                   score: 0,
                   unlock: unlockedCountries.includes(country) ? true : false,
+                  lastplayed: 0
                 },
               ])
             ),
@@ -105,21 +106,21 @@ export default function Login() {
           updateUserProfile(newUserData);
 
           // ✅ Save to localStorage
-          localStorage.setItem('user', JSON.stringify(newUserData));
-          console.log("✅ User data saved to localStorage");
+          // localStorage.setItem('user', JSON.stringify(newUserData));
+          // console.log("✅ User data saved to localStorage");
         } else {
           const data = userSnap.data();
           const premiumStatus = data?.premium?.active ?? false;
 
           console.log("ℹ️ Existing Firestore profile found:", data);
-          localStorage.setItem("premium", JSON.stringify(premiumStatus));
+          // localStorage.setItem("premium", JSON.stringify(premiumStatus));
 
           // ✅ Also update Zustand with Firestore data
           // resetUserProfile();
           updateUserProfile(data);
         }
 
-        await axios.get("/api/post/score");
+        // await axios.get("/api/post/score");
       } catch (err) {
         console.error("Error saving to MongoDB/Firestore:", err);
       }
@@ -163,9 +164,9 @@ export default function Login() {
     </div>
 
     {/* Footer text */}
-    <p className="text-center text-sm text-gray-500 mt-8">
+    {/* <p className="text-center text-sm text-gray-500 mt-8">
       By continuing, you agree to our Terms of Service
-    </p>
+    </p> */}
   </div>
 </div>
   );

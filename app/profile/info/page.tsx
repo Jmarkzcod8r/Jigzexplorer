@@ -204,6 +204,7 @@ export default function ProfileView() {
                   <div>Unlocked: <span className={data.unlock ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
                     {data.unlock ? "Yes" : "No"}
                   </span></div>
+                  <div>Last Played: {data.lastplayed}</div>
                 </div>
               </div>
             ))}

@@ -73,6 +73,7 @@ export async function updateOverallScore(userId: string, country: string, points
     [`countries.${countryKey}.score`]: newScore,
     [`countries.${countryKey}.ATH`]: newATH,
     [`countries.${countryKey}.unlock`]: unlock,
+    [`countries.${countryKey}.lastplayed`]: Date.now(),
     overallscore: newOverall,
     tickets: increment(2),
   });

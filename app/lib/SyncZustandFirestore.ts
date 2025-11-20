@@ -21,6 +21,9 @@ export function SyncZustandFirestore(uid: string) {
           userStore.updatezCountry(name, country);
         });
       }
+      localStorage.clear()
+    } else {
+      alert ('error syncing')
     }
   });
 

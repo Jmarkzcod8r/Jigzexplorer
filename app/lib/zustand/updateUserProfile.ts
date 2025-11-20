@@ -132,6 +132,7 @@ interface CountryData {
   ATH: number;
   score: number;
   unlock: boolean;
+  lastplayed: number
 }
 
 interface Countries {
@@ -181,7 +182,7 @@ const defaultCountries: Countries = {};
 
 /* default user (MUST NOT BE NULL) */
 const defaultUser: UserProfile = {
-  uid: null,
+  uid: '',
   displayName: null,
   email: null,
   photoURL: null,

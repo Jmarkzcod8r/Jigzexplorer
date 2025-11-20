@@ -100,7 +100,9 @@ export default function Home() {
 
    setPhotoURL(localStorage.getItem("photoURL"));
  }, []);
-
+  const redirect_settings_page = () => {
+    router.push("/settings");
+  }
 
   const redirect_login_profile = () => {
     const email = user.user.email
@@ -272,6 +274,17 @@ const countryFlags: Record<string, string> = {
       <Image className="w-4 h-4 sm:w-5 sm:h-5" />
       Webp Converter
     </button>
+    {user.user.email === "jmgutierrez122091@gmail.com" ? (
+          <button
+            onClick={redirect_settings_page}
+            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+          text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+          hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center">
+            Settings
+          </button>
+        ) : (
+          <div></div> // or null if you want nothing
+        )}
 
     {/* <button
       onClick={() => router.push("/connect")}
@@ -282,6 +295,7 @@ const countryFlags: Record<string, string> = {
       <Plug className="w-4 h-4 sm:w-5 sm:h-5" />
       Connect
     </button> */}
+
   </div>
 )}
 

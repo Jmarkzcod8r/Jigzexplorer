@@ -23,7 +23,7 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(2);
+  const [quotaPics, setQuotaPics] = useState(1);
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
@@ -471,11 +471,14 @@ useEffect(() => {
             body: JSON.stringify(payload),
           }).catch(console.error)
 
-          await updateOverallScore(
-            cleanUID,
-            country.toLowerCase(),
-            score + streak * 10 + elapsedTime
-          )
+          if (user.user.uid) {
+            await updateOverallScore(
+              user.user.uid,
+              country.toLowerCase(),
+              score + streak * 10 + elapsedTime
+            )
+          }
+
         }
 
         saveToFirestore()
@@ -944,6 +947,7 @@ useEffect(() => {
               </div>
             )
           )}
+
 
           {completedStatus[currentIndex] ? null : (
          <div
