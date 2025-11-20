@@ -106,19 +106,12 @@ import dbConnect from "../mongodb/connection/dbConnection";
 import WebhookLog from "../mongodb/schemas/webhooklog";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
-import { updateEnv } from "@/app/lib/zustand/updateEnvironmet";
 
-const env = updateEnv()
 
 // ✅ Paddle setup
-const paddle = env.env === "sandbox"
-  ? new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
-      environment: Environment.sandbox,
-    })
-  : new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
-      environment: Environment.production,
-    });
-
+const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
+  environment: Environment.sandbox,
+});
 
 // ✅ Webhook logging function
 async function logWebhookEvent(
@@ -173,8 +166,7 @@ export async function POST(req: Request) {
     const email = parsedData.data?.customData?.userEmail;
     const uid = parsedData.data?.customData?.uid;
 
-    console.log('thiss is in customData email',email);
-    console.log('thiss is in customData uid',uid);
+    console.log('thiss is in customData',email);
 
     // const email =
     //   'jmgutierrez122091@gmail.com' ||
