@@ -63,7 +63,7 @@ export default function Home() {
       localStorage.clear();
     }
 
-    setPhotoURL(localStorage.getItem("photoURL"));
+    setPhotoURL(user.user.photoURL);
 
     if (countriesUnlock.length > 0) {
       const normalizedList = countriesUnlock.map((item) =>

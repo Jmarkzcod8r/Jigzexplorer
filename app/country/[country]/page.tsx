@@ -419,7 +419,7 @@ useEffect(() => {
           <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
             🏆 ${score + streak * 10 + elapsedTime} 🏆
           </div>
-          <div> Previous ATH:  ${user.user.countries[country].ATH}  </div>
+          <div>Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
           <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
             <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
             <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
@@ -982,7 +982,7 @@ useEffect(() => {
 
         </div>
 
-
+        <div> Previous ATH:  {user.user.countries[country]?.ATH}  </div>
       {/* Solved or Puzzle pieces */}
       {completedStatus[currentIndex] ? (
         <div style={{ color: "green", fontWeight: "bold", marginTop: "10px" }}>

@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* <header className="p-4 bg-gray-100">
+        <header className="p-4 bg-gray-100">
           {user?.email ? (
             <p className="text-sm text-gray-700">Logged in as: {user.email}</p>
           ) : (
@@ -78,10 +78,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <p>Environment: {Environment.env}</p>
           <p>Score: {user.overallscore}</p>
           <p>UID: {user.uid}</p>
+          <p>Photo: {user.photoURL}</p>
           <p>Tickets: {user.tickets}</p>
           <p>Tokens: {user.settings?.tokens}</p>
-          <p>Premium Status: {user.premium.status}</p>
-        </header> */}
+          <p>Premium Status: {user.subscription?.status}</p>
+        </header>
 
         {children}
       </body>

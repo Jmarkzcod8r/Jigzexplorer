@@ -124,7 +124,6 @@
 
 // export default ProfilePage;
 
-
 "use client";
 
 import React from "react";
@@ -138,7 +137,7 @@ export default function ProfileView() {
 
   return (
     <div className="p-8 min-h-screen bg-gray-100 font-sans">
-      <Logo/>
+      <Logo />
       <h1 className="text-3xl font-bold mb-6">User Profile</h1>
 
       {/* Basic Info */}
@@ -160,26 +159,25 @@ export default function ProfileView() {
       {/* Premium & Scores */}
       <div className="mb-6 p-4 bg-white shadow rounded">
         <h2 className="text-xl font-semibold mb-2">Account Info</h2>
-        <p><strong>Premium Status:</strong> {user.premium.status}</p>
-        <p><strong>Premium Active:</strong> {user.premium.active ? "Yes" : "No"}</p>
-        {user.premium.expiryDate && (
-          <p><strong>Premium Expiry:</strong> {user.premium.expiryDate}</p>
-        )}
-        <p><strong>Tickets:</strong> {user.tickets}</p>
-        <p><strong>Overall Score:</strong> {user.overallscore}</p>
+        <p>
+          <strong>Premium Status:</strong>{" "}
+          {user.subscription?.status ?? "Freemium"}
+        </p>
+        <p><strong>Tickets:</strong> {user.tickets ?? 0}</p>
+        <p><strong>Overall Score:</strong> {user.overallscore ?? 0}</p>
       </div>
 
       {/* Settings */}
       <div className="mb-6 p-4 bg-white shadow rounded">
         <h2 className="text-xl font-semibold mb-2">Game Settings</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <p><strong>Tokens:</strong> {user.settings.tokens}</p>
-          <p><strong>Streak Multiplier:</strong> {user.settings.streakMultiplier}x</p>
-          <p><strong>Time Multiplier:</strong> {user.settings.timeMultiplier}x</p>
-          <p><strong>Time Duration:</strong> {user.settings.timeDuration}s</p>
-          <p><strong>Turbo Bonus:</strong> {user.settings.turboBonus}</p>
-          <p><strong>Turbo Countdown:</strong> {user.settings.turbocountdown}s</p>
-          <p><strong>Puzzle Completion Score:</strong> {user.settings.puzzlecompletionscore}</p>
+          <p><strong>Tokens:</strong> {user.settings.tokens ?? 0}</p>
+          <p><strong>Streak Multiplier:</strong> {user.settings.streakMultiplier ?? 1}x</p>
+          <p><strong>Time Multiplier:</strong> {user.settings.timeMultiplier ?? 1}x</p>
+          <p><strong>Time Duration:</strong> {user.settings.timeDuration ?? 60}s</p>
+          <p><strong>Turbo Bonus:</strong> {user.settings.turboBonus ?? 0}</p>
+          <p><strong>Turbo Countdown:</strong> {user.settings.turbocountdown ?? 30}s</p>
+          <p><strong>Puzzle Completion Score:</strong> {user.settings.puzzlecompletionscore ?? 50}</p>
         </div>
       </div>
 
@@ -196,15 +194,18 @@ export default function ProfileView() {
                 className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
               >
                 <div className="font-semibold text-blue-600 capitalize">
-                  {country.replace(/_/g, ' ')}
+                  {country.replace(/_/g, " ")}
                 </div>
                 <div className="text-sm text-gray-600 mt-1">
-                  <div>Score: <span className="font-medium">{data.score}</span></div>
-                  <div>ATH: <span className="font-medium">{data.ATH}</span></div>
-                  <div>Unlocked: <span className={data.unlock ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-                    {data.unlock ? "Yes" : "No"}
-                  </span></div>
-                  <div>Last Played: {data.lastplayed}</div>
+                  <div>Score: <span className="font-medium">{data.score ?? 0}</span></div>
+                  <div>ATH: <span className="font-medium">{data.ATH ?? 0}</span></div>
+                  <div>
+                    Unlocked:{" "}
+                    <span className={data.unlock ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                      {data.unlock ? "Yes" : "No"}
+                    </span>
+                  </div>
+                  <div>Last Played: {data.lastplayed ?? 0}</div>
                 </div>
               </div>
             ))}
@@ -212,7 +213,7 @@ export default function ProfileView() {
         )}
       </div>
 
-      {/* Debug Info (optional - remove in production) */}
+      {/* Debug Info (optional) */}
       <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
         <h3 className="text-lg font-semibold mb-2 text-yellow-800">Debug Info</h3>
         <h2 className="text-sm text-yellow-700">

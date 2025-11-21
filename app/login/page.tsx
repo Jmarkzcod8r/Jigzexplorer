@@ -16,7 +16,11 @@ export default function Login() {
   const router = useRouter();
 
   // ✅ Zustand store hook
-  const { updateUserProfile, resetUserProfile } = useUpdateUserProfile();
+  const {  updateUserProfile, resetUserProfile } = useUpdateUserProfile();
+
+  const Countries = ["Denmark", "Iceland", "Ireland", "Latvia", "Lithuania", "Norway", "Sweden", "United Kingdom", "Austria", "Belgium", "Liechtenstein", "Luxembourg", "Monaco", "Netherlands", "Albania", "Andorra", "Bosnia and Herzegovina", "Croatia", "Greece", "Italy", "Malta", "Montenegro", "North Macedonia", "Portugal", "San Marino", "Serbia", "Slovenia", "Spain", "Vatican City", "Belarus", "Bulgaria", "Czechia", "Hungary", "Moldova", "Poland", "Romania", "Slovakia", "Ukraine" ].map(c => c.toLowerCase());
+
+
 
   const signIn = async () => {
     try {
@@ -53,51 +57,116 @@ export default function Login() {
           // 🔹 Create new Firestore profile
           const unlockedCountries = ["estonia", "finland", "france", "germany", "switzerland"];
 
-          const newUserData = {
-            uid: user.uid,
-            displayName: user.displayName,
-            email: user.email,
-            photoURL: user.photoURL,
-            emailVerified: user.emailVerified,
+          // Assuming you have `user` from Zustand and `unlockedCountries` as an array of strings
+// const newUserData = {
+//   uid: user.uid,
+//   displayName: user.displayName,
+//   email: user.email,
+//   photoURL: user.photoURL,
+//   emailVerified: user.emailVerified,
 
-            tickets: 0,
-            overallscore: 0,
+//   tickets: 0,
+//   overallscore: 0,
 
-            // 🔹 Matches new Zustand structure
-            premium: {
-              active: false,
-              status: 'Freemium',
-              expiryDate: "",
-            },
+//   // 🔹 Subscription structure
+//   subscription: {
+//     subscriptionId:  "", // Paddle subscription ID
+//     productId:  "",           // Paddle Product / Plan
+//     status:  "Freemium",         // active | past_due | canceled | trialing | Freemium
+//     active:  false,
 
-            settings: {
-              tokens: 0,
-              streakMultiplier: 10,
-              timeMultiplier: 10,
-              timeDuration: 180,
-              turboBonus: 200,
-              turbocountdown: 30,
-              puzzlecompletionscore: 100,
-            },
+//     expiryDate:  "",
+//     cancelAtPeriodEnd: false,
 
-            countries: Object.fromEntries(
-              [
-                "denmark","estonia","finland","iceland","ireland","latvia","lithuania","norway","sweden","united kingdom",
-                "austria","belgium","france","germany","liechtenstein","luxembourg","monaco","netherlands","switzerland",
-                "albania","andorra","bosnia and herzegovina","croatia","greece","italy","malta","montenegro","north macedonia",
-                "portugal","san marino","serbia","slovenia","spain","vatican city","belarus","bulgaria","czechia","hungary",
-                "moldova","poland","romania","slovakia","ukraine"
-              ].map((country) => [
-                country,
-                {
-                  ATH: 0,
-                  score: 0,
-                  unlock: unlockedCountries.includes(country) ? true : false,
-                  lastplayed: 0
-                },
-              ])
-            ),
-          };
+//     lastPayment: {
+//       date:  0,
+//       amount:  0,
+//       currency: "",
+//       status:  "",
+//       transactionId:"",
+//     },
+
+//     gracePeriod: {
+//       daysTotal:  0,
+//       daysRemaining:  30,
+//       resetIntervalMonths:  6,
+//       lastResetDate:0,
+//       isInGracePeriod:  false,
+//     },
+//   },
+
+//   // 🔹 Settings preserved
+//   settings: {
+//     tokens: 0,
+//     streakMultiplier: 1,
+//     timeMultiplier: 1,
+//     timeDuration: 60,
+//     turboBonus: 0,
+//     turbocountdown: 30,
+//     puzzlecompletionscore: 50,
+//   },
+
+//   // 🔹 Countries with unlock logic
+//   countries: Object.fromEntries(
+//     Object.entries(Countries).map(([countryName, data]) => [
+//       countryName.toLowerCase(),
+//       {
+//         ATH:  0,
+//         score:  0,
+//         unlock:false,
+//         lastplayed:  0,
+//       },
+//     ])
+//   ),
+// };
+const newUserData = {
+  uid: user.uid,
+  displayName: user.displayName,
+  email: user.email,
+  photoURL: user.photoURL,
+  emailVerified: user.emailVerified,
+  tickets: 0,
+  overallscore: 0,
+
+  subscription: {
+    subscriptionId: "",
+    planId: "freemium",
+    planName: "Freemium",
+    currency: "USD",
+    amount: 0,
+    billingInterval: "month",
+    billingFrequency: 1,
+    status: "Freemium",
+    isTrial: false,
+    trialEndsAt: 0,
+    nextBillAt: 0,
+    lastPaymentAt: 0,
+    cancelAt: 0,
+    paymentType: 0,
+    last4: 0,
+    meta: {},
+  },
+
+  settings: {
+    tokens: 0,
+    streakMultiplier: 1,
+    timeMultiplier: 1,
+    timeDuration: 60,
+    turboBonus: 0,
+    turbocountdown: 30,
+    puzzlecompletionscore: 50,
+  },
+
+  countries: Object.fromEntries(
+    Countries.map((country) => [
+      country.toLowerCase(),
+      { ATH: 0, score: 0, unlock: false, lastplayed: 0 },
+    ])
+  ),
+};
+
+
+
 
           await setDoc(userRef, newUserData);
           console.log("✅ Firestore profile created");

@@ -81,5 +81,5 @@ export async function updateOverallScore(userId: string, country: string, points
   // ✅ Update Zustand store
   userStore.updatezCountry(countryKey, { score: newScore, ATH: newATH, unlock });
 
-  userStore.updateUserProfile({ overallscore: newOverall, tickets: (userStore.user.tickets || 0) + 2 });
+  // userStore.updateUserProfile({ overallscore: newOverall, tickets: userStore.user.tickets  + 2 });
 }
