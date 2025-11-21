@@ -86,7 +86,7 @@ const Page = () => {
 
       {/* Tickets & Overall */}
       <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-lg text-center mb-4">
-      <p className="text-gray-700 font-medium">🔥 Status: {user.premium.status}</p>
+      <p className="text-gray-700 font-medium">🔥 Status: {user.subscription?.status}</p>
         <p className="text-gray-700 font-medium">🎟️ Tickets: {score.tickets}</p>
         <p className="text-gray-700 font-medium">⭐ Overall Score: {score.overallscore}</p>
       </div>
