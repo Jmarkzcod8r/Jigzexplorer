@@ -119,7 +119,12 @@ const defaultUser: UserProfile = {
 
 /* ----------------- Zustand Store ----------------- */
 
-export const useUpdateUserProfile = create<UserProfileState>()(
+/* ----------------- Zustand Store ----------------- */
+
+export const useUpdateUserProfile = create<UserProfileState & {
+  incrementSetting: (key: keyof UserSettings, value?: number) => void;
+  decrementSetting: (key: keyof UserSettings, value?: number) => void;
+}>()(
   immer((set) => ({
     user: { ...defaultUser },
 
@@ -133,6 +138,22 @@ export const useUpdateUserProfile = create<UserProfileState>()(
         Object.assign(state.user.settings, data);
       }),
 
+    incrementSetting: (key, value = 1) =>
+      set((state) => {
+        if (state.user.settings[key] !== undefined && typeof state.user.settings[key] === "number") {
+          state.user.settings[key] += value;
+        }
+      }),
+
+    decrementSetting: (key, value = 1) =>
+      set((state) => {
+        if (state.user.settings[key] !== undefined && typeof state.user.settings[key] === "number") {
+          state.user.settings[key] -= value;
+          // Optional: prevent negative values
+          if (state.user.settings[key] < 0) state.user.settings[key] = 0;
+        }
+      }),
+
     updatezCountry: (name, data) =>
       set((state) => {
         if (!state.user.countries[name]) return;
@@ -144,21 +165,14 @@ export const useUpdateUserProfile = create<UserProfileState>()(
         const country = state.user.countries[name];
         if (!country) return;
 
-        // Increase score properly
         const newScore = (country.score || 0) + points;
         country.score = newScore;
-
-        // ATH update
         country.ATH = Math.max(country.ATH, newScore);
-
-        // Auto-unlock
         country.unlock = true;
 
-        // Update overall score
         state.user.overallscore = Object.values(state.user.countries)
           .reduce((sum, c) => sum + (c.score || 0), 0);
 
-        // Reward tickets
         state.user.tickets += 2;
       }),
 
@@ -174,6 +188,7 @@ export const useUpdateUserProfile = create<UserProfileState>()(
       }),
   }))
 );
+
 
 
 // Use this to copy paste on pages.
