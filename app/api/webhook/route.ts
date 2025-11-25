@@ -100,6 +100,10 @@
 
 //   return NextResponse.json({ ok: true });
 // }
+
+// Notes:
+// (1)Change also the secret key in .env file everytime a new webhook connection is made
+
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk";
 import { NextResponse } from "next/server";
 import dbConnect from "../mongodb/connection/dbConnection";
@@ -107,10 +111,21 @@ import WebhookLog from "../mongodb/schemas/webhooklog";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/lib/firebase";
 
+// change this to either sandbox or production...
+const webhook_environment = "sandbox"; // or "production"
 
-// ✅ Paddle setup
-const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
-  environment: Environment.sandbox,
+// Choose correct Paddle secret token
+const paddleSecret =
+  webhook_environment === "sandbox"
+    ? process.env.PADDLE_SECRET_TOKEN_SANDBOX!
+    : process.env.PADDLE_SECRET_TOKEN_LIVE!;
+
+// Initialize Paddle
+const paddle = new Paddle(paddleSecret, {
+  environment:
+    webhook_environment === "sandbox"
+      ? Environment.sandbox
+      : Environment.production,
 });
 
 // ✅ Webhook logging function
@@ -147,7 +162,10 @@ export async function POST(req: Request) {
 
   const signature = req.headers.get("paddle-signature") || "";
   const rawRequestBody = await req.text();
-  const secretKey = process.env.WEBHOOK_SECRET_KEY || "";
+  const secretKey = process.env.WEBHOOK_SECRET_KEY_SANDBOX || ""
+  // webhook_environment === "sandbox"
+  //   ? process.env.WEBHOOK_SECRET_KEY_SANDBOX || ""
+  //   : process.env.WEBHOOK_SECRET_KEY_LIVE || "";
 
   try {
     if (!signature || !rawRequestBody) {
@@ -168,6 +186,7 @@ export async function POST(req: Request) {
 
     console.log('thiss is in customData',email);
 
+    console.log('thiss is in customDate-uid',uid);
     // const email =
     //   'jmgutierrez122091@gmail.com' ||
     //   null;
@@ -178,17 +197,18 @@ export async function POST(req: Request) {
     switch (eventData.eventType) {
       case EventName.SubscriptionActivated:
         console.log(`✅ Subscription ${eventData.data.id} activated`);
+
         // await logWebhookEvent(eventData, "success", null, signature, req);
 
         // if (email) {
-          const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
-          await updateDoc(userRef, {
-            premium: {
-              status: true,
-              subscriptionId: eventData.data.id, // ✅ correct syntax
-            },
-          });
-          console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
+          // const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+          // await updateDoc(userRef, {
+          //   premium: {
+          //     status: true,
+          //     subscriptionId: eventData.data.id, // ✅ correct syntax
+          //   },
+          // });
+          // console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
           // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
         // }
         break;
@@ -204,9 +224,9 @@ export async function POST(req: Request) {
         // }
         break;
 
-      default:
-        console.log(`ℹ️ Unhandled event type: ${eventData.eventType}`);
-        await logWebhookEvent(eventData, "ignored", null, signature, req);
+      // default:
+      //   console.log(`ℹ️ Unhandled event type: ${eventData.eventType}`);
+      //   await logWebhookEvent(eventData, "ignored", null, signature, req);
     }
 
     return NextResponse.json({ ok: true });

@@ -1,10 +1,15 @@
 import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { NextResponse } from "next/server";
 
-
+// Notes:
+// (1) The env from req.json() controls whether this backend is in sandbox or production
 
 const paddle_sandbox = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
   environment: Environment.sandbox, // switch to .production in live mode
+});
+
+const paddle_live = new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
+  environment: Environment.production, // switch to .production in live mode
 });
 
 export async function POST(req: Request) {
@@ -26,8 +31,10 @@ export async function POST(req: Request) {
         items: [
           {
 
-            priceId: "pri_01k56yns22wkpzrztxpc0ztr64",  // This is sandbox
+            // priceId: "pri_01k56yns22wkpzrztxpc0ztr64",  // This is sandbox- $3
+            priceId: "pri_01k52257k9nrrcvm74m88cct2t",  // This is sandbox - $30
             // priceId: "pri_01k83r3pxx8g69603hpc7bm27s",  // This is for production
+            // priceId: "pri_01kaxe46svpfvd2wr3sngap8se",  // This is for production - $1
 
             quantity: 1
           },
@@ -45,6 +52,35 @@ export async function POST(req: Request) {
 
       // ✅ Return checkout URL to frontend
       return NextResponse.json({ transactionId: txn.id, checkoutUrl: txn.checkout });
+    } else {
+
+      const txn = await paddle_live.transactions.create({
+        items: [
+          {
+
+            // priceId: "pri_01k56yns22wkpzrztxpc0ztr64",  // This is sandbox- $3
+            // priceId: "pri_01k52257k9nrrcvm74m88cct2t",  // This is sandbox - $30
+            // priceId: "pri_01k83r3pxx8g69603hpc7bm27s",  // This is for production
+            priceId: "pri_01kaxe46svpfvd2wr3sngap8se",  // This is for production - $1
+
+            quantity: 1
+          },
+        ],
+
+        customData: {
+          userEmail: email, // optional, useful for tracking
+          uid: uid
+        },
+        // successUrl: "https://jigzexplorer.quest/checkout-success",
+        // cancelUrl: "https://jigzexplorer.quest/checkout-cancel",
+      });
+
+      console.log("Created Paddle transaction:", txn);
+
+      // ✅ Return checkout URL to frontend
+      return NextResponse.json({ transactionId: txn.id, checkoutUrl: txn.checkout });
+
+
     }
 
   } catch (error: any) {
