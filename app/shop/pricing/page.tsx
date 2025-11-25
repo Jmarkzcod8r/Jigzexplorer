@@ -48,7 +48,7 @@ const PremiumWelcome = () => {
     if (env.env == 'production') {
       initializePaddle({
         environment: "production", // Use "sandbox" for testing
-        token: process.env.NEXT_PUBLIC_PADDLE_TOKEN_LIVE!,
+        token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_LIVE!,
 
       }).then((p) => setPaddle(p));
     }
