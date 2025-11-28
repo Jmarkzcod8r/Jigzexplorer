@@ -47,7 +47,7 @@ const PremiumWelcome = () => {
 
     if (env.env == 'production') {
       initializePaddle({
-        environment: "production", // Use "sandbox" for testing
+        // environment: "production", // Use "sandbox" for testing
         token: 'live_75e8b184e28463f4153fc4d2388',
         // token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_LIVE!,
 
