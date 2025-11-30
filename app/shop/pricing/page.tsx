@@ -90,47 +90,74 @@ const PremiumWelcome = () => {
         }
       }
 
+      const checkoutEnv = env.env === "sandbox" ? "sandbox" : "production";
 
-      let response;
+const response = await fetch("/api/paddle/activate-subscription", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, uid, env: checkoutEnv }),
+});
 
-      if (env.env === "sandbox") {
-        response = await fetch("/api/paddle/activate-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, uid, env: "sandbox" }),
-        });
-      } else {
-        response = await fetch("/api/paddle/activate-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, uid, env: "production" }),
-        });
-      }
+const data = await response.json();
+
+if (!response.ok) {
+  throw new Error(data?.error || "Failed to create checkout session");
+}
+
+//  ✅ Open Paddle checkout
+if (data.transactionId && paddle.Checkout) {
+  paddle.Checkout.open({
+    transactionId: data.transactionId,
+    settings: {
+      displayMode: "overlay",
+      theme: "dark",
+      successUrl: isLocalhost
+        ? "http://localhost:3000/checkout-success"
+        : "https://jigzexplorer.quest/checkout-success",
+    },
+  });
+}
+
+      // let response;
+
+      // if (env.env === "sandbox") {
+      //   response = await fetch("/api/paddle/activate-subscription", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ email, uid, env: "sandbox" }),
+      //   });
+      // } else {
+      //   response = await fetch("/api/paddle/activate-subscription", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ email, uid, env: "production" }),
+      //   });
+      // }
 
 
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to create checkout session");
-        }
-        //  ✅ Paddle checkout (Overlay or Redirect)
-      if (data.transactionId && paddle.Checkout) {
-        //  if (paddle.Checkout) {
-        paddle.Checkout.open({
-          transactionId: data.transactionId,
-          // items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
-          settings: {
-            displayMode: "overlay", // in-page checkout
-            theme: "dark",
-            successUrl: isLocalhost
-            ? "http://localhost:3000/checkout-success"
-            : "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
-            // closeCallback: () => {
-            //   // If user closes/cancels checkout
-            //   router.push("/shop/pricing");
-            // },
-          },
-        });
-      }
+      //   const data = await response.json();
+      //   if (!response.ok) {
+      //     throw new Error(data.error || "Failed to create checkout session");
+      //   }
+      //   //  ✅ Paddle checkout (Overlay or Redirect)
+      // if (data.transactionId && paddle.Checkout) {
+      //   //  if (paddle.Checkout) {
+      //   paddle.Checkout.open({
+      //     transactionId: data.transactionId,
+      //     // items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
+      //     settings: {
+      //       displayMode: "overlay", // in-page checkout
+      //       theme: "dark",
+      //       successUrl: isLocalhost
+      //       ? "http://localhost:3000/checkout-success"
+      //       : "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
+      //       // closeCallback: () => {
+      //       //   // If user closes/cancels checkout
+      //       //   router.push("/shop/pricing");
+      //       // },
+      //     },
+      //   });
+      // }
       // else if (data.checkoutUrl) {
       //   // ✅ Redirect method fallback
       //   window.location.href = data.checkoutUrl;
