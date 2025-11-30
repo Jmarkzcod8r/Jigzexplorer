@@ -37,7 +37,8 @@ const PremiumWelcome = () => {
 
 
   useEffect(() => {
-    if (env.env == 'sandbox') {
+    // '===' instead of '='
+    if (env.env === 'sandbox') {
       initializePaddle({
         environment: "sandbox", // Use "sandbox" for testing
         token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_SANDBOX!,
@@ -45,7 +46,7 @@ const PremiumWelcome = () => {
       }).then((p) => setPaddle(p));
     }
 
-    if (env.env == 'production') {
+    if (env.env === 'production') {
       initializePaddle({
         environment: "production", // Use "sandbox" for testing
         token: 'live_75e8b184e28463f4153fc4d2388',
@@ -111,11 +112,12 @@ const PremiumWelcome = () => {
         if (!response.ok) {
           throw new Error(data.error || "Failed to create checkout session");
         }
-         // ✅ Paddle checkout (Overlay or Redirect)
-      if (data.transactionId && paddle.Checkout) {
+        //  ✅ Paddle checkout (Overlay or Redirect)
+      // if (data.transactionId && paddle.Checkout) {
+         if (paddle.Checkout) {
         paddle.Checkout.open({
           // transactionId: data.transactionId,
-          items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],
+          items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
           settings: {
             displayMode: "overlay", // in-page checkout
             theme: "dark",
@@ -128,13 +130,14 @@ const PremiumWelcome = () => {
             // },
           },
         });
-      } else if (data.checkoutUrl) {
-        // ✅ Redirect method fallback
-        window.location.href = data.checkoutUrl;
       }
-      else {
-        throw new Error("Missing checkoutUrl or transactionId from server");
-      }
+      // else if (data.checkoutUrl) {
+      //   // ✅ Redirect method fallback
+      //   window.location.href = data.checkoutUrl;
+      // }
+      // else {
+      //   throw new Error("Missing checkoutUrl or transactionId from server");
+      // }
 
     } catch (err: any) {
       console.error("Checkout failed:", err);
@@ -204,7 +207,7 @@ const PremiumWelcome = () => {
           <h1 className="text-3xl font-bold text-blue-600 mb-2">
             🎉 Premium Package
           </h1>
-
+                {env.env}
           <p className="text-gray-500 mb-6 text-lg font-medium">
             Only <span className="text-blue-600 font-bold">$3/month</span>
           </p>
