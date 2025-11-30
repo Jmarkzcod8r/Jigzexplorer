@@ -8,7 +8,8 @@ const paddle_sandbox = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
   environment: Environment.sandbox, // switch to .production in live mode
 });
 
-const paddle_live = new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
+// const paddle_live = new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
+const paddle_live = new Paddle('pdl_live_apikey_01k6aybmav7e5q4h1cevreqfar_b5bdbhE4yA1A4cvyfpJB7T_A0u', {
   environment: Environment.production, // switch to .production in live mode
 });
 
