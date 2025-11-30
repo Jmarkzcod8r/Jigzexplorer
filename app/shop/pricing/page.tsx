@@ -93,25 +93,25 @@ const PremiumWelcome = () => {
 
       let response;
 
-      if (env.env === "sandbox") {
-        response = await fetch("/api/paddle/activate-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, uid, env: "sandbox" }),
-        });
-      } else {
-        response = await fetch("/api/paddle/activate-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, uid, env: "production" }),
-        });
-      }
+      // if (env.env === "sandbox") {
+      //   response = await fetch("/api/paddle/activate-subscription", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ email, uid, env: "sandbox" }),
+      //   });
+      // } else {
+      //   response = await fetch("/api/paddle/activate-subscription", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ email, uid, env: "production" }),
+      //   });
+      // }
 
 
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to create checkout session");
-        }
+        // const data = await response.json();
+        // if (!response.ok) {
+        //   throw new Error(data.error || "Failed to create checkout session");
+        // }
         //  ✅ Paddle checkout (Overlay or Redirect)
       // if (data.transactionId && paddle.Checkout) {
          if (paddle.Checkout) {
