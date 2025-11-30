@@ -93,31 +93,31 @@ const PremiumWelcome = () => {
 
       let response;
 
-      // if (env.env === "sandbox") {
-      //   response = await fetch("/api/paddle/activate-subscription", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({ email, uid, env: "sandbox" }),
-      //   });
-      // } else {
-      //   response = await fetch("/api/paddle/activate-subscription", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({ email, uid, env: "production" }),
-      //   });
-      // }
+      if (env.env === "sandbox") {
+        response = await fetch("/api/paddle/activate-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, uid, env: "sandbox" }),
+        });
+      } else {
+        response = await fetch("/api/paddle/activate-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, uid, env: "production" }),
+        });
+      }
 
 
-        // const data = await response.json();
-        // if (!response.ok) {
-        //   throw new Error(data.error || "Failed to create checkout session");
-        // }
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to create checkout session");
+        }
         //  ✅ Paddle checkout (Overlay or Redirect)
-      // if (data.transactionId && paddle.Checkout) {
-         if (paddle.Checkout) {
+      if (data.transactionId && paddle.Checkout) {
+        //  if (paddle.Checkout) {
         paddle.Checkout.open({
-          // transactionId: data.transactionId,
-          items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
+          transactionId: data.transactionId,
+          // items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
           settings: {
             displayMode: "overlay", // in-page checkout
             theme: "dark",
