@@ -29,7 +29,8 @@ export async function POST(req: Request) {
     }
 
     // ✅ Create a Paddle transaction (server-side)
-    if (env == 'sandbox') {
+    if (env === 'sandbox') {
+      console.log("commencing sandbox protocol");
       const txn = await paddle_sandbox.transactions.create({
         items: [
           {
@@ -55,7 +56,9 @@ export async function POST(req: Request) {
 
       // ✅ Return checkout URL to frontend
       return NextResponse.json({ transactionId: txn.id, checkoutUrl: txn.checkout });
-    } else {
+    }
+    if (env === 'production') {
+      console.log("commencing live protocol");
 
       const txn = await paddle_live.transactions.create({
         items: [
