@@ -47,7 +47,7 @@ const PremiumWelcome = () => {
 
     if (env.env == 'production') {
       initializePaddle({
-        // environment: "production", // Use "sandbox" for testing
+        environment: "production", // Use "sandbox" for testing
         token: 'live_75e8b184e28463f4153fc4d2388',
         // token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_LIVE!,
 
@@ -114,7 +114,8 @@ const PremiumWelcome = () => {
          // ✅ Paddle checkout (Overlay or Redirect)
       if (data.transactionId && paddle.Checkout) {
         paddle.Checkout.open({
-          transactionId: data.transactionId,
+          // transactionId: data.transactionId,
+          items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],
           settings: {
             displayMode: "overlay", // in-page checkout
             theme: "dark",
