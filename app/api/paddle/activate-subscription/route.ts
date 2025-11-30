@@ -8,13 +8,15 @@ const paddle_sandbox = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
   environment: Environment.sandbox, // switch to .production in live mode
 });
 
-// const paddle_live = new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
-const paddle_live = new Paddle('pdl_live_apikey_01k6aybmav7e5q4h1cevreqfar_b5bdbhE4yA1A4cvyfpJB7T_A0u' );
+const paddle_live = new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
+// const paddle_live = new Paddle('pdl_live_apikey_01k6aybmav7e5q4h1cevreqfar_b5bdbhE4yA1A4cvyfpJB7T_A0u', {
+  environment: Environment.production, // switch to .production in live mode
+});
 
 export async function POST(req: Request) {
   console.log("api/paddle/activate-subscription");
   console.log("SANDBOX TOKEN:", process.env.PADDLE_SECRET_TOKEN_SANDBOX);
-  console.log("LIVE TOKEN:", process.env.PADDLE_SECRET_TOKEN_LIVE);
+  console.log("LIVE TOKEN New:", process.env.PADDLE_SECRET_TOKEN_LIVE);
 
   try {
     const { email, uid, env } = await req.json();
