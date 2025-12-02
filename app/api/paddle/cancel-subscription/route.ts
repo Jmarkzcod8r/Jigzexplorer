@@ -1,46 +1,53 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const { subscriptionId, email, uid, env, cancelNow } = await req.json();
 
-  // For canceling Subscription: <start>
-      const { subscriptionId , email, uid, env} = await req.json();
+  console.log(`Processing cancel-subscription for ID: ${subscriptionId}, email: ${email}, env: ${env}`);
 
-      console.log(`processing api/paddle/cancel-subscription/route.ts with id: ${ subscriptionId} for ${email}`)
-      // console.log()
-      if (!subscriptionId) {
-        return NextResponse.json({ error: "Missing subscriptionId" }, { status: 400 });
-      }
-
-      try {
-        // const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/pause`, {
-
-        const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.PADDLE_SECRET_TOKEN_SANDBOX}`,
-            "Content-Type": "application/json",
-          },
-          // Pause immediately.. <start>
-              // body: JSON.stringify({
-              //   "effective_from": "immediately"
-              // }),
-          //  <end> ...Pause immediately..
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("❌ Paddle cancel error:", errorData);
-          return NextResponse.json({ error: "Failed to cancel subscription" }, { status: response.status });
-        }
-
-        const data = await response.json();
-        console.log("✅ Subscription canceled:", data);
-        return NextResponse.json({ success: true, data });
-      } catch (err) {
-        console.error("Error:", err);
-        return NextResponse.json({ error: "Server error" }, { status: 500 });
-      }
-
+  if (!subscriptionId) {
+    return NextResponse.json({ error: "Missing subscriptionId" }, { status: 400 });
   }
 
+  try {
+    // Determine the correct Paddle API key based on environment
+    const PADDLE_API_KEY =
+      env === "sandbox"
+        ? process.env.PADDLE_SECRET_TOKEN_SANDBOX
+        : process.env.PADDLE_SECRET_TOKEN_LIVE;
 
+    const PADDLE_VENDOR_ID =
+      env === "sandbox"
+        ? process.env.PADDLE_VENDOR_ID_SANDBOX
+        : process.env.PADDLE_VENDOR_ID_LIVE;
+
+    if (!PADDLE_API_KEY || !PADDLE_VENDOR_ID) {
+      return NextResponse.json({ error: "Paddle credentials missing" }, { status: 500 });
+    }
+
+    const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        vendor_id: PADDLE_VENDOR_ID,
+        vendor_auth_code: PADDLE_API_KEY,
+        effective_from: cancelNow ? "immediately" : "next_payment", // cancel immediately or next billing
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("❌ Paddle cancel error:", data);
+      return NextResponse.json({ error: "Failed to cancel subscription", details: data }, { status: response.status });
+    }
+
+    console.log("✅ Subscription cancel scheduled:", data);
+    return NextResponse.json({ success: true, data });
+  } catch (err) {
+    console.error("Error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
