@@ -241,7 +241,7 @@ export async function POST(req: Request) {
     //     break;
     // }
 
-    console.log(`${eventData.data.id}`)
+    console.log(`${eventData.eventType}`)
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("❌ Webhook processing error:", err);
