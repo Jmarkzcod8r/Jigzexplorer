@@ -31,11 +31,15 @@ export async function POST(req: Request) {
       headers: {
         "Content-Type": "application/json",
       },
+      // body: JSON.stringify({
+      //   vendor_id: PADDLE_VENDOR_ID,
+      //   vendor_auth_code: PADDLE_API_KEY,
+      //   effective_from: cancelNow ? "immediately" : "next_payment", // cancel immediately or next billing
+      // }),..
       body: JSON.stringify({
-        vendor_id: PADDLE_VENDOR_ID,
-        vendor_auth_code: PADDLE_API_KEY,
-        effective_from: cancelNow ? "immediately" : "next_payment", // cancel immediately or next billing
-      }),
+        "effective_from": "next_billing_period"
+      })
+
     });
 
     const data = await response.json();
