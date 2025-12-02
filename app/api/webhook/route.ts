@@ -192,16 +192,16 @@ export async function POST(req: Request) {
     // ✅ Verify and decode Paddle event
     const eventData = await paddle.webhooks.unmarshal(rawRequestBody, secretKey, signature);
     const JSONData = JSON.stringify(eventData, null, 2);
-    console.log("📦 Paddle Webhook Received:", JSONData);
+    // console.log("📦 Paddle Webhook Received:", JSONData);
 
     // convert string back to object
     const parsedData = JSON.parse(JSONData);
     const email = parsedData.data?.customData?.userEmail;
     const uid = parsedData.data?.customData?.uid;
 
-    console.log('thiss is in customData',email);
+    // console.log('thiss is in customData',email);
 
-    console.log('thiss is in customDate-uid',uid);
+    // console.log('thiss is in customDate-uid',uid);
     // const email =
     //   'jmgutierrez122091@gmail.com' ||
     //   null;
@@ -209,38 +209,39 @@ export async function POST(req: Request) {
     // if (!email) console.warn("⚠️ No email found in event data.");
 
     // ✅ Handle event types
-    switch (eventData.eventType) {
-      case EventName.SubscriptionActivated:
-        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} activated`);
+    // switch (eventData.eventType) {
+    //   case EventName.SubscriptionActivated:
+    //     console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} activated`);
 
-        // await logWebhookEvent(eventData, "success", null, signature, req);
+    //     // await logWebhookEvent(eventData, "success", null, signature, req);
 
-        // if (email) {
-          // const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
-          // await updateDoc(userRef, {
-          //   premium: {
-          //     status: true,
-          //     subscriptionId: eventData.data.id, // ✅ correct syntax
-          //   },
-          // });
-          // console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
-          // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
-        // }
-        break;
+    //     // if (email) {
+    //       // const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+    //       // await updateDoc(userRef, {
+    //       //   premium: {
+    //       //     status: true,
+    //       //     subscriptionId: eventData.data.id, // ✅ correct syntax
+    //       //   },
+    //       // });
+    //       // console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
+    //       // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
+    //     // }
+    //     break;
 
-      case EventName.SubscriptionCanceled:
-        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} canceled`);
-        break;
+    //   case EventName.SubscriptionCanceled:
+    //     console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} canceled`);
+    //     break;
 
-      case EventName.TransactionUpdated:
-        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated....`);
-        break;
+    //   case EventName.TransactionUpdated:
+    //     console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated....`);
+    //     break;
 
-      case EventName.TransactionReady:
-        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} ready....`);
-        break;
-    }
+    //   case EventName.TransactionReady:
+    //     console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} ready....`);
+    //     break;
+    // }
 
+    console.log(`${eventData.data.id}`)
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("❌ Webhook processing error:", err);
