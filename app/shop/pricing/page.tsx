@@ -111,9 +111,11 @@ if (data.transactionId && paddle.Checkout) {
     settings: {
       displayMode: "overlay",
       theme: "dark",
-      successUrl: isLocalhost
-        ? "http://localhost:3000/checkout-success"
-        : "https://jigzexplorer.quest/checkout-success",
+      successUrl:
+      // isLocalhost
+      //   ? "http://localhost:3000/checkout-success"
+      //   :
+         "https://jigzexplorer.quest/checkout-success",
     },
   });
 }

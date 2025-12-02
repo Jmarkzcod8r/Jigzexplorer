@@ -44,10 +44,10 @@ export async function POST(req: Request) {
           },
         ],
 
-        // customData: {
-        //   userEmail: email, // optional, useful for tracking
-        //   uid: uid
-        // },
+        customData: {
+          userEmail: email, // optional, useful for tracking
+          uid: uid
+        },
         // successUrl: "https://jigzexplorer.quest/checkout-success",
         // cancelUrl: "https://jigzexplorer.quest/checkout-cancel",
       });
@@ -73,10 +73,10 @@ export async function POST(req: Request) {
           },
         ],
 
-        // customData: {
-        //   userEmail: email, // optional, useful for tracking
-        //   uid: uid
-        // },
+        customData: {
+          userEmail: email, // optional, useful for tracking
+          uid: uid
+        },
         // successUrl: "https://jigzexplorer.quest/checkout-success",
         // cancelUrl: "https://jigzexplorer.quest/checkout-cancel",
       });

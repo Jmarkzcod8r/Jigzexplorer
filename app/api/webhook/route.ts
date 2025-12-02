@@ -128,11 +128,19 @@ const paddle = new Paddle(paddleSecret, {
       : Environment.production,
 });
 
-const formattedDate = new Date().toLocaleDateString("en-US", {
+const now = new Date();
+
+const formattedDate = now.toLocaleDateString("en-US", {
   month: "short",
   day: "numeric",
   year: "numeric",
-});
+}).replace(",", "."); // Add the dot after month
+
+// Format hours and minutes in 24-hour format
+const hours = now.getHours().toString().padStart(2, "0");
+const minutes = now.getMinutes().toString().padStart(2, "0");
+
+const finalDate = `${formattedDate} ${hours}${minutes}H`;
 
 // ✅ Webhook logging function
 // async function logWebhookEvent(
@@ -203,7 +211,7 @@ export async function POST(req: Request) {
     // ✅ Handle event types
     switch (eventData.eventType) {
       case EventName.SubscriptionActivated:
-        console.log(`✅ Subscription ${eventData.data.id} activated`);
+        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} activated`);
 
         // await logWebhookEvent(eventData, "success", null, signature, req);
 
@@ -221,15 +229,15 @@ export async function POST(req: Request) {
         break;
 
       case EventName.SubscriptionCanceled:
-        console.log(`⚠️ ${formattedDate}: Subscription ${eventData.data.id} canceled`);
+        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} canceled`);
         break;
 
       case EventName.TransactionUpdated:
-        console.log(`⚠️ ${formattedDate}: Transaction ${eventData.data.id} updated....`);
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated....`);
         break;
 
       case EventName.TransactionReady:
-        console.log(`⚠️ ${formattedDate}: Transaction ${eventData.data.id} ready....`);
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} ready....`);
         break;
     }
 
