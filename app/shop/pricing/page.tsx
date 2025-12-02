@@ -63,118 +63,135 @@ const PremiumWelcome = () => {
    window.location.hostname === "127.0.0.1");
 
   const handleCheckout = async () => {
-    localStorage.setItem('uid', JSON.stringify(user.user.uid))
     if (!paddle) {
       alert("⚠️ Paddle not initialized yet.");
       return;
     }
-
+    localStorage.setItem('uid', JSON.stringify(user.user.uid))
     setLoading(true);
 
-    try {
-      // Optional: show a temporary "processing" page
-      // router.push("/checkout");
-
-      const rawEmail = user.user.email
-      const rawuid =  user.user.uid
-
-      let email = "guest@example.com";
-      let uid = "...uid...";
-
-      if (rawEmail && rawuid) {
-        try {
-          email = rawEmail
-          uid = rawuid;
-        } catch {
-          email = rawEmail;
-        }
-      }
-
+    if (user.user.subscription?.status === 'Active') {
       const checkoutEnv = env.env === "sandbox" ? "sandbox" : "production";
 
-const response = await fetch("/api/paddle/activate-subscription", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, uid, env: checkoutEnv }),
-});
+      // cancel subscription at paddle
+      const response = await fetch("/api/paddle/cancel-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.user.email , uid: user.user.uid
+          , env: checkoutEnv, subscriptionId: user.user.subscription?.subscriptionId  }),
+      });
+      console.log('this is response:' , response)
+    } else {
+      try {
+        // Optional: show a temporary "processing" page
+        // router.push("/checkout");
 
-const data = await response.json();
-
-if (!response.ok) {
-  throw new Error(data?.error || "Failed to create checkout session");
-}
-
-//  ✅ Open Paddle checkout
-if (data.transactionId && paddle.Checkout) {
-  paddle.Checkout.open({
-    transactionId: data.transactionId,
-    settings: {
-      displayMode: "overlay",
-      theme: "dark",
-      successUrl:
-      // isLocalhost
-      //   ? "http://localhost:3000/checkout-success"
-      //   :
-         "https://jigzexplorer.quest/checkout-success",
-    },
-  });
-}
-
-      // let response;
-
-      // if (env.env === "sandbox") {
-      //   response = await fetch("/api/paddle/activate-subscription", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({ email, uid, env: "sandbox" }),
-      //   });
-      // } else {
-      //   response = await fetch("/api/paddle/activate-subscription", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({ email, uid, env: "production" }),
-      //   });
-      // }
+        const rawEmail = user.user.email
+        const rawuid =  user.user.uid
 
 
-      //   const data = await response.json();
-      //   if (!response.ok) {
-      //     throw new Error(data.error || "Failed to create checkout session");
-      //   }
-      //   //  ✅ Paddle checkout (Overlay or Redirect)
-      // if (data.transactionId && paddle.Checkout) {
-      //   //  if (paddle.Checkout) {
-      //   paddle.Checkout.open({
-      //     transactionId: data.transactionId,
-      //     // items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
-      //     settings: {
-      //       displayMode: "overlay", // in-page checkout
-      //       theme: "dark",
-      //       successUrl: isLocalhost
-      //       ? "http://localhost:3000/checkout-success"
-      //       : "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
-      //       // closeCallback: () => {
-      //       //   // If user closes/cancels checkout
-      //       //   router.push("/shop/pricing");
-      //       // },
-      //     },
-      //   });
-      // }
-      // else if (data.checkoutUrl) {
-      //   // ✅ Redirect method fallback
-      //   window.location.href = data.checkoutUrl;
-      // }
-      // else {
-      //   throw new Error("Missing checkoutUrl or transactionId from server");
-      // }
+        let email = "guest@example.com";
+        let uid = "...uid...";
 
-    } catch (err: any) {
-      console.error("Checkout failed:", err);
-      alert("Checkout failed. Please try again.");
-      router.push("/shop/pricing");
-    } finally {
-      setLoading(false);
+        if (rawEmail && rawuid) {
+          try {
+            email = rawEmail
+            uid = rawuid;
+          } catch {
+            email = rawEmail;
+          }
+        }
+
+        const checkoutEnv = env.env === "sandbox" ? "sandbox" : "production";
+
+        const response = await fetch("/api/paddle/activate-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, uid, env: checkoutEnv }),
+        });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data?.error || "Failed to create checkout session");
+  }
+
+  //  ✅ Open Paddle checkout
+  if (data.transactionId && paddle.Checkout) {
+    paddle.Checkout.open({
+      transactionId: data.transactionId,
+      settings: {
+        displayMode: "overlay",
+        theme: "dark",
+        successUrl:
+        // isLocalhost
+        //   ? "http://localhost:3000/checkout-success"
+        //   :
+           "https://jigzexplorer.quest/checkout-success",
+      },
+    });
+  }
+
+        // let response;
+
+        // if (env.env === "sandbox") {
+        //   response = await fetch("/api/paddle/activate-subscription", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ email, uid, env: "sandbox" }),
+        //   });
+        // } else {
+        //   response = await fetch("/api/paddle/activate-subscription", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ email, uid, env: "production" }),
+        //   });
+        // }
+
+
+        //   const data = await response.json();
+        //   if (!response.ok) {
+        //     throw new Error(data.error || "Failed to create checkout session");
+        //   }
+        //   //  ✅ Paddle checkout (Overlay or Redirect)
+        // if (data.transactionId && paddle.Checkout) {
+        //   //  if (paddle.Checkout) {
+        //   paddle.Checkout.open({
+        //     transactionId: data.transactionId,
+        //     // items: [{priceId: "pri_01kaxe46svpfvd2wr3sngap8se" , quantity: 1}],  //-? live
+        //     settings: {
+        //       displayMode: "overlay", // in-page checkout
+        //       theme: "dark",
+        //       successUrl: isLocalhost
+        //       ? "http://localhost:3000/checkout-success"
+        //       : "https://jigzexplorer.quest/checkout-success", // Paddle redirects after success
+        //       // closeCallback: () => {
+        //       //   // If user closes/cancels checkout
+        //       //   router.push("/shop/pricing");
+        //       // },
+        //     },
+        //   });
+        // }
+        // else if (data.checkoutUrl) {
+        //   // ✅ Redirect method fallback
+        //   window.location.href = data.checkoutUrl;
+        // }
+        // else {
+        //   throw new Error("Missing checkoutUrl or transactionId from server");
+        // }
+
+      } catch (err: any) {
+        console.error("Checkout failed:", err);
+        alert("Checkout failed. Please try again.");
+        router.push("/shop/pricing");
+      } finally {
+        setLoading(false);
+      }
+
     }
+
+
+
   };
 
   return (
@@ -284,7 +301,7 @@ if (data.transactionId && paddle.Checkout) {
             disabled={loading}
             className="cursor-pointer w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
           >
-            {loading ? "Loading..." : "Subscribe 🚀"}
+           {user.user.subscription?.status=== "Active" ? "Cancel 🚫" : "Subscribe 🚀"}
           </button>
         </div>
       </div>

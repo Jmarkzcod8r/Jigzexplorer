@@ -3,8 +3,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
 
   // For canceling Subscription: <start>
-      const { subscriptionId } = await req.json();
-      console.log(`processing api/paddle/cancel-subscription/route.ts with id: ${ subscriptionId}`)
+      const { subscriptionId , email, uid, env} = await req.json();
+
+      console.log(`processing api/paddle/cancel-subscription/route.ts with id: ${ subscriptionId} for ${email}`)
+      // console.log()
       if (!subscriptionId) {
         return NextResponse.json({ error: "Missing subscriptionId" }, { status: 400 });
       }
@@ -12,10 +14,10 @@ export async function POST(req: Request) {
       try {
         // const response = await fetch(`https://sandbox-api.paddle.com/subscriptions/${subscriptionId}/pause`, {
 
-        const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, { //-> This is for live
+        const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${process.env.PADDLE_SECRET_TOKEN}`,
+            Authorization: `Bearer ${process.env.PADDLE_SECRET_TOKEN_SANDBOX}`,
             "Content-Type": "application/json",
           },
           // Pause immediately.. <start>

@@ -91,7 +91,7 @@ const defaultSubscription: PaddleSubscription = {
   amount: 0,
   billingInterval: "month",
   billingFrequency: 1,
-  status: "Freemium", // default status
+  status: "Freemium", // Active | Past_due | Canceled | Trialing | Freemium
   isTrial: false,
   trialEndsAt: undefined,
   nextBillAt: undefined,
