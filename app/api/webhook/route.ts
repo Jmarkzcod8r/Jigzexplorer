@@ -244,17 +244,31 @@ export async function POST(req: Request) {
       case EventName.TransactionCompleted:
         console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} completed → transaction finalized`);
         console.log("📦 Paddle Webhook Received:", JSONData);
-        //  if (email) {
-        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
-        //   await updateDoc(userRef, {
-        //     premium: {
-        //       status: true,
-        //       subscriptionId: eventData.data.id, // ✅ correct syntax
-        //     },
-        //   });
-        //   console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
-        //   localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
-        // }
+         if (email) {
+          const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+          await updateDoc(userRef, {
+            subscription: {
+              amount: Number(eventData.data?.items?.[0]?.price?.unitPrice?.amount) || 0,
+              billingFrequency: eventData.data?.items?.[0]?.price?.billingCycle?.frequency || 1,
+              billingInterval: eventData.data?.items?.[0]?.price?.billingCycle?.interval || "month",
+              cancelAt: 0,
+              currency: eventData.data?.currencyCode || "USD",
+              isTrial: eventData.data?.items?.[0]?.price?.trialPeriod ? true : false,
+              last4: eventData.data?.payments?.[0]?.methodDetails?.card?.last4 || "0000",
+              lastPaymentAt: eventData.data?.payments?.[0]?.capturedAt || Date.now(),
+              meta: {},
+              nextBillAt: eventData.data?.billingPeriod?.endsAt || 0,
+              paymentType: 0,
+              planId: eventData.data?.subscriptionId ? "Active" : "Freemium",
+              planName: eventData.data?.items?.[0]?.price?.name || "Active",
+              status: "Active",
+              subscriptionId: eventData.data?.subscriptionId || '',
+              trialEndsAt: 0,
+            },
+          });
+
+          console.log(`🔥 Firestore updated: ${email} -> subscription info saved`);
+        }
         break;
 
       // Default for unhandled events
