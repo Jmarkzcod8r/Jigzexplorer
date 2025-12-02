@@ -15,7 +15,7 @@ const paddle_live = new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
 
 export async function POST(req: Request) {
   console.log("api/paddle/activate-subscription");
-  console.log("SANDBOX TOKEN:.", process.env.PADDLE_SECRET_TOKEN_SANDBOX);
+  console.log("SANDBOX TOKEN:..", process.env.PADDLE_SECRET_TOKEN_SANDBOX);
   console.log("LIVE TOKEN New:", process.env.PADDLE_SECRET_TOKEN_LIVE);
 
   try {
