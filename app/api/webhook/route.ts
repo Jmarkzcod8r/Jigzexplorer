@@ -103,6 +103,7 @@
 
 // Notes:
 // (1)Change also the secret key in .env file everytime a new webhook connection is made
+// (2) Modify webhook at paddle to activate and deactivate.
 
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk";
 import { NextResponse } from "next/server";

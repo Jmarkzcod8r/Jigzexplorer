@@ -274,7 +274,7 @@ const countryFlags: Record<string, string> = {
       <Image className="w-4 h-4 sm:w-5 sm:h-5" />
       Webp Converter
     </button>
-    {user.user.email === "jmgutierrez122091@gmail.com" ? (
+
           <button
             onClick={redirect_settings_page}
             className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
@@ -282,9 +282,7 @@ const countryFlags: Record<string, string> = {
           hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center">
             Settings
           </button>
-        ) : (
-          <div></div> // or null if you want nothing
-        )}
+
 
     {/* <button
       onClick={() => router.push("/connect")}
