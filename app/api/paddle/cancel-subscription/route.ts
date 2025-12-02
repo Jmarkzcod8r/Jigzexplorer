@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     if (!PADDLE_API_KEY || !PADDLE_VENDOR_ID) {
       return NextResponse.json({ error: "Paddle credentials missing" }, { status: 500 });
     }
+    console.log (`api key: ${PADDLE_API_KEY} and vendor id: ${PADDLE_VENDOR_ID}`)
 
     const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, {
       method: "POST",
