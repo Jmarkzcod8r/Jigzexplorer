@@ -128,6 +128,12 @@ const paddle = new Paddle(paddleSecret, {
       : Environment.production,
 });
 
+const formattedDate = new Date().toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
 // ✅ Webhook logging function
 // async function logWebhookEvent(
 //   eventData: any,
@@ -215,19 +221,16 @@ export async function POST(req: Request) {
         break;
 
       case EventName.SubscriptionCanceled:
-        console.log(`⚠️ Subscription ${eventData.data.id} canceled`);
-        // await logWebhookEvent(eventData, "success", null, signature, req);
-
-        // if (email) {
-        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
-        //   await updateDoc(userRef, { premium: false });
-        //   console.log(`🧊 Firestore updated: ${email} -> premium: false`);
-        // }
+        console.log(`⚠️ ${formattedDate}: Subscription ${eventData.data.id} canceled`);
         break;
 
-      // default:
-      //   console.log(`ℹ️ Unhandled event type: ${eventData.eventType}`);
-      //   await logWebhookEvent(eventData, "ignored", null, signature, req);
+      case EventName.TransactionUpdated:
+        console.log(`⚠️ ${formattedDate}: Transaction ${eventData.data.id} updated....`);
+        break;
+
+      case EventName.TransactionReady:
+        console.log(`⚠️ ${formattedDate}: Transaction ${eventData.data.id} ready....`);
+        break;
     }
 
     return NextResponse.json({ ok: true });
