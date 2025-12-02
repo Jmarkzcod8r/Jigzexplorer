@@ -209,37 +209,60 @@ export async function POST(req: Request) {
     // if (!email) console.warn("⚠️ No email found in event data.");
 
     // ✅ Handle event types
-    // switch (eventData.eventType) {
-    //   case EventName.SubscriptionActivated:
-    //     console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} activated`);
+    switch (eventData.eventType) {
+      // 1️⃣ Transaction ready → checkout started
+      case EventName.TransactionReady:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} ready → checkout started`);
+        break;
 
-    //     // await logWebhookEvent(eventData, "success", null, signature, req);
+      // 2️⃣ Transaction updated → transaction info updated
+      case EventName.TransactionUpdated:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated → transaction info updated`);
+        break;
 
-    //     // if (email) {
-    //       // const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
-    //       // await updateDoc(userRef, {
-    //       //   premium: {
-    //       //     status: true,
-    //       //     subscriptionId: eventData.data.id, // ✅ correct syntax
-    //       //   },
-    //       // });
-    //       // console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
-    //       // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
-    //     // }
-    //     break;
+      // 3️⃣ Transaction paid → first payment succeeded
+      case EventName.TransactionPaid:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} paid → first payment succeeded`);
+        break;
 
-    //   case EventName.SubscriptionCanceled:
-    //     console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} canceled`);
-    //     break;
+      // 4️⃣ Subscription created → subscription object created
+      case EventName.SubscriptionCreated:
+        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} created → subscription object created`);
+        break;
 
-    //   case EventName.TransactionUpdated:
-    //     console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated....`);
-    //     break;
+      // 5️⃣ Subscription activated → subscription activated
+      case EventName.SubscriptionActivated:
+        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} activated → subscription activated`);
+        break;
 
-    //   case EventName.TransactionReady:
-    //     console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} ready....`);
-    //     break;
-    // }
+      // 6️⃣ Transaction updated → post-activation updates
+      case EventName.TransactionUpdated: // same event type, but different context
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated → post-activation updates`);
+        break;
+
+      // 7️⃣ Transaction completed → transaction finalized
+      case EventName.TransactionCompleted:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} completed → transaction finalized`);
+        console.log("📦 Paddle Webhook Received:", JSONData);
+        //  if (email) {
+        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+        //   await updateDoc(userRef, {
+        //     premium: {
+        //       status: true,
+        //       subscriptionId: eventData.data.id, // ✅ correct syntax
+        //     },
+        //   });
+        //   console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
+        //   localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
+        // }
+        break;
+
+      // Default for unhandled events
+      default:
+        console.log(`ℹ️ ${finalDate}: Unhandled event type: ${eventData.eventType}`);
+        break;
+    }
+
 
     console.log(`${eventData.eventType}`)
     return NextResponse.json({ ok: true });
@@ -249,3 +272,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: String(err) }, { status: 500 });
   }
 }
+
+
+ // if (email) {
+          // const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+          // await updateDoc(userRef, {
+          //   premium: {
+          //     status: true,
+          //     subscriptionId: eventData.data.id, // ✅ correct syntax
+          //   },
+          // });
+          // console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
+          // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
+        // }
