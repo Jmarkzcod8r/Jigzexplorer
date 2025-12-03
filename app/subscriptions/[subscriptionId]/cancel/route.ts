@@ -3,10 +3,8 @@ import { Paddle, Environment } from '@paddle/paddle-node-sdk';
 
 
 export async function POST(req: Request) {
-  const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
-    environment: Environment.sandbox
-  });
 
+    try {
   const { subscriptionId, email, uid, env, cancelNow } = await req.json();
 
   console.log(`Processing canceling-subscription for ID: ${subscriptionId}, email: ${email}, env: ${env}`);
@@ -15,22 +13,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing subscriptionId" }, { status: 400 });
   }
 
-  try {
-    // Determine the correct Paddle API key based on environment
-    const PADDLE_API_KEY =
-      env === "sandbox"
-        ? process.env.PADDLE_SECRET_TOKEN_SANDBOX
-        : process.env.PADDLE_SECRET_TOKEN_LIVE;
+  const paddle = env === 'sandbox'
+  ? new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
+      environment: Environment.sandbox
+    })
+  : new Paddle(process.env.PADDLE_SECRET_TOKEN_LIVE!, {
+      environment: Environment.production
+    });
 
-    const PADDLE_VENDOR_ID =
-      env === "sandbox"
-        ? process.env.PADDLE_VENDOR_ID_SANDBOX
-        : process.env.PADDLE_VENDOR_ID_LIVE;
-
-    if (!PADDLE_API_KEY || !PADDLE_VENDOR_ID) {
-      return NextResponse.json({ error: "Paddle credentials missing" }, { status: 500 });
-    }
-    console.log (`api key: ${PADDLE_API_KEY} and vendor id: ${PADDLE_VENDOR_ID}`)
+    console.log (`paddle to be used: ${paddle}`)
     try {
         const response = await paddle.subscriptions.cancel(subscriptionId, {
             effectiveFrom: "immediately"

@@ -277,24 +277,19 @@ export async function POST(req: Request) {
         if (email) {
           const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
           await updateDoc(userRef, {
-            subscription: {
-              amount:  0,
-              billingFrequency: 1,
-              billingInterval: eventData.data?.items?.[0]?.price?.billingCycle?.interval || "month",
-              cancelAt: Date.now(),
-              currency: eventData.data?.currencyCode || "USD",
-              isTrial: eventData.data?.items?.[0]?.price?.trialPeriod ? true : false,
-              // last4: eventData.data?.payments?.[0]?.methodDetails?.card?.last4 || "0000",
-              // lastPaymentAt: eventData.data?.payments?.[0]?.capturedAt || Date.now(),
-              meta: {},
-              // nextBillAt: eventData.data?.billingPeriod?.endsAt || 0,
-              paymentType: 0,
-              // planId: eventData.data?.subscriptionId ? "Active" : "Freemium",
-              planName: eventData.data?.items?.[0]?.price?.name || "Active",
-              status: "canceled",
-              // subscriptionId: eventData.data?.subscriptionId || '',
-              trialEndsAt: 0,
-            },
+            "subscription.amount": 0,
+            "subscription.billingFrequency": 1,
+            "subscription.billingInterval": eventData.data?.items?.[0]?.price?.billingCycle?.interval || "month",
+            "subscription.cancelAt": Date.now(),
+            "subscription.currency": eventData.data?.currencyCode || "USD",
+            "subscription.isTrial": eventData.data?.items?.[0]?.price?.trialPeriod ? true : false,
+            "subscription.last4": "0000",
+            // "subscription.lastPaymentAt": Date.now(),
+            "subscription.meta": {},
+            "subscription.paymentType": 0,
+            "subscription.planName": eventData.data?.items?.[0]?.price?.name || "Active",
+            "subscription.status": "canceled",
+            "subscription.trialEndsAt": 0
           });
 
           console.log(`🔥 Firestore updated: ${email} -> subscription info saved`);
