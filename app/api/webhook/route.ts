@@ -276,6 +276,7 @@ export async function POST(req: Request) {
         console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} canceled `);
         if (email) {
           const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+          // This means that when a user cancel a subscription,the card data for last4 is also lost.
           await updateDoc(userRef, {
             "subscription.amount": 0,
             "subscription.billingFrequency": 1,
@@ -283,7 +284,8 @@ export async function POST(req: Request) {
             "subscription.cancelAt": Date.now(),
             "subscription.currency": eventData.data?.currencyCode || "USD",
             "subscription.isTrial": eventData.data?.items?.[0]?.price?.trialPeriod ? true : false,
-            "subscription.last4": "0000",
+            "subscription.last4":  "0000",
+            "subscription.nextBillAt": 0,
             // "subscription.lastPaymentAt": Date.now(),
             "subscription.meta": {},
             "subscription.paymentType": 0,

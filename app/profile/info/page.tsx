@@ -163,6 +163,35 @@ export default function ProfileView() {
           <strong>Premium Status:</strong>{" "}
           {user.subscription?.status ?? "Freemium"}
         </p>
+
+     {user.subscription?.status === "Active" && (
+  <p>
+    <strong>Next Bill At:</strong>{" "}
+    {user.subscription?.nextBillAt
+      ? new Date(user.subscription.nextBillAt).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : "N/A"}
+    {user.subscription?.nextBillAt && (
+      <span>
+        {" "}
+        ({Math.max(
+          0,
+          Math.ceil(
+            (new Date(user.subscription.nextBillAt).getTime() - Date.now()) /
+              (1000 * 60 * 60 * 24)
+          )
+        )}{" "}
+        days left)
+      </span>
+          )}
+        </p>
+      )}
+
+
+
         <p><strong>Tickets:</strong> {user.tickets ?? 0}</p>
         <p><strong>Overall Score:</strong> {user.overallscore ?? 0}</p>
       </div>

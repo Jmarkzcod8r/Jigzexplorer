@@ -48,6 +48,19 @@ const paddle = new Paddle(paddleSecret, {
 //     console.error("❌ Failed to log webhook:", err);
 //   }
 // }
+const now = new Date();
+
+const formattedDate = now.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+}).replace(",", "."); // Add the dot after month
+
+// Format hours and minutes in 24-hour format
+const hours = now.getHours().toString().padStart(2, "0");
+const minutes = now.getMinutes().toString().padStart(2, "0");
+
+const finalDate = `${formattedDate} ${hours}${minutes}H`;
 
 export async function POST(req: Request) {
   // await dbConnect();
@@ -88,38 +101,98 @@ export async function POST(req: Request) {
 
     // ✅ Handle event types
     switch (eventData.eventType) {
+      // 1️⃣ Transaction ready → checkout started
+      case EventName.TransactionReady:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} ready → checkout started`);
+        break;
+
+      // 2️⃣ Transaction updated → transaction info updated
+      case EventName.TransactionUpdated:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated → transaction info updated`);
+        break;
+
+      // 3️⃣ Transaction paid → first payment succeeded
+      case EventName.TransactionPaid:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} paid → first payment succeeded`);
+        break;
+
+      // 4️⃣ Subscription created → subscription object created
+      case EventName.SubscriptionCreated:
+        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} created → subscription object created`);
+        break;
+
+      // 5️⃣ Subscription activated → subscription activated
       case EventName.SubscriptionActivated:
-        console.log(`✅ Subscription ${eventData.data.id} activated`);
-
-        // await logWebhookEvent(eventData, "success", null, signature, req);
-
-        // if (email) {
-          // const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
-          // await updateDoc(userRef, {
-          //   premium: {
-          //     status: true,
-          //     subscriptionId: eventData.data.id, // ✅ correct syntax
-          //   },
-          // });
-          // console.log(`🔥 Firestore updated: ${email} -> premium {status: true, subscription: ${eventData.data.id}`);
-          // localStorage.setItem ('subId', eventData.data.id ) //-> cannot be used on server
-        // }
+        console.log(`⚠️ ${finalDate}: Subscription ${eventData.data.id} activated → subscription activated`);
         break;
 
-      case EventName.SubscriptionCanceled:
-        console.log(`⚠️ Subscription ${eventData.data.id} canceled`);
-        // await logWebhookEvent(eventData, "success", null, signature, req);
-
-        // if (email) {
-        //   const userRef = doc(db, "Firebase-jigzexplorer-profiles", email);
-        //   await updateDoc(userRef, { premium: false });
-        //   console.log(`🧊 Firestore updated: ${email} -> premium: false`);
-        // }
+      // 6️⃣ Transaction updated → post-activation updates
+      case EventName.TransactionUpdated: // same event type, but different context
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} updated → post-activation updates`);
         break;
 
-      // default:
-      //   console.log(`ℹ️ Unhandled event type: ${eventData.eventType}`);
-      //   await logWebhookEvent(eventData, "ignored", null, signature, req);
+      // 7️⃣ Transaction completed → transaction finalized
+      case EventName.TransactionCompleted:
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} completed → transaction finalized`);
+        console.log("📦 Paddle Webhook Received:", JSONData);
+         if (email) {
+          const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+          await updateDoc(userRef, {
+            subscription: {
+              amount: Number(eventData.data?.items?.[0]?.price?.unitPrice?.amount) || 0,
+              billingFrequency: eventData.data?.items?.[0]?.price?.billingCycle?.frequency || 1,
+              billingInterval: eventData.data?.items?.[0]?.price?.billingCycle?.interval || "month",
+              cancelAt: 0,
+              currency: eventData.data?.currencyCode || "USD",
+              isTrial: eventData.data?.items?.[0]?.price?.trialPeriod ? true : false,
+              last4: eventData.data?.payments?.[0]?.methodDetails?.card?.last4 || "0000",
+              lastPaymentAt: eventData.data?.payments?.[0]?.capturedAt || Date.now(),
+              meta: {},
+              nextBillAt: eventData.data?.billingPeriod?.endsAt || 0,
+              paymentType: 0,
+              planId: eventData.data?.subscriptionId ? "Active" : "Freemium",
+              planName: eventData.data?.items?.[0]?.price?.name || "Active",
+              status: "Active",
+              subscriptionId: eventData.data?.subscriptionId || '',
+              trialEndsAt: 0,
+            },
+          });
+
+          console.log(`🔥 Firestore updated: ${email} -> subscription info saved`);
+        }
+        break;
+
+        case EventName.SubscriptionCanceled: // same event type, but different context
+        console.log(`⚠️ ${finalDate}: Transaction ${eventData.data.id} canceled `);
+        if (email) {
+          const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
+          // This means that when a user cancel a subscription,the card data for last4 is also lost.
+          await updateDoc(userRef, {
+            "subscription.amount": 0,
+            "subscription.billingFrequency": 1,
+            "subscription.billingInterval": eventData.data?.items?.[0]?.price?.billingCycle?.interval || "month",
+            "subscription.cancelAt": Date.now(),
+            "subscription.currency": eventData.data?.currencyCode || "USD",
+            "subscription.isTrial": eventData.data?.items?.[0]?.price?.trialPeriod ? true : false,
+            "subscription.last4":  "0000",
+            "subscription.nextBillAt": 0,
+            // "subscription.lastPaymentAt": Date.now(),
+            "subscription.meta": {},
+            "subscription.paymentType": 0,
+            "subscription.planName": eventData.data?.items?.[0]?.price?.name || "Active",
+            "subscription.status": "canceled",
+            "subscription.trialEndsAt": 0
+          });
+
+          console.log(`🔥 Firestore updated: ${email} -> subscription info saved`);
+        }
+        break;
+
+      // Default for unhandled events
+      default:
+        console.log(`ℹ️ ${finalDate}: Unhandled event type: ${eventData.eventType}`);
+
+        break;
     }
 
     return NextResponse.json({ ok: true });
