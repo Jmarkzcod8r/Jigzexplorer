@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { Paddle } from '@paddle/paddle-node-sdk';
-
+import { Paddle, Environment } from '@paddle/paddle-node-sdk';
 
 
 export async function POST(req: Request) {
-  const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!); // Use sandbox API key in sandbox
+  const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!, {
+    environment: Environment.sandbox
+  });
 
   const { subscriptionId, email, uid, env, cancelNow } = await req.json();
 
-  console.log(`Processing cancel-subscription for ID: ${subscriptionId}, email: ${email}, env: ${env}`);
+  console.log(`Processing canceling-subscription for ID: ${subscriptionId}, email: ${email}, env: ${env}`);
 
   if (!subscriptionId) {
     return NextResponse.json({ error: "Missing subscriptionId" }, { status: 400 });
@@ -31,16 +32,11 @@ export async function POST(req: Request) {
     }
     console.log (`api key: ${PADDLE_API_KEY} and vendor id: ${PADDLE_VENDOR_ID}`)
     try {
-      const response = await paddle.subscriptions.get(subscriptionId
-        // scheduledChange: {
-        //   action: 'cancel',
-        //   effectiveAt: "2025-12-26T10:38:57.97967Z",
-        //   resumeAt: null
-        // },
-        // optional: by default Paddle schedules cancellation at next billing period
-        // effectiveFrom: 'immediately'  // uncomment to cancel immediately
-      );
+        const response = await paddle.subscriptions.cancel(subscriptionId, {
+            effectiveFrom: "immediately"
+          });
       console.log('Cancel response:', response);
+      return NextResponse.json({ response: response });
     } catch (error) {
       console.error('Error cancelling subscription:', error);
     }

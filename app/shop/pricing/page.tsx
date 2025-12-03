@@ -73,12 +73,15 @@ const PremiumWelcome = () => {
     if (user.user.subscription?.status === 'Active') {
       const checkoutEnv = env.env === "sandbox" ? "sandbox" : "production";
 
-      const response = await fetch("/api/paddle/cancel-subscription", {
+
+
+      const response = await fetch(`/subscriptions/${user.user.subscription?.subscriptionId}/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.user.email , uid: user.user.uid
           , env: checkoutEnv, subscriptionId: user.user.subscription?.subscriptionId  }),
       });
+
       console.log('this is response:' , response)
     } else {
       try {
