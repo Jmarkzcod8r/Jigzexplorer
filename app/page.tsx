@@ -65,7 +65,11 @@ export default function Home() {
 
     setPhotoURL(user.user.photoURL);
 
-    if (countriesUnlock.length > 0) {
+    if (user.user.subscription?.status === "Active") {
+      // If subscription is active, unlock all countries
+      setAvailableCountries(countries);
+    } else if (countriesUnlock.length > 0) {
+      // Merge default + unlocked countries for non-active users
       const normalizedList = countriesUnlock.map((item) =>
         item
           .trim()
@@ -75,11 +79,13 @@ export default function Home() {
           .join(" ")
       );
 
-      setAvailableCountries([
-        ...new Set([...default_countries, ...normalizedList]),
-      ]);
+      setAvailableCountries([...new Set([...default_countries, ...normalizedList])]);
+    } else {
+      // Only default countries if nothing is unlocked
+      setAvailableCountries(default_countries);
     }
-  }, [countriesUnlock]);
+  }, [countriesUnlock, user.user.subscription?.status]);
+
 
 
   useEffect(() => {
