@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
+import { Paddle } from '@paddle/paddle-node-sdk';
+
+
 
 export async function POST(req: Request) {
+  const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN_SANDBOX!); // Use sandbox API key in sandbox
+
   const { subscriptionId, email, uid, env, cancelNow } = await req.json();
 
   console.log(`Processing cancel-subscription for ID: ${subscriptionId}, email: ${email}, env: ${env}`);
@@ -25,32 +30,50 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Paddle credentials missing" }, { status: 500 });
     }
     console.log (`api key: ${PADDLE_API_KEY} and vendor id: ${PADDLE_VENDOR_ID}`)
-
-    const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // body: JSON.stringify({
-      //   vendor_id: PADDLE_VENDOR_ID,
-      //   vendor_auth_code: PADDLE_API_KEY,
-      //   effective_from: cancelNow ? "immediately" : "next_payment", // cancel immediately or next billing
-      // }),..
-      body: JSON.stringify({
-        "effective_from": "next_billing_period"
-      })
-
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("❌ Paddle cancel error:", data);
-      return NextResponse.json({ error: "Failed to cancel subscription", details: data }, { status: response.status });
+    try {
+      const response = await paddle.subscriptions.update(subscriptionId, {
+        scheduledChange: {
+          "action": "cancel",
+          'effectiveAt': "2025-12-26T10:38:57.97967Z",
+          "resumeAt": null
+        },
+        // optional: by default Paddle schedules cancellation at next billing period
+        // effectiveFrom: 'immediately'  // uncomment to cancel immediately
+      });
+      console.log('Cancel response:', response);
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
     }
 
-    console.log("✅ Subscription cancel scheduled:", data);
-    return NextResponse.json({ success: true, data });
+
+    // const response = await fetch(`https://api.paddle.com/subscriptions/${subscriptionId}/cancel`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "Authorization":`Bearer ${process.env.PADDLE_SECRET_TOKEN_SANDBOX}`
+    //   },
+    //   // body: JSON.stringify({
+    //   //   effective_from: "next_billing_period",
+    //   //   // vendor_id: PADDLE_VENDOR_ID,
+    //   //   // vendor_auth_code: PADDLE_API_KEY,
+    //   //   // effective_from: cancelNow ? "immediately" : "next_payment", // cancel immediately or next billing
+    //   // })
+    //   body: JSON.stringify({
+    //     'effective_from': "immediately"
+    //   })
+
+    // });
+
+    // const data = await response.json();
+
+    // if (!response.ok) {
+    //   console.error("❌ Paddle cancel error:", data);
+    //   return NextResponse.json({ error: "Failed to cancel subscription", details: data }, { status: response.status });
+    // }
+
+    // console.log("✅ Subscription cancel scheduled:", data);
+    // return NextResponse.json({ success: true, data });
+
   } catch (err) {
     console.error("Error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
