@@ -288,6 +288,15 @@ const countryFlags: Record<string, string> = {
           hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center">
             Settings
           </button>
+          <button
+            onClick={() => {
+              router.push("/reset");
+            }}
+            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white opacity-80
+          text-gray-800 rounded-lg text-lg sm:text-2xl shadow
+          hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center">
+            Reset
+          </button>
 
 
     {/* <button

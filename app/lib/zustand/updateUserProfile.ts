@@ -11,6 +11,7 @@ interface UserSettings {
   turboBonus: number;
   turbocountdown: number;
   puzzlecompletionscore: number;
+  [key: string]: any;
 }
 
 interface CountryData {
@@ -74,10 +75,11 @@ const defaultSettings: UserSettings = {
   tokens: 0,
   streakMultiplier: 1,
   timeMultiplier: 1,
-  timeDuration: 60,
-  turboBonus: 0,
-  turbocountdown: 30,
-  puzzlecompletionscore: 50,
+  timeDuration: 1,
+  turboBonus: 1,
+  turbocountdown: 1,
+  puzzlecompletionscore: 1,
+
 };
 
 const defaultCountries: Countries = {};

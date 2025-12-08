@@ -2,12 +2,15 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useUpdateUserProfile } from "../lib/zustand/updateUserProfile";
 
 export default function Logo() {
+
+    const user = useUpdateUserProfile()
     const router = useRouter()
 
     return (
-        <div className="cursor-pointer flex items-center flex-col group">
+        <div className="cursor-pointer flex items-center flex-col  group">
             <button
                 className="cursor-pointer items-center flex flex-col
                           transition-transform duration-400 ease-out
@@ -16,12 +19,14 @@ export default function Logo() {
                 onClick={() => { router.push('/') }}
             >
                 <img
-                    src="/JigzExplorer-logo2.1.png"
-                    alt="JigzExplorer Logo"
-                    width={30}
-                    height={30}
-                    className="sm:w-[80px] sm:h-[80px] transition-transform duration-300 group-hover:rotate-8"
-                />
+                        src="/JigzExplorer-logo2.1.png"
+                        alt="JigzExplorer Logo"
+                        width={30}
+                        height={30}
+                        className={`sm:w-[80px] sm:h-[80px] rounded-b-lg transition-transform duration-300 group-hover:rotate-8
+                            ${user.user?.subscription?.status === "Active" ? "" : "bg-blue-300"}`}
+                        />
+
                 <h1 className="text-2xl sm:text-3xl font-bold drop-shadow-md mt-1">
                     <span className="text-blue-900">Jigz</span>
                     <span className="text-yellow-600">Explorer</span>

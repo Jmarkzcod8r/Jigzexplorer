@@ -23,7 +23,7 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-  const [quotaPics, setQuotaPics] = useState(1);
+
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
 
@@ -59,12 +59,20 @@ const JigsawPuzzle: React.FC = () => {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [turbo, setTurbo] = useState(false);
-  const [baseCoins, setBaseCoins] = useState (10);
-  const [turbobonus,setTurbobonus] = useState (200) ;
-  const [puzzlecompletionscore, setPuzzlecompletionscore] = useState (100) ;
+
+
   const [countdown, setCountdown] = useState(0);
-  const [duration, setduration] = useState(180);
-  const [turbocountdown, setTurbocountdown] = useState (30);
+  const [quotaPics, setQuotaPics] = useState(2);
+                                                                             // Max Tokens: 30
+  const [baseCoins, setBaseCoins] = useState (10);                           // for coins           + 1   /10
+
+  const puzzlecompletionscore = 100 + (5 * user.user.settings.puzzlecompletionscore)  ; // base                + 5   /10
+  const streakmultiplier = 10 + (user.user.settings.streakMultiplier)   ;            // Multiplier for streak  + 1   /10
+  const timeMultiplier = 10 + (user.user.settings.timeMultiplier)     ;       // Multiplier for elapsed Time   + 1   /10
+  const timeduration = 180 + (5 * user.user.settings.timeDuration);      // duration before penalty(3 mins.)   + 5   /10
+  const turbobonus = 200 + (4 * user.user.settings.turboBonus); // +100 to puzzlecompletionscore               + 4   /10
+  const turbocountdown= 30 + (2 * user.user.settings.turbocountdown);                                   //     + 2    /10
+
   const [cooldown, setCooldown] = useState(false); // 🔒 stays disabled after Turbo ends
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -171,7 +179,8 @@ if (originalPieces[frameIndex] === piece) {
     const updatedStatus = [...completedStatus];
     updatedStatus[currentIndex] = true;
     setCompletedStatus(updatedStatus);
-    setScore((prev) => prev + (turbo ? 200 : 100));
+    // setScore((prev) => prev + (turbo ? 200 : 100));
+    setScore(prevScore => prevScore + (turbo ? turbobonus : puzzlecompletionscore));
     fireConfetti();
     goNext();
   }
@@ -222,7 +231,7 @@ useEffect(() => {
     let timerInterval: NodeJS.Timeout | null = null;
 
     if (startTime && !endTime) {
-      const countdownStart = duration; // 3 minutes = 300 seconds
+      const countdownStart = timeduration; // 3 minutes = 300 seconds
       setElapsedTime(countdownStart);
 
       timerInterval = setInterval(() => {
@@ -417,14 +426,14 @@ useEffect(() => {
         <div style="text-align: center; width: 100%;">
           <b style="font-size: 18px; display: block;">Over-All Score</b>
           <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
-            🏆 ${score + streak * 10 + elapsedTime} 🏆
+            🏆 ${score + streak * streakmultiplier + elapsedTime * timeMultiplier} 🏆
           </div>
           <div>Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
           <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
             <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
             <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
               <div><b>Raw Score:</b> ${score}</div>
-              <div><b>Streak:</b> ${streak} × 10</div>
+              <div><b>Streak:</b> ${streak} × ${user.user.settings.streakMultiplier }</div>
               <div><b>Time Spent:</b> ${elapsedTime}s</div>
               <div style="margin-top: 10px;"><b>Over-All Score Formula:</b></div>
               <div>Raw Score + Streak + Time Spent</div>
@@ -568,7 +577,7 @@ useEffect(() => {
 const placeRandomCorrectPiece = () => {
   const cost = 50;
   if (coins < cost) {
-    alert("Not enough coins!");
+    alert(`  Insufficient! You still  \nneed ${cost - coins} coins for that`);
     return;
   }
   setCoins(prev => prev - cost);
@@ -598,7 +607,8 @@ const placeRandomCorrectPiece = () => {
     const updatedStatus = [...completedStatus];
     updatedStatus[currentIndex] = true;
     setCompletedStatus(updatedStatus);
-    setScore(prev => prev + (turbo ? 200 : 100));
+    // setScore(prev => prev + (turbo ? 200 : 100));
+    setScore(prevScore => prevScore + (turbo ? turbobonus : puzzlecompletionscore));
     fireConfetti();
     goNext();
   }
@@ -608,7 +618,7 @@ const placeRandomCorrectPiece = () => {
 const place3RandomCorrectPieces = () => {
   const cost = 150;
   if (coins < cost) {
-    alert("Not enough coins!");
+    alert(`  Insufficient! You still  \nneed ${cost - coins} coins for that`);
     return;
   }
   setCoins(prev => prev - cost);
@@ -642,7 +652,8 @@ const place3RandomCorrectPieces = () => {
     const updatedStatus = [...completedStatus];
     updatedStatus[currentIndex] = true;
     setCompletedStatus(updatedStatus);
-    setScore(prev => prev + (turbo ? 200 : 100));
+    // setScore(prev => prev + (turbo ? 200 : 100));
+    setScore(prevScore => prevScore + (turbo ? turbobonus : puzzlecompletionscore));
     fireConfetti();
     goNext();
   }
@@ -652,16 +663,18 @@ const place3RandomCorrectPieces = () => {
 const solveAll = () => {
   const cost = 300;
   if (coins < cost) {
-    alert("Not enough coins!");
+    // 1. Calculate the difference: ${cost - coins}
+    // 2. Use the newline character (\n) which works in alert()
+    alert(`  Insufficient! You still  \nneed ${cost - coins} coins for that`);
     return;
-  }
+}
   setCoins(prev => prev - cost);
 
   const newFramePieces = [...originalPieces];
   setFramePieces(newFramePieces);
   setPuzzlePieces([]);
   setSelectedPieces([]);
-  setScore(prev => prev + (turbo ? 200 : 100));
+  setScore(prev => prev + (turbo ? turbobonus : puzzlecompletionscore));
 
   const updatedStatus = [...completedStatus];
   updatedStatus[currentIndex] = true;
@@ -1043,7 +1056,7 @@ useEffect(() => {
               className="cursor-pointer px-4 py-2 bg-blue-500 text-white font-semibold rounded-xl shadow-md
                         hover:bg-blue-600 active:scale-95 transition transform"
             >
-              💡 Hint
+              💡 Hint {puzzlecompletionscore}
             </button>
 
             <button

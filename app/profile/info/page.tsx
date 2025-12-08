@@ -136,24 +136,27 @@ export default function ProfileView() {
   if (!user) return <p>Loading user data...</p>;
 
   return (
-    <div className="p-8 min-h-screen bg-gray-100 font-sans">
+    <div className="p-8 min-h-screen bg-gray-100 font-sans flex justify-center">
+      <div className='max-w-3xl text-center'>
       <Logo />
       <h1 className="text-3xl font-bold mb-6">User Profile</h1>
 
       {/* Basic Info */}
-      <div className="mb-6 p-4 bg-white shadow rounded">
-        <h2 className="text-xl font-semibold mb-2">Basic Info</h2>
+      <div className="mb-6 p-4 bg-white shadow rounded ">
+        <h2 className="text-xl font-semibold mb-2 items-center">Basic Info</h2>
+        {user.photoURL && (
+            <img
+              src={user.photoURL}
+              alt="User Photo"
+              className="w-24 h-24 rounded-full mt-2 mx-auto mb-5"
+            />
+          )}
+
         <p><strong>Name:</strong> {user.displayName ?? "N/A"}</p>
         <p><strong>Email:</strong> {user.email ?? "N/A"}</p>
         <p><strong>Email Verified:</strong> {user.emailVerified ? "Yes" : "No"}</p>
         <p><strong>UID:</strong> {user.uid ?? "N/A"}</p>
-        {user.photoURL && (
-          <img
-            src={user.photoURL}
-            alt="User Photo"
-            className="w-24 h-24 rounded-full mt-2"
-          />
-        )}
+
       </div>
 
       {/* Premium & Scores */}
@@ -164,7 +167,7 @@ export default function ProfileView() {
           {user.subscription?.status ?? "Freemium"}
         </p>
 
-     {user.subscription?.status === "Active" && (
+        {user.subscription?.status === "Active" && (
   <p>
     <strong>Next Bill At:</strong>{" "}
     {user.subscription?.nextBillAt
@@ -174,21 +177,30 @@ export default function ProfileView() {
           year: "numeric",
         })
       : "N/A"}
-    {user.subscription?.nextBillAt && (
-      <span>
-        {" "}
-        ({Math.max(
-          0,
-          Math.ceil(
-            (new Date(user.subscription.nextBillAt).getTime() - Date.now()) /
-              (1000 * 60 * 60 * 24)
-          )
-        )}{" "}
-        days left)
-      </span>
-          )}
-        </p>
-      )}
+
+    {user.subscription?.nextBillAt && (() => {
+      const now = Date.now();
+      const next = new Date(user.subscription.nextBillAt).getTime();
+      const diffMs = Math.max(0, next - now);
+
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor(
+        (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+      );
+
+      return (
+        <span>
+          {" "}
+          ({days} days {hours} hours {minutes} minutes left)
+        </span>
+      );
+    })()}
+  </p>
+)}
+
 
 
 
@@ -254,6 +266,7 @@ export default function ProfileView() {
             {JSON.stringify(user, null, 2)}
           </pre>
         </details>
+      </div>
       </div>
     </div>
   );

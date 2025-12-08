@@ -5,6 +5,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "../api/firebase/firebase-config";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useUpdateUserProfile } from "../lib/zustand/updateUserProfile";
 
 
 
@@ -15,13 +16,15 @@ export default function ResetPage() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
+  const user = useUpdateUserProfile()
+
   const handleReset = async () => {
     try {
       setLoading(true);
       setStatus("Processing...");
 
-      const uid = localStorage.getItem("uid");
-      const email = JSON.parse(localStorage.getItem("email") || "null");
+      const uid = user.user.uid
+      const email = user.user.email
 
       if (!uid || !email) {
         setStatus("⚠️ No user found in local storage.");
@@ -33,6 +36,10 @@ export default function ResetPage() {
       const userRef = doc(db, "Firebase-jigzexplorer-profiles", uid);
       await deleteDoc(userRef);
       console.log("✅ Firestore profile deleted.");
+
+        user.resetUserProfile()
+
+
 
       // 🧹 2️⃣ Delete MongoDB data
       await axios.delete(`/api/post/profile?email=${email}`);

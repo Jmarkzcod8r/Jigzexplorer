@@ -25,6 +25,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+button {
+  cursor: pointer;
+  /* Add a smooth transition for the scale effect */
+  transition: transform 0.3s ease-in-out;
+}
+
+
 
 .perspective {
   perspective: 1000px;
