@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 export default function CheckoutProcessing() {
   const router = useRouter();
 
-  // Optional: Auto-redirect to success page after 5 seconds
+  // Optional: Auto-redirect to success page after 5 seconds..
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/checkout-success");
