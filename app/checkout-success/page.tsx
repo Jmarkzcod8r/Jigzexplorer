@@ -15,7 +15,7 @@ const SuccessPage = () => {
     const uid = localStorage.getItem("uid");
     console.log(uid)
     if (uid) {
-      // Sync Zustand with Firestore for this user
+      // Sync Zustand with Firestore for this user..
       SyncZustandFirestore(uid.slice(1, -1));
     }
 
