@@ -428,7 +428,7 @@ useEffect(() => {
           <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
             🏆 ${score + streak * streakmultiplier + elapsedTime * timeMultiplier} 🏆
           </div>
-          <div>Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
+          <div >Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
           <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
             <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
             <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
@@ -936,7 +936,8 @@ useEffect(() => {
             image && (
               <div className="flex justify-around">
                <Image
-                  src={image.src}
+                  title={image.src}
+                  src={image.src.replace('http://localhost:3000', '')}
                   alt="Original"
                   width={pieceSize.width * 3}
                   height={pieceSize.height * 3}
@@ -995,7 +996,9 @@ useEffect(() => {
 
         </div>
 
-        <div> Previous ATH:  {user.user.countries[country]?.ATH}  </div>
+        <div className='flex w-full bg-red-300 text-center justify-center items-center'>
+          {/* <h2>{country} </h2> */}
+      </div>
       {/* Solved or Puzzle pieces */}
       {completedStatus[currentIndex] ? (
         <div style={{ color: "green", fontWeight: "bold", marginTop: "10px" }}>

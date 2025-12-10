@@ -99,7 +99,7 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold">Settings</h1>
 
         {/* Tokens and Used Tokens - MODIFIED */}
-        <div className="flex items-center space-x-4 p-2 border rounded bg-gray-100">
+        <div className="flex items-center space-x-4 p-2 border rounded flex-col-2">
           <span className="font-semibold">
             Available Tokens: <span className="text-blue-600">{user.settings.tokens}</span>
           </span>
@@ -117,129 +117,153 @@ const SettingsPage = () => {
   const timeduration = 180 + (5 * user.user.settings.timeDuration);      // duration before penalty(3 mins.)   + 5   /10
   const turbobonus = 200 + (4 * user.user.settings.turboBonus); // +100 to puzzlecompletionscore               + 4   /10
   const turbocountdown= 30 + (2 * user.user.settings.turbocountdown);                                   //     + 2    /10 */}
+  <div className="flex justify-center">
+<div className="bg-blue-500 flex flex-col items-center gap-3 p-2 rounded-lg max-w-[400px]">
+    {/* NOTE: I changed 'flex-col-2' to 'flex-col' and added 'w-full'
+        to make the inner divs stretch across the full width.
+    */}
 
-      <div className="bg-blue-500 flex justify-around flex-col items-center gap-3 p-2 rounded-lg">
-         {/* Puzzle Complete Score @+5 */}
-         <div className="flex items-center space-x-2">
-          <span>Puzzle Completion Score: {100 + (5 * user.settings.puzzlecompletionscore)}</span>
-          <button
-            disabled = {usedupTokens}
-            className={`px-2 py-1 text-white rounded
-            ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
-            onClick={() => incrementSetting("puzzlecompletionscore", 1)}
-          >
-            +5s
-          </button>
-          <button
-             className={`px-2 py-1 text-white rounded
-             ${user.settings.puzzlecompletionscore === 0 ? "bg-gray-300" : "bg-red-500"}`}
-            onClick={() => decrementSetting("puzzlecompletionscore", 1)}
-          >
-            -5s
-          </button>
-        </div>
-        {/* Streak Multiplier @ +1 */}
-        <div className="flex items-center space-x-2">
-          <span>Streak Multiplier: {10 + (user.settings.streakMultiplier)}</span>
-          <button
-            disabled = {usedupTokens}
-            className={`px-2 py-1 text-white rounded
-            ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
-            onClick={() => incrementSetting("streakMultiplier", 1)}
-          >
-            +1
-          </button>
-          <button
-           className={`px-2 py-1 text-white rounded
-           ${user.settings.streakMultiplier === 0 ? "bg-gray-300" : "bg-red-500"}`}
-            onClick={() => decrementSetting("streakMultiplier", 1)}
-          >
-            -1
-          </button>
-        </div>
+    {/* Puzzle Complete Score @+5 */}
+    <div className="flex items-center justify-between w-full space-x-2">
+        {/* Label on the Left */}
+        <span>Puzzle Completion Score: {100 + (5 * user.settings.puzzlecompletionscore)}</span>
 
-        {/* Time Duration @ +1*/}
-        <div className="flex items-center space-x-2">
-          <span>Game Time Duration: {180 + (5 * user.settings.timeDuration)}s</span>
-          <button
-            disabled = {usedupTokens}
-            className={`px-2 py-1 text-white rounded
-            ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
-            onClick={() => incrementSetting("timeDuration", 1)}
-          >
-            +5
-          </button>
-          <button
-            className={`px-2 py-1 text-white rounded
-            ${user.settings.timeDuration === 0 ? "bg-gray-300" : "bg-red-500"}`}
-            onClick={() => decrementSetting("timeDuration", 1)}
-          >
-            -5
-          </button>
+        {/* Buttons on the Right */}
+        <div className="flex space-x-2">
+            <button
+                disabled={usedupTokens}
+                className={`px-2 py-1 text-white rounded ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
+                onClick={() => incrementSetting("puzzlecompletionscore", 1)}
+            >
+                +5s
+            </button>
+            <button
+                className={`px-2 py-1 text-white rounded ${user.settings.puzzlecompletionscore === 0 ? "bg-gray-300" : "bg-red-500"}`}
+                onClick={() => decrementSetting("puzzlecompletionscore", 1)}
+            >
+                -5s
+            </button>
         </div>
+    </div>
 
-        {/* Turbo Bonus @ +5 */}
-        <div className="flex items-center space-x-2">
-          <span>Turbo Bonus: {200 + (4 * user.settings.turboBonus)}</span>
-          <button
-            disabled = {usedupTokens}
-            className={`px-2 py-1 text-white rounded
-            ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
-            onClick={() => incrementSetting("turboBonus", 1)}
-          >
-            +4
-          </button>
-          <button
-            className={`px-2 py-1 text-white rounded
-            ${user.settings.turboBonus === 0 ? "bg-gray-300" : "bg-red-500"}`}
-            onClick={() => decrementSetting("turboBonus", 1)}
-          >
-            -4
-          </button>
-        </div>
+    {/* Streak Multiplier @ +1 */}
+    <div className="flex items-center justify-between w-full space-x-2">
+        {/* Label on the Left */}
+        <span>Streak Multiplier: {10 + (user.settings.streakMultiplier)}</span>
 
-        {/*turbocountdown= 30 + (2 * user.user.settings.turbocountdown);     @ +2 */}
-        <div className="flex items-center space-x-2">
-          <span>Turbo Countdown: {30 + (2 * user.settings.turbocountdown)}s</span>
-          <button
-            disabled = {usedupTokens}
-            className={`px-2 py-1 text-white rounded
-            ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
-            onClick={() => incrementSetting("turbocountdown", 1)}
-          >
-            +2
-          </button>
-          <button
-            className={`px-2 py-1 text-white rounded
-            ${user.settings.turbocountdown === 0 ? "bg-gray-300" : "bg-red-500"}`}
-            onClick={() => decrementSetting("turbocountdown", 1)}
-          >
-            -2
-          </button>
+        {/* Buttons on the Right */}
+        <div className="flex space-x-2">
+            <button
+                disabled={usedupTokens}
+                className={`px-2 py-1 text-white rounded ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
+                onClick={() => incrementSetting("streakMultiplier", 1)}
+            >
+                +1
+            </button>
+            <button
+                className={`px-2 py-1 text-white rounded ${user.settings.streakMultiplier === 0 ? "bg-gray-300" : "bg-red-500"}`}
+                onClick={() => decrementSetting("streakMultiplier", 1)}
+            >
+                -1
+            </button>
         </div>
+    </div>
 
-        {/*  const timeMultiplier = 10 + (user.user.settings.timeMultiplier)    @ +1 */}
-        <div className="flex items-center space-x-2">
-          <span>Elapsed Time Multiplier: {10 + (user.settings.timeMultiplier)}</span>
-          <button
-            disabled = {usedupTokens}
-            className={`px-2 py-1 text-white rounded
-            ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
-            onClick={() => incrementSetting("timeMultiplier", 1)}
-          >
-            +1
-          </button>
-          <button
-            className={`px-2 py-1 text-white rounded
-            ${user.settings.timeMultiplier === 0 ? "bg-gray-300" : "bg-red-500"}`}
-            onClick={() => decrementSetting("timeMultiplier", 1)}
-          >
-            -1
-          </button>
-        </div>
+    {/* Time Duration @ +1*/}
+    <div className="flex items-center justify-between w-full space-x-2">
+        {/* Label on the Left */}
+        <span>Game Time Duration: {180 + (5 * user.settings.timeDuration)}s</span>
 
-        <button>Save</button>
+        {/* Buttons on the Right */}
+        <div className="flex space-x-2">
+            <button
+                disabled={usedupTokens}
+                className={`px-2 py-1 text-white rounded ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
+                onClick={() => incrementSetting("timeDuration", 1)}
+            >
+                +5
+            </button>
+            <button
+                className={`px-2 py-1 text-white rounded ${user.settings.timeDuration === 0 ? "bg-gray-300" : "bg-red-500"}`}
+                onClick={() => decrementSetting("timeDuration", 1)}
+            >
+                -5
+            </button>
         </div>
+    </div>
+
+    {/* Turbo Bonus @ +5 */}
+    <div className="flex items-center justify-between w-full space-x-2">
+        {/* Label on the Left */}
+        <span>Turbo Bonus: {200 + (4 * user.settings.turboBonus)}</span>
+
+        {/* Buttons on the Right */}
+        <div className="flex space-x-2">
+            <button
+                disabled={usedupTokens}
+                className={`px-2 py-1 text-white rounded ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
+                onClick={() => incrementSetting("turboBonus", 1)}
+            >
+                +4
+            </button>
+            <button
+                className={`px-2 py-1 text-white rounded ${user.settings.turboBonus === 0 ? "bg-gray-300" : "bg-red-500"}`}
+                onClick={() => decrementSetting("turboBonus", 1)}
+            >
+                -4
+            </button>
+        </div>
+    </div>
+
+    {/* Turbo Countdown @ +2 */}
+    <div className="flex items-center justify-between w-full space-x-2">
+        {/* Label on the Left */}
+        <span>Turbo Countdown: {30 + (2 * user.settings.turbocountdown)}s</span>
+
+        {/* Buttons on the Right */}
+        <div className="flex space-x-2">
+            <button
+                disabled={usedupTokens}
+                className={`px-2 py-1 text-white rounded ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
+                onClick={() => incrementSetting("turbocountdown", 1)}
+            >
+                +2
+            </button>
+            <button
+                className={`px-2 py-1 text-white rounded ${user.settings.turbocountdown === 0 ? "bg-gray-300" : "bg-red-500"}`}
+                onClick={() => decrementSetting("turbocountdown", 1)}
+            >
+                -2
+            </button>
+        </div>
+    </div>
+
+    {/* Elapsed Time Multiplier @ +1 */}
+    <div className="flex items-center justify-between w-full space-x-2">
+        {/* Label on the Left */}
+        <span>Elapsed Time Multiplier: {10 + (user.settings.timeMultiplier)}</span>
+
+        {/* Buttons on the Right */}
+        <div className="flex space-x-2">
+            <button
+                disabled={usedupTokens}
+                className={`px-2 py-1 text-white rounded ${usedupTokens ? "bg-gray-300" : "bg-green-500"}`}
+                onClick={() => incrementSetting("timeMultiplier", 1)}
+            >
+                +1
+            </button>
+            <button
+                className={`px-2 py-1 text-white rounded ${user.settings.timeMultiplier === 0 ? "bg-gray-300" : "bg-red-500"}`}
+                onClick={() => decrementSetting("timeMultiplier", 1)}
+            >
+                -1
+            </button>
+        </div>
+    </div>
+
+    <button>Save</button>
+</div>
+</div>
 
       </div>
     </div>
