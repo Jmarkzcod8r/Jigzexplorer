@@ -72,13 +72,13 @@ interface UserProfileState {
 /* ----------------- Defaults ----------------- */
 
 const defaultSettings: UserSettings = {
-  tokens: 0,
-  streakMultiplier: 1,
-  timeMultiplier: 1,
-  timeDuration: 1,
-  turboBonus: 1,
-  turbocountdown: 1,
-  puzzlecompletionscore: 1,
+  tokens: 3,
+  streakMultiplier: 0,
+  timeMultiplier: 0,
+  timeDuration: 0,
+  turboBonus: 0,
+  turbocountdown: 0,
+  puzzlecompletionscore: 0,
 
 };
 

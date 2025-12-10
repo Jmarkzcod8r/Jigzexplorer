@@ -62,7 +62,7 @@ const JigsawPuzzle: React.FC = () => {
 
 
   const [countdown, setCountdown] = useState(0);
-  const [quotaPics, setQuotaPics] = useState(2);
+  const [quotaPics, setQuotaPics] = useState(10);
                                                                              // Max Tokens: 30
   const [baseCoins, setBaseCoins] = useState (10);                           // for coins           + 1   /10
 
