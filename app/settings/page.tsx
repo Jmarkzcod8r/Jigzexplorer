@@ -30,7 +30,7 @@ const SettingsPage = () => {
 
   // 🆕 CALCULATE USED TOKENS
   // Define the keys from UserSettings that should contribute to the "used" tokens.
-  // We exclude 'tokens' itself.
+  // We exclude 'tokens' itself..
   const usedTokenKeys = [
     "streakMultiplier",
     "timeMultiplier",
