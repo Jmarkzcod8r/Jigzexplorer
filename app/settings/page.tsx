@@ -136,10 +136,10 @@ const modifyPendingSetting = (field: keyof typeof pendingSettings, amount: numbe
       <Logo />
       </div>
       <div className="p-4 bg-gray-100 rounded mt-4">
-  <h2 className="font-bold mb-2">Pending Settings (Preview)</h2>
+  {/* <h2 className="font-bold mb-2">Pending Settings (Preview)</h2>
   <pre className="text-sm">
     {JSON.stringify(pendingSettings, null, 2)}
-  </pre>
+  </pre> */}
 </div>
 
 
