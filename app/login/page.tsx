@@ -181,7 +181,7 @@ const newUserData = {
           const data = userSnap.data();
           const premiumStatus = data?.premium?.active ?? false;
 
-          console.log("ℹ️ Existing Firestore profile found:", data);
+          // console.log("ℹ️ Existing Firestore profile found:", data);
           // localStorage.setItem("premium", JSON.stringify(premiumStatus));
 
           // ✅ Also update Zustand with Firestore data
@@ -224,7 +224,7 @@ const newUserData = {
       onClick={signIn}
     >
       {/* Hover effect background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
+      <div className="absolute inset-0  from-blue-500 to-purple-500 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
 
       <FcGoogle fontSize={28} className="transition-transform group-hover:scale-110 duration-300" />
       <span className="ml-3 text-lg font-medium text-gray-700 group-hover:text-gray-900 transition-colors">

@@ -72,7 +72,7 @@ const JigsawPuzzle: React.FC = () => {
 
 
   const [countdown, setCountdown] = useState(0);
-  const [quotaPics, setQuotaPics] = useState(1);
+  const [quotaPics, setQuotaPics] = useState(10);
                                                                              // Max Tokens: 30
   const [baseCoins, setBaseCoins] = useState (10);                           // for coins           + 1   /10
 
@@ -431,14 +431,14 @@ useEffect(() => {
       const loggedIn = isUserLoggedIn()
 
       Swal.fire({
-        title: "🎉 Congratulationssss!",
+        title: "🎉 Congratulations! 🎉",
         html: `
           <div style="text-align: center; width: 100%;">
             <b style="font-size: 18px; display: block;">Over-All Score</b>
             <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
               🏆 ${score + (streak * streakmultiplier) + (elapsedTime * timeMultiplier)} 🏆
             </div>
-            <div>${score}..${streak}..${streakmultiplier}..${elapsedTime}..${timeMultiplier}..</div>
+
             <div>Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
             <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
               <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
