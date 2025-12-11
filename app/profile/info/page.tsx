@@ -136,7 +136,7 @@ export default function ProfileView() {
   if (!user) return <p>Loading user data...</p>;
 
   return (
-    <div className="p-8 min-h-screen bg-gray-100 font-sans flex justify-center">
+    <div className="p-8 min-h-screen bg-blue-100 font-sans flex justify-center">
       <div className='max-w-3xl text-center'>
       <Logo />
       <h1 className="text-3xl font-bold mb-6">User Profile</h1>

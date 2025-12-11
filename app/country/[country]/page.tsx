@@ -23,15 +23,25 @@ const JigsawPuzzle: React.FC = () => {
   const { country } = useParams<{ country: string }>(); // ✅ dynamic segment param
   const [imageList, setImageList] = useState<string[]>([]);
 
-
+  const [defaultcountry, setDefautcountry] = useState(country)
   const [coins, setCoins] = useState(0);
   const [enableCoins, setEnableCoins] = useState(true);
+
+  const countries = [
+    "Denmark", "Estonia", "Finland", "Iceland", "Ireland", "Latvia", "Lithuania",
+    "Norway", "Sweden", "United Kingdom", "Austria", "Belgium", "France", "Germany",
+    "Liechtenstein", "Luxembourg", "Monaco", "Netherlands", "Switzerland", "Albania",
+    "Andorra", "Bosnia and Herzegovina", "Croatia", "Greece", "Italy", "Malta",
+    "Montenegro", "North Macedonia", "Portugal", "San Marino", "Serbia", "Slovenia",
+    "Spain", "Vatican City", "Belarus", "Bulgaria", "Czechia", "Hungary", "Moldova",
+    "Poland", "Romania", "Slovakia", "Ukraine"
+  ];
 
   // Fetch images for the given country
   useEffect(() => {
     const fetchImages = async () => {
         try {
-          const res = await axios.get<string[]>(`/api/images/${country}`);
+          const res = await axios.get<string[]>(`/api/images/${defaultcountry}`);
           const shuffled = [...res.data].sort(() => Math.random() - 0.5);
           setImageList(shuffled);
         } catch (err) {
@@ -40,9 +50,9 @@ const JigsawPuzzle: React.FC = () => {
         }
       };
 
-    if (country) fetchImages();
+    if (defaultcountry) fetchImages();
 
-  }, [country]);
+  }, [defaultcountry]);
 
   const user = useUpdateUserProfile()
 
@@ -62,7 +72,7 @@ const JigsawPuzzle: React.FC = () => {
 
 
   const [countdown, setCountdown] = useState(0);
-  const [quotaPics, setQuotaPics] = useState(10);
+  const [quotaPics, setQuotaPics] = useState(1);
                                                                              // Max Tokens: 30
   const [baseCoins, setBaseCoins] = useState (10);                           // for coins           + 1   /10
 
@@ -423,40 +433,54 @@ useEffect(() => {
       Swal.fire({
         title: "🎉 Congratulationssss!",
         html: `
-        <div style="text-align: center; width: 100%;">
-          <b style="font-size: 18px; display: block;">Over-All Score</b>
-          <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
-            🏆 ${score + streak * streakmultiplier + elapsedTime * timeMultiplier} 🏆
-          </div>
-          <div >Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
-          <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
-            <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
-            <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
-              <div><b>Raw Score:</b> ${score}</div>
-              <div><b>Streak:</b> ${streak} × ${user.user.settings.streakMultiplier }</div>
-              <div><b>Time Spent:</b> ${elapsedTime}s</div>
-              <div style="margin-top: 10px;"><b>Over-All Score Formula:</b></div>
-              <div>Raw Score + Streak + Time Spent</div>
-              <div style="margin-top: 10px;"><b>Tickets Earned:</b> +2 🎟</div>
+          <div style="text-align: center; width: 100%;">
+            <b style="font-size: 18px; display: block;">Over-All Score</b>
+            <div style="margin: 15px 0; font-size: 45px; font-weight: bold; color: #10b981; display: flex; justify-content: center; align-items: center; gap: 10px;">
+              🏆 ${score + (streak * streakmultiplier) + (elapsedTime * timeMultiplier)} 🏆
             </div>
-          </div>
+            <div>${score}..${streak}..${streakmultiplier}..${elapsedTime}..${timeMultiplier}..</div>
+            <div>Previous ATH: ${user.user.countries[country]?.ATH ?? 0}</div>
+            <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 15px 0; display: inline-block; min-width: 280px;">
+              <b style="display: block; margin-bottom: 10px; font-size: 16px;">You solved ${quotaPics} puzzles!</b>
+              <div style="text-align: center; display: flex; flex-direction: column; gap: 5px;">
+                <div><b>Raw Score:</b> ${score}</div>
+                <div><b>Streak:</b> ${streak} × ${streakmultiplier }</div>
+                <div><b>Time Spent:</b> ${elapsedTime}s x ${timeMultiplier}</div>
+                <div style="margin-top: 10px;"><b>Over-All Score Formula:</b></div>
+                <div>Raw Score + Streak + Time Spent</div>
+                <div style="margin-top: 10px;"><b>Tickets Earned:</b> +2 🎟</div>
+              </div>
+            </div>
 
-          ${loggedIn
-            ? `<div style="color: #059669; margin-top: 15px; display: block;">✅ Your score has been saved!</div>`
-            : `<div style="color: #2563eb; margin-top: 15px; display: block;"><b>🔒 Login to save and share your score!</b></div>`
-          }
-        </div>
-      `,
+            ${loggedIn
+              ? `<div style="color: #059669; margin-top: 15px; display: block;">✅ Your score has been saved!</div>`
+              : `<div style="color: #2563eb; margin-top: 15px; display: block;"><b>🔒 Login to save and share your score!</b></div>`
+            }
+          </div>
+        `,
         icon: "success",
         showCancelButton: true,
+        // showDenyButton: true,       // ✅ Add third button
         confirmButtonText: "Nice!",
-        cancelButtonText: "Restart s🔄",
+        cancelButtonText: "Restart🔄",
+        // denyButtonText: "Continue", // Your third button
       }).then((result) => {
-        if (result.dismiss === Swal.DismissReason.cancel) {
+        if (result.isConfirmed) {
+          console.log("User clicked Nice!");
+        } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
           restartGame();
-          // window.location.reload()
+          setTurbo(false)
         }
-      })
+        // else if (result.isDenied) {
+        //   setDefautcountry('denmark');
+        //   hasFiredRef.current = false
+        //   setSolvedPuzzlesCount(0);
+        //   setCompletedStatus([]);
+        //   console.log("User clicked Share Score");
+        //   // Add your share logic here
+        // }
+      });
+
 
       if (loggedIn) {
         // Save to Firestore / backend
@@ -484,7 +508,7 @@ useEffect(() => {
             await updateOverallScore(
               user.user.uid,
               country.toLowerCase(),
-              score + streak * 10 + elapsedTime
+              score + (streak * streakmultiplier) + (elapsedTime * timeMultiplier)
             )
           }
 

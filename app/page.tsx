@@ -288,7 +288,7 @@ const countryFlags: Record<string, string> = {
           hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center">
             Settings
           </button>
-          <button
+          {/* <button
             onClick={() => {
               router.push("/reset");
             }}
@@ -296,7 +296,7 @@ const countryFlags: Record<string, string> = {
           text-gray-800 rounded-lg text-lg sm:text-2xl shadow
           hover:bg-blue-600 hover:text-white transition duration-300 cursor-pointer  justify-center">
             Reset
-          </button>
+          </button> */}
 
 
     {/* <button

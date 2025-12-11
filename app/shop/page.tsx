@@ -284,7 +284,9 @@ useEffect(() => {
       <h2 className="text-base sm:text-lg font-semibold text-gray-700">
         🎟️ Tickets: <span className="text-blue-600">{user.tickets}</span>
       </h2>
-      <h3>{user.overallscore}</h3>
+      <h2 className="text-base sm:text-lg font-semibold text-gray-700">
+      🟡 Tokens: <span className="text-blue-600">{user.settings.tokens}</span>
+      </h2>
     </div>
 
     {/* Score Form */}
@@ -294,7 +296,7 @@ useEffect(() => {
     >
       <div className="space-y-4">
 
-        <h3 className="text-center"> Solve puzzles and gain tickets to unlock more countries</h3>
+        <h3 className="text-center"> Solve puzzles to gain tickets to unlock more countries and tokens to improve gameplay</h3>
         <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
           🌍 Countries
           <span className="text-sm font-normal text-gray-500">

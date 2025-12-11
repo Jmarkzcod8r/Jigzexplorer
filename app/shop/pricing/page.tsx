@@ -21,7 +21,7 @@ const PremiumWelcome = () => {
     "All access to countries",
     // "All access to reusable pictures",
     "Early access to future new features and updates",
-    "An opportunity to share your pictures as puzzles for the world to see",
+    // "An opportunity to share your pictures as puzzles for the world to see",
   ];
 
   const freeFeatures = [
@@ -216,7 +216,7 @@ const PremiumWelcome = () => {
         {/* Free Package Card */}
         <div className="bg-white shadow-xl rounded-2xl max-w-lg w-full p-8 text-center">
           <h1 className="text-3xl font-bold text-gray-700 mb-2">🆓 Free Package</h1>
-            <h2>{user.user.email}</h2>
+            {/* <h2>{user.user.email}</h2> */}
             {/* <h2>{Environment.env}</h2> */}
           <p className="text-gray-500 mb-6 text-lg font-medium">Enjoy the basics for free</p>
 
@@ -255,9 +255,9 @@ const PremiumWelcome = () => {
           <h1 className="text-3xl font-bold text-blue-600 mb-2">
             🎉 Premium Package
           </h1>
-                {env.env}
+                {/* {env.env} */}
           <p className="text-gray-500 mb-6 text-lg font-medium">
-            Only <span className="text-blue-600 font-bold">$3/month</span>
+            Only <span className="text-blue-600 font-bold">$5/month</span>
           </p>
 
           {/* <p className="text-gray-700 mb-6">

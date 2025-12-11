@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="p-4 bg-gray-100 flex  justify-around">
+        {/* <header className="p-4 bg-gray-100 flex  justify-around">
           {user?.email ? (
             <p className="text-sm text-gray-700">Logged in as: {user.email}</p>
           ) : (
@@ -86,7 +86,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <p>pstreak multiplier: {user.settings.streakMultiplier}</p>
           <p>time Duration: {user.settings.timeDuration}</p>
           <p>time Multiplier:(elapsed time) {user.settings.timeMultiplier}</p>
-        </header>
+        </header> */}
 
         {children}
       </body>
