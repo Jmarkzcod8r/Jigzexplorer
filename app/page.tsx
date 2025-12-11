@@ -322,11 +322,7 @@ const countryFlags: Record<string, string> = {
     {/* Top controls: Back + Marathon + Progress */}
     <div className="col-span-3 sm:col-span-4 flex justify-center gap-4 sm:gap-10 items-center  mb-4 px-2">
       {/* Back button */}
-      <div
-          // onClick={() => setMenu("main")}
-          // className="cursor-pointer flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-200
-          //           text-gray-700 rounded-lg shadow hover:bg-gray-400 transition duration-300 text-sm sm:text-base"
-        >
+      <div  >
           {/* <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> */}
 
           <GlobeButton setMenu={function (menu: string): void {
@@ -344,10 +340,13 @@ const countryFlags: Record<string, string> = {
       </button> */}
 
       {/* Progress label */}
-      <span className="text-xs sm:text-sm  text-gray-800 bg-gray-300 p-3 rounded-md">
-        {availableCountries.length}/{countries.length} (
-        {((availableCountries.length / countries.length) * 100).toFixed(1)}%)
-      </span>
+      <h1 className="text-xs sm:text-sm bg-green-600 opacity-100/15  text-white p-3 rounded-md
+  drop-shadow-[0_0_4px_rgba(255,255,0,0.8)]
+">
+  {availableCountries.length}/{countries.length} (
+  {((availableCountries.length / countries.length) * 100).toFixed(1)}%)
+</h1>
+
     </div>
 
     {/* Country buttons */}

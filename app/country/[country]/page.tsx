@@ -1083,7 +1083,7 @@ useEffect(() => {
               className="cursor-pointer px-4 py-2 bg-blue-500 text-white font-semibold rounded-xl shadow-md
                         hover:bg-blue-600 active:scale-95 transition transform"
             >
-              💡 Hint {puzzlecompletionscore}
+              💡 Hint
             </button>
 
             <button
