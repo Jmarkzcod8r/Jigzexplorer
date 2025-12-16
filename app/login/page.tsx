@@ -148,13 +148,13 @@ const newUserData = {
   },
 
   settings: {
-    tokens: 0,
-    streakMultiplier: 1,
-    timeMultiplier: 1,
-    timeDuration: 60,
+    tokens: 3,
+    streakMultiplier: 0,
+    timeMultiplier: 0,
+    timeDuration: 0,
     turboBonus: 0,
-    turbocountdown: 30,
-    puzzlecompletionscore: 50,
+    turbocountdown: 0,
+    puzzlecompletionscore: 0,
   },
 
   countries: Object.fromEntries(
